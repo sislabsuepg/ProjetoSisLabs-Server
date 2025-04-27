@@ -1,9 +1,11 @@
 import express from "express"
-
+import connection from "./database"
+import homeRoutes from "./routes/homeRoutes"
 class App{
     app: any
 
     constructor(){
+        connection.sync({force:true})
         this.app = express()
         this.middlewares()
         this.routes()
@@ -15,7 +17,7 @@ class App{
     }
 
     routes(){
-        //this.app.use()
+        this.app.use("/", homeRoutes)
     }
 
 }
