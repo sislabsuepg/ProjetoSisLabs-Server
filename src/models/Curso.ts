@@ -1,4 +1,4 @@
-import { Optional } from "sequelize"
+import { Optional } from "sequelize";
 
 import {
   Table,
@@ -6,44 +6,45 @@ import {
   Column,
   DataType,
   PrimaryKey,
-  NotNull,
-  NotEmpty,
-  Length,
   AllowNull,
-  UpdatedAt,
+  NotEmpty,
   AutoIncrement,
-  HasMany
-} from "sequelize-typescript"
-import Aluno from "./Aluno"
+  HasMany,
+  Unique,
+} from "sequelize-typescript";
+import Aluno from "./Aluno";
 
 interface CursoAtributos {
-  id:number,
-  nome:string
+  id: number;
+  nome: string;
 }
 
-interface CursoCreationAtributos extends Optional<CursoAtributos, 'id'> {}
+interface CursoCreationAtributos extends Optional<CursoAtributos, "id"> {}
 
-@Table(
-  {
-    tableName: 'Cursos',
-    modelName: 'Curso',
-    timestamps:false
-  }
-)
-export default class Curso extends Model<CursoAtributos, CursoCreationAtributos>{
+@Table({
+  tableName: "Cursos",
+  modelName: "Curso",
+  timestamps: false,
+})
+export default class Curso extends Model<
+  CursoAtributos,
+  CursoCreationAtributos
+> {
   @PrimaryKey
   @AutoIncrement
   @Column({
-      type: DataType.INTEGER,
+    type: DataType.INTEGER,
   })
-  declare id: number
+  declare id: number;
 
-  @Length({msg: "Tamanho invalido", min:4, max:40})
+  @NotEmpty
+  @Unique(true)
+  @AllowNull(false)
   @Column({
-    type: DataType.STRING,    
+    type: DataType.STRING(40),
   })
-  declare nome: string
+  declare nome: string;
 
-  @HasMany(()=>Aluno)
-  declare alunos:Aluno[]
+  @HasMany(() => Aluno)
+  declare alunos: Aluno[];
 }

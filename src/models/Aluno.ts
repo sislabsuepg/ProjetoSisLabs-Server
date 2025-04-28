@@ -1,83 +1,91 @@
-import Curso from './Curso'
+import Curso from "./Curso";
 
 import { Optional } from "sequelize";
 
 import {
-    Table,
-    Model,
-    Column,
-    DataType,
-    PrimaryKey,
-    AutoIncrement,
-    BelongsTo,
-    NotNull,
-    AllowNull,
-    ForeignKey
-} from "sequelize-typescript"
-import { Col } from "sequelize/types/utils";
-import { NumericLiteral } from 'typescript';
-import { isAlphanumericLocales } from "validator";
+  Table,
+  Model,
+  Column,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  AllowNull,
+  ForeignKey,
+  NotNull,
+  NotEmpty,
+  Default,
+} from "sequelize-typescript";
 
 interface AlunoAtributos {
-    id: number,
-    nome: string,
-    telefone: string,
-    ano: number,
-    email: string,
-    senha: string,
-    ativo: boolean
+  id: number;
+  nome: string;
+  telefone: string;
+  ano: number;
+  email: string;
+  senha: string;
+  ativo: boolean;
 }
 
-interface AlunoCreationAtributos extends Optional<AlunoAtributos, 'id' | 'telefone' | 'senha' | 'ativo'> {}
+interface AlunoCreationAtributos
+  extends Optional<AlunoAtributos, "id" | "telefone" | "senha" | "ativo"> {}
 
 @Table({
-    tableName: 'Alunos',
-    modelName: 'Aluno',
-    timestamps:false
+  tableName: "Alunos",
+  modelName: "Aluno",
+  timestamps: false,
 })
-export default class Aluno extends Model<AlunoAtributos, AlunoCreationAtributos>{
-    @PrimaryKey
-    @AutoIncrement
-    @Column({
-        type: DataType.INTEGER,
-    })
-    declare id: number
+export default class Aluno extends Model<
+  AlunoAtributos,
+  AlunoCreationAtributos
+> {
+  @PrimaryKey
+  @Column({
+    type: DataType.STRING(13),
+  })
+  declare ra: string;
 
-    @Column({
-        type: DataType.STRING
-    })
-    declare nome: string
+  @AllowNull(false)
+  @NotEmpty
+  @Column({
+    type: DataType.STRING(40),
+  })
+  declare nome: string;
 
-    @Column({
-        type: DataType.STRING
-    })
-    declare telefone:string
+  @Column({
+    type: DataType.STRING(15),
+  })
+  declare telefone: string;
 
-    @Column({
-        type: DataType.INTEGER
-    })
-    declare ano: number
+  @AllowNull(false)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare ano: number;
 
-    @Column({
-        type: DataType.STRING
-    })
-    declare email:string
+  @AllowNull(false)
+  @NotEmpty
+  @Column({
+    type: DataType.STRING(50),
+  })
+  declare email: string;
 
-    @Column({
-        type: DataType.STRING
-    })
-    declare senha:string
+  @NotEmpty
+  @Column({
+    type: DataType.STRING(6),
+  })
+  declare senha: string;
 
-    @Column({
-        type: DataType.BOOLEAN
-    })
-    declare ativo: boolean
+  @Default(true)
+  @AllowNull(false)
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  declare ativo: boolean;
 
-    @ForeignKey(() => Curso)
-    @AllowNull(false)
-    @Column({
-        type: DataType.INTEGER
-    })
-    declare idCurso: number;
-
+  @ForeignKey(() => Curso)
+  @AllowNull(false)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare idCurso: number;
 }

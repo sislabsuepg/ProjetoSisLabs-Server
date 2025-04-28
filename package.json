@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec tsx src/server.ts",
+    "dev": "nodemon --watch 'src' --exec tsx src/server.ts",
     "start": "node dist/server.js"
   },
   "repository": {
