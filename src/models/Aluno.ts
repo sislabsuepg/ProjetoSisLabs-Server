@@ -98,6 +98,14 @@ export default class Aluno extends Model<
   declare idCurso: number;
 
   @BeforeCreate
+  static preparaNome(instance: Aluno) {
+    instance.nome = instance.nome
+      .split(" ")
+      .map((n) => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase())
+      .join(" ");
+  }
+
+  @BeforeCreate
   static async hashSenha(instance: Aluno) {
     instance.senha = await bcrypt.hash(instance.senha, 3);
   }
