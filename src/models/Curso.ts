@@ -34,9 +34,9 @@ export default class Curso extends Model<CursoAtributos, CursoCreationAtributos>
   @Column({
       type: DataType.INTEGER,
   })
-  declare id: string
+  declare id: number
 
-  @Length({msg: "Tamanho invalido", min:4, max:50})
+  @Length({msg: "Tamanho invalido", min:4, max:40})
   @Column({
     type: DataType.STRING,    
   })
