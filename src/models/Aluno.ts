@@ -1,5 +1,7 @@
 import Curso from "./Curso";
 
+import bcrypt from "bcryptjs";
+
 import { Optional } from "sequelize";
 
 import {
@@ -14,6 +16,7 @@ import {
   NotNull,
   NotEmpty,
   Default,
+  BeforeCreate,
 } from "sequelize-typescript";
 
 interface AlunoAtributos {
@@ -69,11 +72,16 @@ export default class Aluno extends Model<
   })
   declare email: string;
 
-  @NotEmpty
+  @Default("")
   @Column({
     type: DataType.STRING(6),
   })
   declare senha: string;
+
+  @Column({
+    type: DataType.VIRTUAL,
+  })
+  declare senhaInserida: string;
 
   @Default(true)
   @AllowNull(false)
@@ -88,4 +96,13 @@ export default class Aluno extends Model<
     type: DataType.INTEGER,
   })
   declare idCurso: number;
+
+  @BeforeCreate
+  static async hashSenha(instance: Aluno) {
+    instance.senha = await bcrypt.hash(instance.senha, 3);
+  }
+
+  static async verificaSenha(senhaInserida: string, senha: string) {
+    return await bcrypt.compare(senhaInserida, senha);
+  }
 }
