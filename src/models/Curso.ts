@@ -11,8 +11,10 @@ import {
   Length,
   AllowNull,
   UpdatedAt,
-  AutoIncrement
+  AutoIncrement,
+  HasMany
 } from "sequelize-typescript"
+import Aluno from "./Aluno"
 
 interface CursoAtributos {
   id:number,
@@ -42,4 +44,6 @@ export default class Curso extends Model<CursoAtributos, CursoCreationAtributos>
   })
   declare nome: string
 
+  @HasMany(()=>Aluno)
+  declare alunos:Aluno[]
 }

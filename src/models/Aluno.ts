@@ -10,7 +10,9 @@ import {
     PrimaryKey,
     AutoIncrement,
     BelongsTo,
-    NotNull
+    NotNull,
+    AllowNull,
+    ForeignKey
 } from "sequelize-typescript"
 import { Col } from "sequelize/types/utils";
 import { NumericLiteral } from 'typescript';
@@ -71,12 +73,11 @@ export default class Aluno extends Model<AlunoAtributos, AlunoCreationAtributos>
     })
     declare ativo: boolean
 
-    @BelongsTo(()=>Curso, 'idCurso')
+    @ForeignKey(() => Curso)
+    @AllowNull(false)
     @Column({
         type: DataType.INTEGER
     })
-    @NotNull
-    declare idCurso: number
-    
+    declare idCurso: number;
 
 }
