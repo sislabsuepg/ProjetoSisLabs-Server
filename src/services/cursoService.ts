@@ -5,11 +5,8 @@ export default class CursoService {
     if (!nome) {
       return ["Nome do curso é obrigatório"];
     }
-    if (nome.length < 3) {
-      return ["Nome do curso deve ter pelo menos 3 caracteres"];
-    }
-    if (nome.length > 40) {
-      return ["Nome do curso deve ter no máximo 40 caracteres"];
+    if (nome.length < 3 || nome.length > 40) {
+      return ["Nome do curso deve ter entre 3 e 40 caracteres"];
     }
     if (!/^[a-zA-Z0-9 ]+$/.test(nome)) {
       return ["Nome do curso deve conter apenas letras e números"];
@@ -18,7 +15,11 @@ export default class CursoService {
   }
 
   static async getAllCursos() {
-    return await Curso.findAll();
+    return (
+      (await Curso.findAll({
+        order: [["nome", "ASC"]],
+      })) || []
+    );
   }
 
   static async getCursoById(id: number) {
@@ -26,17 +27,17 @@ export default class CursoService {
   }
 
   static async getCursoByNome(nome: string) {
-    let teste = this.verificaNome(nome);
-    if (teste.length > 0) {
-      return Promise.reject(teste);
+    let erros = this.verificaNome(nome);
+    if (erros.length > 0) {
+      return Promise.reject(erros);
     }
     return await Curso.findOne({ where: { nome } });
   }
 
   static async createCurso(nome: string) {
-    let teste = this.verificaNome(nome);
-    if (teste.length > 0) {
-      return Promise.reject(teste);
+    let erros = this.verificaNome(nome);
+    if (erros.length > 0) {
+      return Promise.reject(erros);
     }
 
     const cursoExistente = await Curso.findOne({ where: { nome } });
@@ -48,9 +49,9 @@ export default class CursoService {
   }
 
   static async updateCurso(id: number, nome: string) {
-    let teste = this.verificaNome(nome);
-    if (teste.length > 0) {
-      return Promise.reject(teste);
+    let erros = this.verificaNome(nome);
+    if (erros.length > 0) {
+      return Promise.reject(erros);
     }
     const curso = await Curso.findByPk(id);
     if (curso) {
