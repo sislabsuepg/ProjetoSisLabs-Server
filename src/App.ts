@@ -2,6 +2,7 @@ import express from "express"
 import connection from "./database"
 import homeRoutes from "./routes/homeRoutes"
 import cursoRoutes from  './routes/cursoRoutes'
+import alunoRoutes from './routes/alunoRoutes'
 class App{
     app: any
 
@@ -20,6 +21,7 @@ class App{
     routes(){
         this.app.use("/", homeRoutes)
         this.app.use("/cursos/", cursoRoutes)
+        this.app.use("/alunos/", alunoRoutes)
     }
 
 }
