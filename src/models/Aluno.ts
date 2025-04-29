@@ -1,6 +1,6 @@
 import Curso from "./Curso";
 
-import bcrypt from "bcryptjs";
+import md5 from "md5";
 
 import { Optional } from "sequelize";
 
@@ -107,10 +107,13 @@ export default class Aluno extends Model<
 
   @BeforeCreate
   static async hashSenha(instance: Aluno) {
-    instance.senha = await bcrypt.hash(instance.senha, 3);
+    instance.senha = await md5(instance.senha);
   }
 
   static async verificaSenha(senhaInserida: string, senha: string) {
-    return await bcrypt.compare(senhaInserida, senha);
-  }
+    return new Promise((()=>{
+        return md5(senhaInserida)==md5(senha)
+    }))
+
+}
 }
