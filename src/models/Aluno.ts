@@ -25,6 +25,7 @@ interface AlunoAtributos {
   email: string;
   senha: string;
   ativo: boolean;
+  idCurso: number;
 }
 
 interface AlunoCreationAtributos
@@ -76,11 +77,6 @@ export default class Aluno extends Model<
   })
   declare senha: string;
 
-  @Column({
-    type: DataType.VIRTUAL,
-  })
-  declare senhaInserida: string;
-
   @Default(true)
   @AllowNull(false)
   @Column({
@@ -104,9 +100,9 @@ export default class Aluno extends Model<
   }
 
   @BeforeCreate
-  static defineEmail(instance: Aluno){
-    if(!instance.email){
-      instance.email = instance.ra + "@uepg.br"
+  static defineEmail(instance: Aluno) {
+    if (!instance.email) {
+      instance.email = instance.ra + "@uepg.br";
     }
   }
 
@@ -115,10 +111,11 @@ export default class Aluno extends Model<
     instance.senha = await md5(instance.senha);
   }
 
-  static async verificaSenha(senhaInserida: string, senha: string) {
-    return new Promise((()=>{
-        return md5(senhaInserida)==md5(senha)
-    }))
+  verificaSenha(senhaInserida: string) {
+    return md5(senhaInserida) == this.senha;
+  }
 
-}
+  atualizaSenha(senha: string) {
+    this.senha = md5(senha);
+  }
 }

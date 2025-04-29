@@ -5,33 +5,40 @@ import { Request, Response } from "express";
 
 class CursoController {
   async index(req: Request, res: Response) {
-    const listaCursos = await CursoService.getAllCursos();
-    res.status(listaCursos.status).json(listaCursos);
+    if (!req.query.nome) {
+      const { status, erros, data } = await CursoService.getAllCursos();
+      res.status(status).json({ erros, data });
+    } else {
+      const { status, erros, data } = await CursoService.getCursoByNome(
+        req.query.nome as string
+      );
+      res.status(status).json({ erros, data });
+    }
   }
 
   async show(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const curso = await CursoService.getCursoById(id);
-    res.status(curso.status).json(curso);
+    const { status, erros, data } = await CursoService.getCursoById(id);
+    res.status(status).json({ erros, data });
   }
 
   async store(req: Request, res: Response) {
     const { nome } = req.body;
-    const curso = await CursoService.createCurso(nome);
-    res.status(curso.status).json(curso);
+    const { status, erros, data } = await CursoService.createCurso(nome);
+    res.status(status).json({ erros, data });
   }
 
   async update(req: Request, res: Response) {
     const id = parseInt(req.params.id);
     const { nome } = req.body;
-    const curso = await CursoService.updateCurso(id, nome);
-    res.status(curso.status).json(curso);
+    const { status, erros, data } = await CursoService.updateCurso(id, nome);
+    res.status(status).json({ erros, data });
   }
 
   async destroy(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const curso = await CursoService.deleteCurso(id);
-    res.status(curso.status).json(curso);
+    const { status, erros, data } = await CursoService.deleteCurso(id);
+    res.status(status).json({ erros, data });
   }
 }
 
