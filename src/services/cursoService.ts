@@ -1,6 +1,7 @@
 import Curso from "../models/Curso";
 
 export default class CursoService {
+
   static verificaNome(nome: string) {
     if (!nome) {
       return ["Nome do curso é obrigatório"];
@@ -15,57 +16,125 @@ export default class CursoService {
   }
 
   static async getAllCursos() {
-    return (
-      (await Curso.findAll({
-        order: [["nome", "ASC"]],
-      })) || []
-    );
+    const cursos = await Curso.findAll();
+    if (!cursos) {
+      return {
+        status: 404,
+        erros: ["Nenhum curso encontrado"],
+        data: null
+      };
+    }
+    return {
+      status: 200,
+      erros: [],
+      data: cursos,
+    };
   }
 
   static async getCursoById(id: number) {
-    return await Curso.findByPk(id);
+    const curso = await Curso.findByPk(id);
+    if (!curso) {
+      return {
+        status: 404,
+        erros: ["Curso não encontrado"],
+        data: null
+      };
+    }
+    return {
+      status: 200,
+      erros: [],
+      data: curso,
+    };
   }
 
   static async getCursoByNome(nome: string) {
-    let erros = this.verificaNome(nome);
+    const erros: string[] = this.verificaNome(nome);
     if (erros.length > 0) {
-      return Promise.reject(erros);
+      return {
+        status: 400,
+        erros: erros,
+        data: null
+      };
     }
-    return await Curso.findOne({ where: { nome } });
+    const curso = await Curso.findOne({ where: { nome: nome } });
+    if (!curso) {
+      return {
+        status: 404,
+        erros: ["Curso não encontrado"],
+        data: null
+      };
+    }
+    return {
+      status: 200,
+      erros: [],
+      data: curso,
+    };
   }
 
   static async createCurso(nome: string) {
-    let erros = this.verificaNome(nome);
+    const erros: string[] = this.verificaNome(nome);
     if (erros.length > 0) {
-      return Promise.reject(erros);
+      return {
+        status: 400,
+        erros: erros,
+        data: null
+      };
     }
-
-    const cursoExistente = await Curso.findOne({ where: { nome } });
-    if (cursoExistente) {
-      return Promise.reject(["Curso já existe"]);
+    const curso = await Curso.create({ nome: nome });
+    if (!curso) {
+      return {
+        status: 500,
+        erros: ["Erro ao criar curso"],
+        data: null
+      };
     }
-
-    return await Curso.create({ nome });
+    return {
+      status: 201,
+      erros: [],
+      data: curso,
+    };
   }
 
   static async updateCurso(id: number, nome: string) {
-    let erros = this.verificaNome(nome);
+    const erros: string[] = this.verificaNome(nome);
     if (erros.length > 0) {
-      return Promise.reject(erros);
+      return {
+        status: 400,
+        erros: erros,
+        data: null
+      };
     }
     const curso = await Curso.findByPk(id);
-    if (curso) {
-      curso.nome = nome;
-      return await curso.save();
+    if (!curso) {
+      return {
+        status: 404,
+        erros: ["Curso não encontrado"],
+        data: null
+      };
     }
-    return Promise.reject(["Curso não encontrado"]);
+    curso.nome = nome;
+    await curso.save();
+    return {
+      status: 200,
+      erros: [],
+      data: curso,
+    };
   }
 
   static async deleteCurso(id: number) {
     const curso = await Curso.findByPk(id);
-    if (curso) {
-      return await curso.destroy();
+    if (!curso) {
+      return {
+        status: 404,
+        erros: ["Curso não encontrado"],
+        data: null
+      };
     }
-    return Promise.reject(["Curso não encontrado"]);
+    await curso.destroy();
+    return {
+      status: 200,
+      erros: [],
+      data: null,
+    };
   }
 }

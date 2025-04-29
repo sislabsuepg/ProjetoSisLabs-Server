@@ -10,17 +10,15 @@ import {
   Column,
   DataType,
   PrimaryKey,
-  AutoIncrement,
   AllowNull,
   ForeignKey,
-  NotNull,
   NotEmpty,
   Default,
   BeforeCreate,
 } from "sequelize-typescript";
 
 interface AlunoAtributos {
-  id: number;
+  ra: string;
   nome: string;
   telefone: string;
   ano: number;
@@ -30,7 +28,7 @@ interface AlunoAtributos {
 }
 
 interface AlunoCreationAtributos
-  extends Optional<AlunoAtributos, "id" | "telefone" | "senha" | "ativo"> {}
+  extends Optional<AlunoAtributos, "telefone" | "senha" | "ativo" | "email"> {}
 
 @Table({
   tableName: "Alunos",
@@ -103,6 +101,13 @@ export default class Aluno extends Model<
       .split(" ")
       .map((n) => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase())
       .join(" ");
+  }
+
+  @BeforeCreate
+  static defineEmail(instance: Aluno){
+    if(!instance.email){
+      instance.email = instance.ra + "@uepg.br"
+    }
   }
 
   @BeforeCreate
