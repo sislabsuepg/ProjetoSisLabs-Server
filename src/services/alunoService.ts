@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import Aluno from "../models/Aluno";
-import md5 from "md5";
+import jwt from "jsonwebtoken";
 
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
@@ -309,6 +309,35 @@ export default class AlunoService {
       };
     } catch (e) {
       return { status: 500, erros: ["Erro ao excluir aluno"], data: [] };
+    }
+  }
+
+  static async loginAluno(ra: string, senha: string) {
+    try {
+      const aluno = await Aluno.findByPk(ra);
+      if (!aluno) {
+        return {
+          status: 404,
+          erros: ["RA não encontrado"],
+          data: [],
+        };
+      }
+
+      if (!aluno.verificaSenha(senha)) {
+        return {
+          status: 401,
+          erros: ["senha inválida"],
+          data: [],
+        };
+      }
+
+      return {
+        status: 200,
+        erros: [],
+        data: aluno,
+      };
+    } catch (e) {
+      return { status: 500, erros: ["Erro ao fazer login"], data: [] };
     }
   }
 }

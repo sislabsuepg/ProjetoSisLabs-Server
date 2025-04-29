@@ -16,4 +16,6 @@ router.put("/senha/:id", AlunoController.updateSenha);
 
 router.delete("/:id", AlunoController.destroy);
 
+router.post("/login", AlunoController.login);
+
 export default router;

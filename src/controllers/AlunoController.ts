@@ -65,6 +65,12 @@ class AlunoController {
     const { status, erros, data } = await AlunoService.deleteAluno(ra);
     res.status(status).json({ erros, data });
   }
+
+  async login(req: Request, res: Response) {
+    const { ra, senha } = req.body;
+    const { status, erros, data } = await AlunoService.loginAluno(ra, senha);
+    res.status(status).json({ erros, data });
+  }
 }
 
 export default new AlunoController();
