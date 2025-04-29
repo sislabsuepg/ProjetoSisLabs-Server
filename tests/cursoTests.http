@@ -10,3 +10,27 @@ Content-Type: application/json
 {
     "nome": "Engenharia de Software"
 }
+
+###
+
+GET http://localhost:3400/cursos/1
+Content-Type: application/json
+
+###
+
+PUT http://localhost:3400/cursos/1
+Content-Type: application/json
+
+{
+    "nome": "Engenharia de Software Avançada"
+}
+
+###
+
+DELETE http://localhost:3400/cursos/1
+Content-Type: application/json
+
+###
+
+GET http://localhost:3400/cursos/?nome=Engenharia localhost:3400/cursos/?nome=Engenharia de Software Avançada
+Content-Type: application/json

@@ -8,7 +8,7 @@ export default class CursoService {
     if (nome.length < 3 || nome.length > 40) {
       return ["Nome do curso deve ter entre 3 e 40 caracteres"];
     }
-    if (!/^[a-zA-Z0-9 ]+$/.test(nome)) {
+    if (!/^[a-zA-Z\u00C0-\u00FF ]+$/.test(nome)) {
       return ["Nome do curso deve conter apenas letras e números"];
     }
     return [];
