@@ -1,7 +1,6 @@
 import Curso from "../models/Curso";
 
 export default class CursoService {
-
   static verificaNome(nome: string) {
     if (!nome) {
       return ["Nome do curso é obrigatório"];
@@ -21,7 +20,7 @@ export default class CursoService {
       return {
         status: 404,
         erros: ["Nenhum curso encontrado"],
-        data: null
+        data: null,
       };
     }
     return {
@@ -37,7 +36,7 @@ export default class CursoService {
       return {
         status: 404,
         erros: ["Curso não encontrado"],
-        data: null
+        data: null,
       };
     }
     return {
@@ -53,7 +52,7 @@ export default class CursoService {
       return {
         status: 400,
         erros: erros,
-        data: null
+        data: null,
       };
     }
     const curso = await Curso.findOne({ where: { nome: nome } });
@@ -61,7 +60,7 @@ export default class CursoService {
       return {
         status: 404,
         erros: ["Curso não encontrado"],
-        data: null
+        data: null,
       };
     }
     return {
@@ -77,15 +76,25 @@ export default class CursoService {
       return {
         status: 400,
         erros: erros,
-        data: null
+        data: null,
       };
     }
+
+    const existe = await Curso.findOne({ where: { nome: nome } });
+    if (existe) {
+      return {
+        status: 400,
+        erros: ["Curso já existe"],
+        data: null,
+      };
+    }
+
     const curso = await Curso.create({ nome: nome });
     if (!curso) {
       return {
         status: 500,
         erros: ["Erro ao criar curso"],
-        data: null
+        data: null,
       };
     }
     return {
@@ -101,7 +110,7 @@ export default class CursoService {
       return {
         status: 400,
         erros: erros,
-        data: null
+        data: null,
       };
     }
     const curso = await Curso.findByPk(id);
@@ -109,7 +118,7 @@ export default class CursoService {
       return {
         status: 404,
         erros: ["Curso não encontrado"],
-        data: null
+        data: null,
       };
     }
     curso.nome = nome;
@@ -127,7 +136,7 @@ export default class CursoService {
       return {
         status: 404,
         erros: ["Curso não encontrado"],
-        data: null
+        data: null,
       };
     }
     await curso.destroy();

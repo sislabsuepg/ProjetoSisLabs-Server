@@ -1,0 +1,12 @@
+
+GET http://localhost:3400/cursos
+Content-Type: application/json
+
+###
+
+POST http://localhost:3400/cursos
+Content-Type: application/json
+
+{
+    "nome": "Engenharia de Software"
+}
