@@ -1,18 +1,13 @@
-import { response, Router } from "express";
-import Curso from "../models/Curso";
-import { Response } from "express";
-import alunoAutenticado from "../middlewares/autenticado";
+import { Router } from "express";
 
+const router: Router = Router();
 
-const router:Router = Router()
+router.get("/", (req, res) => {
+  res.send("Operante");
+});
 
-router.get('/', alunoAutenticado,(req, res)=>{
-    res.send('Operante')
-})
+router.get("/test", (req, res) => {
+  res.send("Tudo certo :)");
+});
 
-router.get('/test',(req, res)=>{
-
-    res.send('Testando')
-})
-
-export default router
+export default router;
