@@ -20,10 +20,8 @@ class AlunoController {
 
   async show(req: Request, res: Response) {
     const { ra } = req.params;
-    if (!ra) {
-      const { status, erros, data } = await AlunoService.getAlunoByRa(ra);
-      res.status(status).json({ erros, data });
-    }
+    const { status, erros, data } = await AlunoService.getAlunoByRa(ra);
+    res.status(status).json({ erros, data });
   }
 
   async store(req: Request, res: Response) {
