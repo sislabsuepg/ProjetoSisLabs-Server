@@ -1,6 +1,8 @@
 import { Op } from "sequelize";
 import Aluno from "../models/Aluno";
+import config from "../config/config";
 import jwt from "jsonwebtoken";
+import Curso from "../models/Curso";
 
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
@@ -40,6 +42,10 @@ export default class AlunoService {
   }
 
   static verificaEmail(email: string): string[] {
+    if (!email) {
+      return [];
+    }
+    
     if (
       !/[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?/.test(
         email
@@ -67,12 +73,10 @@ export default class AlunoService {
     try {
       const alunos = await Aluno.findAll({
         attributes: ["ra", "nome", "telefone", "ano", "email", "ativo"],
-        include: [
+        include: 
           {
-            association: "curso",
-            attributes: ["id", "nome"],
-          },
-        ],
+            model: Curso,
+          }, 
       });
 
       if (!alunos) {
@@ -89,7 +93,7 @@ export default class AlunoService {
         data: alunos,
       };
     } catch (e) {
-      return { status: 500, erros: ["Erro ao buscar alunos"], data: [] };
+      return { status: 500, erros: e, data: [] };
     }
   }
 
@@ -103,11 +107,10 @@ export default class AlunoService {
           ],
         },
         attributes: ["ra", "nome", "telefone", "ano", "email", "ativo"],
-        include: [
+        include:[ 
           {
-            association: "curso",
-            attributes: ["id", "nome"],
-          },
+            model: Curso,
+          }, 
         ],
       });
 
@@ -133,11 +136,10 @@ export default class AlunoService {
     try {
       const aluno = await Aluno.findByPk(ra, {
         attributes: ["ra", "nome", "telefone", "ano", "email", "ativo"],
-        include: [
+        include:[ 
           {
-            association: "curso",
-            attributes: ["id", "nome"],
-          },
+            model: Curso,
+          }, 
         ],
       });
 
@@ -177,6 +179,31 @@ export default class AlunoService {
         ...this.verificaSenha(senha),
       ];
 
+      const novoAluno: any = {}
+      if (ra) {
+        novoAluno["ra"] = ra;
+      }
+      if (nome) {
+        novoAluno["nome"] = nome;
+      }
+      if (telefone) {
+        novoAluno["telefone"] = telefone;
+      }
+      if (ano) {
+        novoAluno["ano"] = ano;
+      }
+      if (email) {
+        novoAluno["email"] = email;
+      }
+      if (senha) {
+        novoAluno["senha"] = senha;
+      }
+      if (idCurso) {
+        novoAluno["idCurso"] = idCurso;
+      }
+
+
+
       if (erros.length > 0) {
         return {
           status: 400,
@@ -185,15 +212,14 @@ export default class AlunoService {
         };
       }
 
-      const aluno = await Aluno.create({
-        ra,
-        nome,
-        telefone,
-        ano,
-        email,
-        senha,
-        idCurso,
-      });
+      const aluno = await Aluno.create(novoAluno);
+      if (!aluno) {
+        return {
+          status: 400,
+          erros: ["Erro ao criar aluno"],
+          data: [],
+        };
+      }
 
       return {
         status: 201,
@@ -201,6 +227,7 @@ export default class AlunoService {
         data: aluno,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao criar aluno"], data: [] };
     }
   }
@@ -314,7 +341,14 @@ export default class AlunoService {
 
   static async loginAluno(ra: string, senha: string) {
     try {
-      const aluno = await Aluno.findByPk(ra);
+      const aluno = await Aluno.findByPk(ra, {
+        attributes: ["ra", "nome", "telefone", "ano", "email","senha", "ativo"],
+        include:[ 
+          {
+            model: Curso,
+          }, 
+        ],
+      });
       if (!aluno) {
         return {
           status: 404,
@@ -330,11 +364,22 @@ export default class AlunoService {
           data: [],
         };
       }
+      aluno.senha = "";
+      if (!aluno.ativo) {
+        return {
+          status: 401,
+          erros: ["Aluno não está ativo"],
+          data: [],
+        };
+      }
+      const token = jwt.sign({ aluno }, config.secret, {
+        expiresIn: "2h",
+      });
 
       return {
         status: 200,
         erros: [],
-        data: aluno,
+        data: token,
       };
     } catch (e) {
       return { status: 500, erros: ["Erro ao fazer login"], data: [] };

@@ -1,0 +1,26 @@
+
+GET http://localhost:3400/alunos
+Content-Type: application/json
+
+###
+
+POST http://localhost:3400/alunos
+Content-Type: application/json
+
+{
+    "ra": "23002302",
+    "nome": "João da SIlva",
+    "senha": "123456",
+    "ano": 1,
+    "idCurso": 1
+}
+
+###
+
+POST http://localhost:3400/alunos/login
+Content-Type: application/json
+
+{
+    "ra": "23002302",
+    "senha": "123456"
+}

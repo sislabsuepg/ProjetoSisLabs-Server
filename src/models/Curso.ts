@@ -10,6 +10,7 @@ import {
   NotEmpty,
   AutoIncrement,
   Unique,
+  HasMany,
 } from "sequelize-typescript";
 import Aluno from "./Aluno";
 
@@ -43,5 +44,11 @@ export default class Curso extends Model<
     type: DataType.STRING(40),
   })
   declare nome: string;
+
+  @HasMany(() => Aluno, {
+    foreignKey: "idCurso",
+    sourceKey: "id",
+  })
+  declare alunos: Aluno[];
 
 }

@@ -10,6 +10,7 @@ interface Config {
   password: string;
   database: string;
   db_port: number;
+  secret: string;
 }
 
 const config: Config = {
@@ -19,8 +20,8 @@ const config: Config = {
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB || 'sislabs',
-  db_port: Number(process.env.DB_PORT) || 5432
-
+  db_port: Number(process.env.DB_PORT) || 5432,
+  secret: process.env.SECRET || 'Default',
 };
 
 export default config;

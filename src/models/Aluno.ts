@@ -15,6 +15,7 @@ import {
   NotEmpty,
   Default,
   BeforeCreate,
+  BelongsTo,
 } from "sequelize-typescript";
 
 interface AlunoAtributos {
@@ -64,7 +65,7 @@ export default class Aluno extends Model<
   })
   declare ano: number;
 
-  @AllowNull(false)
+
   @NotEmpty
   @Column({
     type: DataType.STRING(50),
@@ -73,7 +74,7 @@ export default class Aluno extends Model<
 
   @Default("")
   @Column({
-    type: DataType.STRING(6),
+    type: DataType.STRING(32),
   })
   declare senha: string;
 
@@ -84,12 +85,19 @@ export default class Aluno extends Model<
   })
   declare ativo: boolean;
 
-  @ForeignKey(() => Curso)
+  
+/*   @ForeignKey(() => Curso)
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
   })
-  declare idCurso: number;
+  declare idCurso: number; */
+
+  @BelongsTo(() => Curso, {
+    foreignKey: "idCurso",
+    targetKey: "id",
+  })
+  declare curso: Curso;
 
   @BeforeCreate
   static preparaNome(instance: Aluno) {
