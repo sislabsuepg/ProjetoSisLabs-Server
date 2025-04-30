@@ -341,7 +341,7 @@ export default class AlunoService {
 
   static async loginAluno(ra: string, senha: string) {
     try {
-      const aluno = await Aluno.findByPk(ra, {
+      const aluno: Aluno|null = await Aluno.findByPk(ra, {
         attributes: ["ra", "nome", "telefone", "ano", "email","senha", "ativo"],
         include:[ 
           {

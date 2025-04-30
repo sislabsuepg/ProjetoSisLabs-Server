@@ -24,3 +24,7 @@ Content-Type: application/json
     "ra": "23002302",
     "senha": "123456"
 }
+
+###
+GET http://localhost:3400/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbHVubyI6eyJyYSI6IjIzMDAyMzAyIiwibm9tZSI6Ikpvw6NvIERhIFNpbHZhIiwidGVsZWZvbmUiOm51bGwsImFubyI6MSwiZW1haWwiOiIyMzAwMjMwMkB1ZXBnLmJyIiwic2VuaGEiOiIiLCJhdGl2byI6dHJ1ZSwiY3Vyc28iOnsiaWQiOjEsIm5vbWUiOiJFbmdlbmhhcmlhIGRlIFNvZnR3YXJlIn19LCJpYXQiOjE3NDYwMjg5NTEsImV4cCI6MTc0NjAzNjE1MX0.tohaxNoHNq6cLpVtqf6sQ61-_7eg-_N7LQel-397TMw
