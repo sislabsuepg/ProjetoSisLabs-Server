@@ -1,10 +1,10 @@
 
-GET http://localhost:3400/alunos
+GET http://localhost:3400/aluno
 Content-Type: application/json
 
 ###
 
-POST http://localhost:3400/alunos
+POST http://localhost:3400/aluno
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:3400/alunos/login
+POST http://localhost:3400/aluno/login
 Content-Type: application/json
 
 {
@@ -26,6 +26,6 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3400/alunos/tokenTests
+GET http://localhost:3400/aluno/tokenTests
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbHVubyI6eyJyYSI6IjIzMDAyMzAyIiwibm9tZSI6Ikpvw6NvIERhIFNpbHZhIiwidGVsZWZvbmUiOm51bGwsImFubyI6MSwiZW1haWwiOiIyMzAwMjMwMkB1ZXBnLmJyIiwic2VuaGEiOiIiLCJhdGl2byI6dHJ1ZSwiY3Vyc28iOnsiaWQiOjEsIm5vbWUiOiJFbmdlbmhhcmlhIGRlIFNvZnR3YXJlIn19LCJpYXQiOjE3NDYwMzg5NDcsImV4cCI6MTc0NjA0NjE0N30.8UBz80OJAUDIgj2WApD20hJO6vwjOhoEYJJHogNbOfU
