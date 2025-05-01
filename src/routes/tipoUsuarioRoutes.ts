@@ -1,5 +1,5 @@
 import { Router } from "express";
-import TipoUsuarioController from "../controllers/tipoUsuarioController";
+import TipoUsuarioController from "../controllers/TipoUsuarioController";
 const router: Router = Router();
 
 router.get("/", TipoUsuarioController.index);

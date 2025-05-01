@@ -3,6 +3,7 @@ import connection from "./database"
 import homeRoutes from "./routes/homeRoutes"
 import cursoRoutes from  './routes/cursoRoutes'
 import alunoRoutes from './routes/alunoRoutes'
+import tipoUsuarioRoutes from './routes/tipoUsuarioRoutes'
 class App{
     app: any
 
@@ -22,6 +23,7 @@ class App{
         this.app.use("/", homeRoutes)
         this.app.use("/cursos/", cursoRoutes)
         this.app.use("/alunos/", alunoRoutes)
+        this.app.use("/tipoUsuario/", tipoUsuarioRoutes)
     }
 
 }
