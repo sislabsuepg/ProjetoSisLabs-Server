@@ -1,3 +1,4 @@
+import { Optional } from "sequelize";
 import {
   Table,
   Model,
@@ -22,12 +23,14 @@ interface TipoUsuarioAtributos {
   advertencia: boolean;
 }
 
+interface TipoUsuarioCreationAtributos extends Optional<TipoUsuarioAtributos, "idTipoUsuario"> {}
+
 @Table({
   tableName: "TipoUsuarios",
   modelName: "TipoUsuario",
   timestamps: false,
 })
-export default class TipoUsuario extends Model<TipoUsuarioAtributos> {
+export default class TipoUsuario extends Model<TipoUsuarioAtributos, TipoUsuarioCreationAtributos> {
   @PrimaryKey
   @AutoIncrement
   @Column({

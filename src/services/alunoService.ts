@@ -26,7 +26,7 @@ export default class AlunoService {
       return ["Nome do aluno deve ter entre 3 e 40 caracteres"];
     }
     if (!/^[a-zA-Z\u00C0-\u00FF ]+$/.test(nome)) {
-      return ["Nome do curso deve conter apenas letras"];
+      return ["Nome do aluno deve conter apenas letras"];
     }
     return [];
   }

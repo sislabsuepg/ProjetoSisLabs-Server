@@ -55,7 +55,7 @@ export default class Aluno extends Model<
   declare nome: string;
 
   @Column({
-    type: DataType.STRING(15),
+    type: DataType.STRING(15), //"(dd) 99999-9999""
   })
   declare telefone: string;
 
@@ -86,7 +86,7 @@ export default class Aluno extends Model<
   declare ativo: boolean;
 
   
-/*   @ForeignKey(() => Curso)
+/*@ForeignKey(() => Curso)
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
