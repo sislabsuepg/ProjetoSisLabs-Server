@@ -8,7 +8,7 @@ import {
     PrimaryKey,
     AutoIncrement,
     AllowNull,
-    HasMany
+    BelongsToMany,
 } from "sequelize-typescript";
 
 import Horario from "./Horario";
@@ -46,8 +46,10 @@ export default class Aula extends Model<AulaAtributos, AulaCreationAtributos> {
     })
     declare idLaboratorio: string;
 
-   @HasMany(() => Horario, {
-        foreignKey: "idAula",
+    @BelongsToMany(() => Horario, {
+        through: "AulaHorario",
+        foreignKey: "idHorario",
+        otherKey: "idAula",
     })
     declare horarios: Horario[];
  
