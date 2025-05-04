@@ -19,7 +19,7 @@ interface AlunoLaboratorioAtributos {
 })
 export default class AlunoLaboratorio extends Model<AlunoLaboratorioAtributos> {
 
-    /* @HasMany(() => Aluno, {
+    @HasMany(() => Aluno, {
         foreignKey: "ra",
     })
     declare alunos: Aluno[];
@@ -27,6 +27,6 @@ export default class AlunoLaboratorio extends Model<AlunoLaboratorioAtributos> {
     @HasMany(() => Laboratorio, {
         foreignKey: "id",
     })
-    declare laboratorios: Laboratorio[]; */
+    declare laboratorios: Laboratorio[];
 
 }
