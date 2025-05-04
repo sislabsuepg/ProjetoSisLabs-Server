@@ -6,15 +6,14 @@ import {
   Column,
   DataType,
   PrimaryKey,
-  AutoIncrement,
   AllowNull,
   Unique,
   Default,
-  BelongsTo,
   BelongsToMany,
+  HasMany,
 } from "sequelize-typescript";
 import Aluno from "./Aluno";
-
+import Evento from "./Evento";
 interface LaboratorioAtributos {
   id: string;
   nome: string;
@@ -54,6 +53,13 @@ export default class Laboratorio extends Model<
         defaultValue: false,
     })
     declare restrito: boolean;
+
+    @HasMany(()=> Evento, {
+        foreignKey: "idLaboratorio",
+        sourceKey: "id",
+        
+    })
+    declare eventos: Evento[];
 
     @BelongsToMany(() => Aluno, {
         through: "AlunoLaboratorio",

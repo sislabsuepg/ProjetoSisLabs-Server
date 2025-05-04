@@ -9,14 +9,15 @@ import Aula from "../models/Aula";
 import Professor from "../models/Professor";
 import Emprestimo from "../models/Emprestimo";
 import Horario from "../models/Horario";
+import Evento from "../models/Evento";
 import AlunoLaboratorio from "../models/AlunoLaboratorio";
 import AlunoProfessor from "../models/AlunoProfessor";
-
+import AulaHorario from "../models/AulaHorario";
 
 const connection: Sequelize = new Sequelize({
   ...databaseConfig,
   dialect: "postgres",
-  models: [Curso, Aluno, Usuario, TipoUsuario, Laboratorio, Aula, Professor, Emprestimo, Horario, AlunoLaboratorio, AlunoProfessor],
+  models: [Curso, Aluno, Usuario, TipoUsuario, Laboratorio, Aula, Professor, Emprestimo, Horario, Evento,AlunoLaboratorio, AlunoProfessor, AulaHorario],
 });
 
 export default connection;
