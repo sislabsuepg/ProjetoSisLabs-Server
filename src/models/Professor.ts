@@ -11,7 +11,11 @@ import {
     AutoIncrement,
     AllowNull,
     Unique,
+    BelongsTo,
+    BelongsToMany,
 } from 'sequelize-typescript';
+
+import Aluno from './Aluno';
 
 interface ProfessorAttributes {
     id: number;
@@ -47,4 +51,12 @@ export default class Professor extends Model<ProfessorAttributes, ProfessorCreat
         type: DataType.STRING(40),
     })
     declare email: string;
+
+    @BelongsToMany(() => Aluno, {
+        through: 'AlunoProfessor',
+        foreignKey: 'idProfessor',
+        otherKey: 'raAluno',
+    })
+    declare alunos: Aluno[];
+
 }

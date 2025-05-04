@@ -8,10 +8,7 @@ import {
     PrimaryKey,
     AutoIncrement,
     AllowNull,
-    Unique,
-    HasMany,
-    BelongsToMany,
-    ForeignKey,
+    BelongsToMany
 } from "sequelize-typescript";
 
 import Horario from "./Horario";

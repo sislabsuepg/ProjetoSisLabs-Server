@@ -10,7 +10,10 @@ import {
   AllowNull,
   Unique,
   Default,
+  BelongsTo,
+  BelongsToMany,
 } from "sequelize-typescript";
+import Aluno from "./Aluno";
 
 interface LaboratorioAtributos {
   id: string;
@@ -51,5 +54,13 @@ export default class Laboratorio extends Model<
         defaultValue: false,
     })
     declare restrito: boolean;
+
+    @BelongsToMany(() => Aluno, {
+        through: "AlunoLaboratorio",
+        foreignKey: "idLaboratorio",
+        otherKey: "raAluno"
+    })
+    declare alunos: Aluno[];
+
 
 }

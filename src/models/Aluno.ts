@@ -16,7 +16,10 @@ import {
   Default,
   BeforeCreate,
   BelongsTo,
+  BelongsToMany,
 } from "sequelize-typescript";
+import Laboratorio from "./Laboratorio";
+import Professor from "./Professor";
 
 interface AlunoAtributos {
   ra: string;
@@ -85,19 +88,26 @@ export default class Aluno extends Model<
   })
   declare ativo: boolean;
 
-  
-/*@ForeignKey(() => Curso)
-  @AllowNull(false)
-  @Column({
-    type: DataType.INTEGER,
-  })
-  declare idCurso: number; */
-
   @BelongsTo(() => Curso, {
     foreignKey: "idCurso",
     targetKey: "id",
   })
   declare curso: Curso;
+
+  @BelongsToMany(() => Laboratorio, {
+    through: "AlunoLaboratorio",
+    foreignKey: "raAluno",
+    otherKey: "idLaboratorio",
+  })
+  declare laboratorios: Laboratorio[];
+ 
+  @BelongsToMany(()=> Professor,{
+    through: "AlunoProfessor",
+    foreignKey: "raAluno",
+    otherKey: "idProfessor",
+  }) 
+  declare professores: Professor[];
+
 
   @BeforeCreate
   static preparaNome(instance: Aluno) {
