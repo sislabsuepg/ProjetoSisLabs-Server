@@ -9,13 +9,13 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 
-import TipoUsuario from "./TipoUsuario";
+import PermissaoUsuario from "./PermissaoUsuario";
 
 interface UsuarioAtributos {
   login: string;
   senha: string;
   nome: string;
-  idTipoUsuario: number;
+  idpermissao: number;
 }
 
 @Table({
@@ -44,9 +44,9 @@ export default class Usuario extends Model<UsuarioAtributos> {
   })
   declare nome: string;
 
-  @BelongsTo(() => TipoUsuario, {
-    foreignKey: "idTipoUsuario",
-    targetKey: "idTipoUsuario",
+  @BelongsTo(() => PermissaoUsuario, {
+    foreignKey: "idpermissao",
+    targetKey: "id",
   })
-  declare tipoUsuario: TipoUsuario;
+  declare permissaoUsuario: PermissaoUsuario;
 }

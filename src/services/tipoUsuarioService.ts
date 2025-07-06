@@ -1,4 +1,4 @@
-import TipoUsuario from "../models/TipoUsuario";
+import TipoUsuario from "../models/PermissaoUsuario";
 
 import { Op } from "sequelize";
 
