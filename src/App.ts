@@ -3,7 +3,7 @@ import connection from "./database";
 import homeRoutes from "./routes/homeRoutes";
 import cursoRoutes from "./routes/cursoRoutes";
 import alunoRoutes from "./routes/alunoRoutes";
-import tipoUsuarioRoutes from "./routes/tipoUsuarioRoutes";
+import permissaoUsuarioRoutes from "./routes/permissaoUsuarioRoutes";
 import UsuarioRoutes from "./routes/usuarioRoutes";
 class App {
   app: any;
@@ -24,7 +24,7 @@ class App {
     this.app.use("/", homeRoutes);
     this.app.use("/curso/", cursoRoutes);
     this.app.use("/aluno/", alunoRoutes);
-    this.app.use("/tipoUsuario/", tipoUsuarioRoutes);
+    this.app.use("/permissao/", permissaoUsuarioRoutes);
     this.app.use("/usuario/", UsuarioRoutes);
   }
 }

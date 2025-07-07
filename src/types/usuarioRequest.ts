@@ -5,7 +5,7 @@ export default interface UsuarioRequest extends Request {
     login: string;
     senha: string;
     nome: string;
-    tipo: {
+    permissao: {
       id: number;
       nome: string;
       cadastr: boolean;
