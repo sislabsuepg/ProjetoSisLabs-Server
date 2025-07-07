@@ -46,7 +46,7 @@ export default class PermissaoUsuario extends Model<
   @NotEmpty
   @Unique
   @Column({
-    type: DataType.STRING(20),
+    type: DataType.STRING(30),
   })
   declare nomepermissao: string;
 
@@ -84,3 +84,5 @@ export default class PermissaoUsuario extends Model<
   })
   declare usuarios: Usuario[];
 }
+
+// modificado

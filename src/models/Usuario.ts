@@ -7,24 +7,37 @@ import {
   AllowNull,
   NotEmpty,
   BelongsTo,
+  AutoIncrement,
+  Unique,
 } from "sequelize-typescript";
 
 import PermissaoUsuario from "./PermissaoUsuario";
 
 interface UsuarioAtributos {
+  id: number;
   login: string;
   senha: string;
   nome: string;
+  ativo: boolean;
   idpermissao: number;
 }
 
 @Table({
-  tableName: "Usuarios",
+  tableName: "Usuario",
   modelName: "Usuario",
   timestamps: false,
 })
 export default class Usuario extends Model<UsuarioAtributos> {
   @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare id: number;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Unique
   @Column({
     type: DataType.STRING(20),
   })
@@ -33,7 +46,7 @@ export default class Usuario extends Model<UsuarioAtributos> {
   @AllowNull(false)
   @NotEmpty
   @Column({
-    type: DataType.STRING(12),
+    type: DataType.STRING(32),
   })
   declare senha: string;
 
@@ -44,9 +57,18 @@ export default class Usuario extends Model<UsuarioAtributos> {
   })
   declare nome: string;
 
+  @AllowNull(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: true,
+  })
+  declare ativo: boolean;
+
   @BelongsTo(() => PermissaoUsuario, {
     foreignKey: "idpermissao",
     targetKey: "id",
   })
   declare permissaoUsuario: PermissaoUsuario;
 }
+
+//modificado
