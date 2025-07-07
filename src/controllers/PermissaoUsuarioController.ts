@@ -10,7 +10,7 @@ class PermissaoUsuarioController {
     } else {
       const { status, erros, data } =
         await permissaoUsuarioService.getPermissaoUsuarioByNome(
-          req.query.nome as string
+          req.query.nomePermissao as string
         );
       res.status(status).json({ erros, data });
     }
@@ -24,10 +24,11 @@ class PermissaoUsuarioController {
   }
 
   async store(req: Request, res: Response) {
-    const { nome, cadastro, alteracao, relatorio, advertencia } = req.body;
+    const { nomePermissao, cadastro, alteracao, relatorio, advertencia } =
+      req.body;
     const { status, erros, data } =
       await permissaoUsuarioService.createPermissaoUsuario(
-        nome,
+        nomePermissao,
         cadastro,
         alteracao,
         relatorio,

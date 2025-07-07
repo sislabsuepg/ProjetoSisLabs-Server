@@ -1,16 +1,16 @@
-GET http://127.0.0.1:3400/tipoUsuario/
+GET http://127.0.0.1:3400/permissao/
 
 ###
 
-GET http://localhost:3400/tipoUsuario/1
+GET http://localhost:3400/permissao/1
 
 ###
 
-POST http://localhost:3400/tipoUsuario/
+POST http://localhost:3400/permissao/
 Content-Type: application/json
 
 {
-  "nome": "adm",
+  "nomePermissao": "adm",
   "cadastro": "true",
   "relatorio": "true",
   "advertencia": "false"

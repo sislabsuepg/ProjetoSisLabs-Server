@@ -113,7 +113,7 @@ export default class PermissaoUsuarioService {
         cadastro: cadastro || false,
         alteracao: alteracao || false,
         relatorio: relatorio || false,
-        excluir: excluir || false,
+        advertencia: excluir || false,
       };
 
       const permissaoUsuario = await PermissaoUsuario.create(
@@ -133,6 +133,7 @@ export default class PermissaoUsuarioService {
         data: permissaoUsuario,
       };
     } catch (e) {
+      console.log(e);
       return {
         status: 500,
         erros: ["Erro ao criar permissão de usuario"],
