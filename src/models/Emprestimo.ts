@@ -1,89 +1,101 @@
 import { Optional } from "sequelize";
 
 import {
-    Table,
-    Model,
-    Column,
-    DataType,
-    PrimaryKey,
-    AutoIncrement,
-    AllowNull,
-    Unique,
-    Default,
+  Table,
+  Model,
+  Column,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  AllowNull,
+  Unique,
+  Default,
+  BelongsTo,
 } from "sequelize-typescript";
+import Aluno from "./Aluno";
+import Usuario from "./Usuario";
+import Laboratorio from "./Laboratorio";
 
 interface EmprestimoAtributos {
-    id: number;
-    dataHoraEntrada: Date;
-    dataHoraSaida: Date;
-    posse_chave: boolean;
-    advertencia: boolean;
-    idLaboratorio: string;
-    raAluno: string;
-    loginUsuario: string;
+  id: number;
+  dataHoraEntrada: Date;
+  dataHoraSaida: Date;
+  posseChave: boolean;
+  advertencia: boolean;
+  idLaboratorio: string;
+  idAluno: string;
+  idUsuarioEntrada: string;
+  idUsuarioSaida: string;
 }
 
 interface EmprestimoCreationAtributos
-    extends Optional<EmprestimoAtributos, "id"|"dataHoraEntrada"|"dataHoraSaida"|"posse_chave"|"advertencia"> {}
+  extends Optional<
+    EmprestimoAtributos,
+    "id" | "dataHoraSaida" | "posseChave" | "advertencia" | "idUsuarioSaida"
+  > {}
 
 @Table({
-    tableName: "Emprestimos",
-    modelName: "Emprestimo",
-    timestamps: false,
+  tableName: "emprestimo",
+  modelName: "Emprestimo",
+  timestamps: false,
 })
 export default class Emprestimo extends Model<
-    EmprestimoAtributos,
-    EmprestimoCreationAtributos
+  EmprestimoAtributos,
+  EmprestimoCreationAtributos
 > {
-    @PrimaryKey
-    @AutoIncrement
-    @Column({
-        type: DataType.INTEGER,
-    })
-    declare id: number;
+  @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare id: number;
 
-    @AllowNull(false)
-    @Column({
-        type: DataType.DATE,
-    })
-    declare dataHoraEntrada: Date;
+  @AllowNull(false)
+  @Column({
+    type: DataType.DATE,
+  })
+  declare dataHoraEntrada: Date;
 
-    @Column({
-        type: DataType.DATE,
-    })
-    declare dataHoraSaida: Date;
+  @Column({
+    type: DataType.DATE,
+  })
+  declare dataHoraSaida: Date;
 
-    @AllowNull(false)
-    @Default(false)
-    @Column({
-        type: DataType.BOOLEAN,
-    })
-    declare posse_chave: boolean;
+  @AllowNull(false)
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  declare posseChave: boolean;
 
-    @AllowNull(false)
-    @Default(false)
-    @Column({
-        type: DataType.BOOLEAN,
-    })
-    declare advertencia: boolean;
+  @AllowNull(false)
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  declare advertencia: boolean;
 
-    @AllowNull(false)
-    @Column({
-        type: DataType.STRING(8),
-    })
-    declare idLaboratorio: string;
+  @BelongsTo(() => Laboratorio, {
+    foreignKey: "idLaboratorio",
+    targetKey: "id",
+  })
+  declare laboratorio: Laboratorio;
 
-    @AllowNull(false)
-    @Column({
-        type: DataType.STRING(13),
-    })
-    declare raAluno: string;
+  @BelongsTo(() => Aluno, {
+    foreignKey: "idAluno",
+    targetKey: "id",
+  })
+  declare aluno: Aluno;
 
-    @AllowNull(false)
-    @Column({
-        type: DataType.STRING(20),
-    })
-    declare loginUsuario: string;
+  @BelongsTo(() => Usuario, {
+    foreignKey: "idUsuarioEntrada",
+    targetKey: "id",
+  })
+  declare usuarioEntrada: Usuario;
 
-
+  @BelongsTo(() => Usuario, {
+    foreignKey: "idUsuarioSaida",
+    targetKey: "id",
+  })
+  declare usuarioSaida: Usuario;
 }

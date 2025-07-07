@@ -11,62 +11,68 @@ import {
   Default,
   BelongsToMany,
   HasMany,
+  AutoIncrement,
 } from "sequelize-typescript";
 import Aluno from "./Aluno";
 import Evento from "./Evento";
+import Orientacao from "./Orientacao";
 interface LaboratorioAtributos {
   id: string;
   nome: string;
+  numero: string;
   restrito: boolean;
 }
 
 interface LaboratorioCreationAtributos
-  extends Optional<LaboratorioAtributos, "id"|"restrito"> {}
+  extends Optional<LaboratorioAtributos, "id"> {}
 
 @Table({
-    tableName: "Laboratorios",
-    modelName: "Laboratorio",
-    timestamps: false,
+  tableName: "laboratorio",
+  modelName: "Laboratorio",
+  timestamps: false,
 })
-
 export default class Laboratorio extends Model<
   LaboratorioAtributos,
   LaboratorioCreationAtributos
 > {
-    @PrimaryKey
-    @Column({
-        type: DataType.STRING(8),
-    })
-    declare id: string;
-    
-    @AllowNull(false)
-    @Unique(true)
-    @Column({
-        type: DataType.STRING(60),
-    })
-    declare nome: string;
-    
-    @AllowNull(false)
-    @Default(false)
-    @Column({
-        type: DataType.BOOLEAN,
-        defaultValue: false,
-    })
-    declare restrito: boolean;
+  @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare id: number;
 
-    @HasMany(()=> Evento, {
-        foreignKey: "idLaboratorio",
-        sourceKey: "id",
-        
-    })
-    declare eventos: Evento[];
+  @AllowNull(false)
+  @Unique(true)
+  @Column({
+    type: DataType.STRING(8),
+  })
+  declare numero: string;
 
-    @BelongsToMany(() => Aluno, {
-        through: "AlunoLaboratorio",
-        foreignKey: "idLaboratorio",
-        otherKey: "raAluno"
-    })
-    declare alunos: Aluno[];
+  @AllowNull(false)
+  @Unique(true)
+  @Column({
+    type: DataType.STRING(60),
+  })
+  declare nome: string;
 
+  @AllowNull(false)
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  declare restrito: boolean;
 
+  @HasMany(() => Evento, {
+    foreignKey: "idLaboratorio",
+    sourceKey: "id",
+  })
+  declare eventos: Evento[];
+
+  @HasMany(() => Orientacao, {
+    foreignKey: "idLaboratorio",
+    sourceKey: "id",
+  })
+  declare orientacoes: Orientacao[];
 }

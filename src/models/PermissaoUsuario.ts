@@ -27,7 +27,7 @@ interface PermissaoUsuarioCreationAtributos
   extends Optional<PermissaoUsuarioAtributos, "id"> {}
 
 @Table({
-  tableName: "PermissaoUsuario",
+  tableName: "permissaousuario",
   modelName: "PermissaoUsuario",
   timestamps: false,
 })

@@ -11,16 +11,19 @@ import {
 } from "sequelize-typescript";
 
 import Usuario from "./Usuario";
+import { Optional } from "sequelize";
 
 interface RegistroAtributos {
   id: number;
-  datahora: Date;
+  dataHora: Date;
   descricao: string;
-  idusuario: number;
+  idUsuario: number;
 }
 
+interface RegistroCreationAtributos extends Optional<RegistroAtributos, "id"> {}
+
 @Table({
-  tableName: "Registro",
+  tableName: "registro",
   modelName: "Registro",
   timestamps: false,
 })
@@ -36,7 +39,7 @@ export default class Registro extends Model<RegistroAtributos> {
   @Column({
     type: DataType.DATE,
   })
-  declare datahora: Date;
+  declare dataHora: Date;
 
   @AllowNull(false)
   @NotEmpty
@@ -46,7 +49,7 @@ export default class Registro extends Model<RegistroAtributos> {
   declare descricao: string;
 
   @BelongsTo(() => Usuario, {
-    foreignKey: "idusuario",
+    foreignKey: "idUsuario",
     targetKey: "id",
   })
   declare usuario: Usuario;

@@ -11,18 +11,21 @@ import {
   AutoIncrement,
   Unique,
   HasMany,
+  Max,
+  Min,
 } from "sequelize-typescript";
 import Aluno from "./Aluno";
 
 interface CursoAtributos {
   id: number;
   nome: string;
+  anosMaximo: number;
 }
 
 interface CursoCreationAtributos extends Optional<CursoAtributos, "id"> {}
 
 @Table({
-  tableName: "Cursos",
+  tableName: "curso",
   modelName: "Curso",
   timestamps: false,
 })
@@ -45,10 +48,18 @@ export default class Curso extends Model<
   })
   declare nome: string;
 
+  @AllowNull(false)
+  @NotEmpty
+  @Min(1)
+  @Max(8)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare anosMaximo: number;
+
   @HasMany(() => Aluno, {
     foreignKey: "idCurso",
     sourceKey: "id",
   })
   declare alunos: Aluno[];
-
 }

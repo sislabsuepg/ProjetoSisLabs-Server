@@ -17,17 +17,22 @@ import {
   BeforeCreate,
   BelongsTo,
   BelongsToMany,
+  AutoIncrement,
+  Unique,
+  HasMany,
 } from "sequelize-typescript";
-import Laboratorio from "./Laboratorio";
-import Professor from "./Professor";
+
+import Orientacao from "./Orientacao";
+import Emprestimo from "./Emprestimo";
 
 interface AlunoAtributos {
+  id: number;
   ra: string;
   nome: string;
-  telefone: string;
-  ano: number;
-  email: string;
   senha: string;
+  telefone: string;
+  anoCurso: number;
+  email: string;
   ativo: boolean;
   idCurso: number;
 }
@@ -36,7 +41,7 @@ interface AlunoCreationAtributos
   extends Optional<AlunoAtributos, "telefone" | "senha" | "ativo" | "email"> {}
 
 @Table({
-  tableName: "Alunos",
+  tableName: "aluno",
   modelName: "Aluno",
   timestamps: false,
 })
@@ -45,6 +50,15 @@ export default class Aluno extends Model<
   AlunoCreationAtributos
 > {
   @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare id: number;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Unique(true)
   @Column({
     type: DataType.STRING(13),
   })
@@ -66,12 +80,11 @@ export default class Aluno extends Model<
   @Column({
     type: DataType.INTEGER,
   })
-  declare ano: number;
-
+  declare anoCurso: number;
 
   @NotEmpty
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.STRING(40),
   })
   declare email: string;
 
@@ -94,20 +107,17 @@ export default class Aluno extends Model<
   })
   declare curso: Curso;
 
-  @BelongsToMany(() => Laboratorio, {
-    through: "AlunoLaboratorio",
-    foreignKey: "raAluno",
-    otherKey: "idLaboratorio",
+  @HasMany(() => Orientacao, {
+    foreignKey: "idAluno",
+    sourceKey: "id",
   })
-  declare laboratorios: Laboratorio[];
- 
-  @BelongsToMany(()=> Professor,{
-    through: "AlunoProfessor",
-    foreignKey: "raAluno",
-    otherKey: "idProfessor",
-  }) 
-  declare professores: Professor[];
+  declare orientacoes: Orientacao[];
 
+  @HasMany(() => Emprestimo, {
+    foreignKey: "idAluno",
+    sourceKey: "id",
+  })
+  declare emprestimos: Emprestimo[];
 
   @BeforeCreate
   static preparaNome(instance: Aluno) {
