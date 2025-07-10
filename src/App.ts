@@ -1,10 +1,12 @@
 import express from "express";
+import cors from "cors";
 import connection from "./database";
 import homeRoutes from "./routes/homeRoutes";
 import cursoRoutes from "./routes/cursoRoutes";
 import alunoRoutes from "./routes/alunoRoutes";
 import permissaoUsuarioRoutes from "./routes/permissaoUsuarioRoutes";
 import UsuarioRoutes from "./routes/usuarioRoutes";
+
 class App {
   app: any;
 
@@ -18,6 +20,7 @@ class App {
   middlewares() {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
+    this.app.use(cors());
   }
 
   routes() {
