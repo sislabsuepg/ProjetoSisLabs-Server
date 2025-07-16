@@ -9,7 +9,7 @@ class CursoController {
       const { status, erros, data } = await CursoService.getAllCursos();
       res.status(status).json({ erros, data });
     } else {
-      const { status, erros, data } = await CursoService.getCursoByNome(
+      const { status, erros, data } = await CursoService.getCursosByNome(
         req.query.nome as string
       );
       res.status(status).json({ erros, data });
@@ -17,21 +17,28 @@ class CursoController {
   }
 
   async show(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
+    const id: number = parseInt(req.params.id);
     const { status, erros, data } = await CursoService.getCursoById(id);
     res.status(status).json({ erros, data });
   }
 
   async store(req: Request, res: Response) {
-    const { nome } = req.body;
-    const { status, erros, data } = await CursoService.createCurso(nome);
+    const { nome, anosMax } = req.body;
+    const { status, erros, data } = await CursoService.createCurso(
+      nome,
+      anosMax
+    );
     res.status(status).json({ erros, data });
   }
 
   async update(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const { nome } = req.body;
-    const { status, erros, data } = await CursoService.updateCurso(id, nome);
+    const { nome, anosMax } = req.body;
+    const { status, erros, data } = await CursoService.updateCurso(
+      id,
+      nome,
+      anosMax
+    );
     res.status(status).json({ erros, data });
   }
 

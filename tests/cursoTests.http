@@ -8,7 +8,8 @@ POST http://localhost:3400/curso
 Content-Type: application/json
 
 {
-    "nome": "Engenharia de Software"
+    "nome": "Engenharia de Software",
+    "anosMax": 5
 }
 
 ###
@@ -23,6 +24,15 @@ Content-Type: application/json
 
 {
     "nome": "Engenharia de Software Avançada"
+}
+
+###
+
+PUT http://localhost:3400/curso/1
+Content-Type: application/json
+
+{
+    "anosMax": 4
 }
 
 ###

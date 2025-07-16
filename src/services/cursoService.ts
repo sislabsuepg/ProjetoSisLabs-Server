@@ -1,16 +1,15 @@
+import { Op } from "sequelize";
 import Curso from "../models/Curso";
 export default class CursoService {
   static verificaNome(nome: string): string[] {
-    if (!nome) {
-      return ["Nome do curso é obrigatório"];
-    }
+    const erros: string[] = [];
     if (nome.length < 3 || nome.length > 40) {
-      return ["Nome do curso deve ter entre 3 e 40 caracteres"];
+      erros.push("Nome do curso deve ter entre 3 e 40 caracteres");
     }
     if (!/^[a-zA-Z \u00C0-\u00FF]+$/.test(nome)) {
-      return ["Nome do curso deve conter apenas letras"];
+      erros.push("Nome do curso deve conter apenas letras");
     }
-    return [];
+    return erros;
   }
 
   static async getAllCursos() {
@@ -53,9 +52,9 @@ export default class CursoService {
     }
   }
 
-  static async getCursoByNome(nome: string) {
+  static async getCursosByNome(nomeBusca: string) {
     try {
-      const erros: string[] = this.verificaNome(nome);
+      const erros: string[] = this.verificaNome(nomeBusca);
       if (erros.length > 0) {
         return {
           status: 400,
@@ -63,7 +62,7 @@ export default class CursoService {
           data: null,
         };
       }
-      const curso = await Curso.findOne({ where: { nome: nome } });
+      const curso = await Curso.findAll({ where: { nome: { [Op.like]: `%${nomeBusca}%` } } });
       if (!curso) {
         return {
           status: 404,
@@ -81,9 +80,12 @@ export default class CursoService {
     }
   }
 
-  static async createCurso(nome: string) {
+  static async createCurso(nome: string, anosMax: number) {
     try {
       const erros: string[] = this.verificaNome(nome);
+      if (anosMax && (anosMax < 1 || anosMax > 8)) {
+        erros.push("Anos máximos deve ser entre 1 e 8");
+      }
       if (erros.length > 0) {
         return {
           status: 400,
@@ -101,7 +103,7 @@ export default class CursoService {
         };
       }
 
-      const curso = await Curso.create({ nome: nome });
+      const curso = await Curso.create({ nome: nome, anosMaximo: anosMax });
       if (!curso) {
         return {
           status: 500,
@@ -119,9 +121,23 @@ export default class CursoService {
     }
   }
 
-  static async updateCurso(id: number, nome: string) {
+  static async updateCurso(id: number, nome?: string, anosMax?: number) {
     try {
-      const erros: string[] = this.verificaNome(nome);
+      const erros: string[] = [];
+      if (!nome && !anosMax) {
+        return {
+          status: 400,
+          erros: ["Nome ou anos máximos devem ser informados"],
+          data: null,
+        };
+      }
+      if (anosMax && (anosMax < 1 || anosMax > 8)) {
+        erros.push("Anos máximos deve ser entre 1 e 8");
+      }
+      if (nome) {
+        const nomeErros = this.verificaNome(nome);
+        erros.push(...nomeErros);
+      }
       if (erros.length > 0) {
         return {
           status: 400,
@@ -137,7 +153,12 @@ export default class CursoService {
           data: null,
         };
       }
-      curso.nome = nome;
+      if (nome) {
+        curso.nome = nome;
+      }
+      if (anosMax) {
+        curso.anosMaximo = anosMax;
+      }
       await curso.save();
       return {
         status: 200,
