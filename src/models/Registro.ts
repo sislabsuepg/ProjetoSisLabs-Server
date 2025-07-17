@@ -27,7 +27,10 @@ interface RegistroCreationAtributos extends Optional<RegistroAtributos, "id"> {}
   modelName: "Registro",
   timestamps: false,
 })
-export default class Registro extends Model<RegistroAtributos> {
+export default class Registro extends Model<
+  RegistroAtributos,
+  RegistroCreationAtributos
+> {
   @PrimaryKey
   @AutoIncrement
   @Column({

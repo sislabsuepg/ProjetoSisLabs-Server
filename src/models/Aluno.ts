@@ -38,7 +38,10 @@ interface AlunoAtributos {
 }
 
 interface AlunoCreationAtributos
-  extends Optional<AlunoAtributos, "telefone" | "senha" | "ativo" | "email"> {}
+  extends Optional<
+    AlunoAtributos,
+    "id" | "telefone" | "senha" | "ativo" | "email"
+  > {}
 
 @Table({
   tableName: "aluno",

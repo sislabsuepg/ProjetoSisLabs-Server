@@ -33,7 +33,10 @@ interface UsuarioCreationAtributos extends Optional<UsuarioAtributos, "id"> {}
   modelName: "Usuario",
   timestamps: false,
 })
-export default class Usuario extends Model<UsuarioAtributos> {
+export default class Usuario extends Model<
+  UsuarioAtributos,
+  UsuarioCreationAtributos
+> {
   @PrimaryKey
   @AutoIncrement
   @Column({
