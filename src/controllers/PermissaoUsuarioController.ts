@@ -39,8 +39,17 @@ class PermissaoUsuarioController {
 
   async update(req: Request, res: Response) {
     const id = parseInt(req.params.id);
+    const { nomePermissao, cadastro, alteracao, relatorio, advertencia } =
+      req.body;
     const { status, erros, data } =
-      await permissaoUsuarioService.updatePermissaoUsuario(id, req.body);
+      await permissaoUsuarioService.updatePermissaoUsuario(
+        id,
+        nomePermissao,
+        cadastro,
+        alteracao,
+        relatorio,
+        advertencia
+      );
     res.status(status).json({ erros, data });
   }
 

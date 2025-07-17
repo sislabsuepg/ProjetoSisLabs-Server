@@ -142,7 +142,14 @@ export default class PermissaoUsuarioService {
     }
   }
 
-  static async updatePermissaoUsuario(id: number, requisicao: any) {
+  static async updatePermissaoUsuario(
+    id: number,
+    nomePermissao?: string,
+    cadastro?: boolean,
+    alteracao?: boolean,
+    relatorio?: boolean,
+    advertencia?: boolean
+  ) {
     try {
       const permissaoUsuario = await PermissaoUsuario.findByPk(id);
       if (!permissaoUsuario) {
@@ -153,21 +160,27 @@ export default class PermissaoUsuarioService {
         };
       }
 
-      if (requisicao.nomePermissao) {
-        requisicao.nomePermissao = permissaoUsuario.nomePermissao;
+      if (
+        !nomePermissao &&
+        !cadastro &&
+        !alteracao &&
+        !relatorio &&
+        !advertencia
+      ) {
+        return {
+          status: 400,
+          erros: ["Nenhum campo para atualização foi fornecido"],
+          data: [],
+        };
       }
-      if (requisicao.cadastro) {
-        requisicao.cadastro = permissaoUsuario.cadastro;
-      }
-      if (requisicao.alteracao) {
-        requisicao.alteracao = permissaoUsuario.alteracao;
-      }
-      if (requisicao.relatorio) {
-        requisicao.relatorio = permissaoUsuario.relatorio;
-      }
-      if (requisicao.advertencia) {
-        requisicao.advertencia = permissaoUsuario.advertencia;
-      }
+
+      permissaoUsuario.nomePermissao =
+        nomePermissao || permissaoUsuario.nomePermissao;
+      permissaoUsuario.cadastro = cadastro || permissaoUsuario.cadastro;
+      permissaoUsuario.alteracao = alteracao || permissaoUsuario.alteracao;
+      permissaoUsuario.relatorio = relatorio || permissaoUsuario.relatorio;
+      permissaoUsuario.advertencia =
+        advertencia || permissaoUsuario.advertencia;
 
       await permissaoUsuario.save();
 

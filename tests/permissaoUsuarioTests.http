@@ -1,4 +1,4 @@
-GET http://127.0.0.1:3400/permissao/
+GET http://localhost:3400/permissao/
 
 ###
 
@@ -14,4 +14,13 @@ Content-Type: application/json
   "cadastro": "true",
   "relatorio": "true",
   "advertencia": "false"
+}
+
+### 
+
+PUT http://localhost:3400/permissao/1
+Content-Type: application/json
+
+{
+  "nomePermissao": "admin1"
 }
