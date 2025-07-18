@@ -11,8 +11,17 @@ Content-Type: application/json
     "ra": "23002302",
     "nome": "João da SIlva",
     "senha": "123456",
-    "ano": 1,
+    "anoCurso": 1,
     "idCurso": 1
+}
+
+###
+
+PUT http://localhost:3400/aluno/1
+Content-Type: application/json
+
+{
+    "telefone": "(42) 99845-8741"
 }
 
 ###

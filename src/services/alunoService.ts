@@ -6,77 +6,91 @@ import Curso from "../models/Curso";
 
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
-    if (!ra) {
-      return ["RA do aluno é obrigatório"];
+    const erros: string[] = [];
+    if (!ra || ra.trim() === "") {
+      erros.push("RA do aluno é obrigatório");
     }
     if (ra.length < 5 || ra.length > 13) {
-      return ["RA do aluno deve ter entre 5 e 13 caracteres"];
+      erros.push("RA do aluno deve ter entre 5 e 13 caracteres");
     }
     if (!/^[0-9]+$/.test(ra)) {
-      return ["RA do aluno deve conter apenas números"];
+      erros.push("RA do aluno deve conter apenas números");
     }
-    return [];
+    return erros;
   }
 
   static verificaNome(nome: string): string[] {
+    const erros: string[] = [];
     if (!nome) {
-      return ["Nome do aluno é obrigatório"];
+      erros.push("Nome do aluno é obrigatório");
     }
     if (nome.length < 3 || nome.length > 40) {
-      return ["Nome do aluno deve ter entre 3 e 40 caracteres"];
+      erros.push("Nome do aluno deve ter entre 3 e 40 caracteres");
     }
     if (!/^[a-zA-Z\u00C0-\u00FF ]+$/.test(nome)) {
-      return ["Nome do aluno deve conter apenas letras"];
+      erros.push("Nome do aluno deve conter apenas letras");
     }
-    return [];
+    return erros;
   }
 
   static verificaTelefone(telefone: string): string[] {
+    const erros: string[] = [];
     if (!telefone) {
-      return [];
+      erros.push("Telefone do aluno é obrigatório");
     }
     if (!/\(\d\d\) \d\d\d\d\d-\d\d\d\d/.test(telefone)) {
-      return ["Telefone inválido"];
+      erros.push("Telefone inválido");
     }
-    return [];
+    return erros;
+  }
+
+  static verificaAnoCurso(ano: number): string[] {
+    const erros: string[] = [];
+    if (ano < 1) {
+      erros.push("Ano do curso nao pode ser inferior a 1");
+    }
+    if (ano > 8) {
+      erros.push("Ano do curso nao pode ser superior à 8");
+    }
+    return erros;
   }
 
   static verificaEmail(email: string): string[] {
+    const erros: string[] = [];
     if (!email) {
-      return [];
+      erros.push("Email do aluno é obrigatório");
     }
-    
     if (
       !/[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?/.test(
         email
       )
     ) {
-      return ["Email inválido"];
+      erros.push("Email inválido");
     }
-    return [];
+    return erros;
   }
 
   static verificaSenha(senha: string): string[] {
+    const erros: string[] = [];
     if (!senha) {
-      return ["Senha do aluno é obrigatória"];
+      erros.push("Senha do aluno é obrigatória");
     }
     if (senha.length < 4 || senha.length > 6) {
-      return ["Senha do aluno deve ter entre 4 e 6 caracteres"];
+      erros.push("Senha do aluno deve ter entre 4 e 6 caracteres");
     }
     if (!/^[0-9]+$/.test(senha)) {
-      return ["Senha do aluno deve conter apenas números"];
+      erros.push("Senha do aluno deve conter apenas números");
     }
-    return [];
+    return erros;
   }
 
   static async getAllAlunos() {
     try {
       const alunos = await Aluno.findAll({
-        attributes: ["ra", "nome", "telefone", "ano", "email", "ativo"],
-        include: 
-          {
-            model: Curso,
-          }, 
+        attributes: ["ra", "nome", "telefone", "anoCurso", "email", "ativo"],
+        include: {
+          model: Curso,
+        },
       });
 
       if (!alunos) {
@@ -93,24 +107,46 @@ export default class AlunoService {
         data: alunos,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: e, data: [] };
     }
   }
 
-  static async searchAlunos(nome: string, ra: string) {
+  static async searchAlunos(nome?: string, ra?: string) {
     try {
+      if (!nome && !ra) {
+        return {
+          status: 400,
+          erros: ["Nome ou RA devem ser informados para busca"],
+          data: [],
+        };
+      }
+      const erros: string[] = [];
+      if (nome && this.verificaNome(nome).length > 0) {
+        erros.push(...this.verificaNome(nome));
+      }
+      if (ra && this.verificaRa(ra).length > 0) {
+        erros.push(...this.verificaRa(ra));
+      }
+      if (erros.length > 0) {
+        return {
+          status: 400,
+          erros: erros,
+          data: [],
+        };
+      }
       const alunos = await Aluno.findAll({
         where: {
           [Op.or]: [
-            { nome: { [Op.like]: `%${nome}%` } },
-            { ra: { [Op.like]: `%${ra}%` } },
+            { nome: { [Op.like]: `%${nome || ""}%` } },
+            { ra: { [Op.like]: `%${ra || ""}%` } },
           ],
         },
-        attributes: ["ra", "nome", "telefone", "ano", "email", "ativo"],
-        include:[ 
+        attributes: ["ra", "nome", "telefone", "anoCurso", "email", "ativo"],
+        include: [
           {
             model: Curso,
-          }, 
+          },
         ],
       });
 
@@ -128,18 +164,19 @@ export default class AlunoService {
         data: alunos,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao buscar alunos"], data: [] };
     }
   }
 
-  static async getAlunoByRa(ra: string) {
+  static async getAlunoById(id: number) {
     try {
-      const aluno = await Aluno.findByPk(ra, {
-        attributes: ["ra", "nome", "telefone", "ano", "email", "ativo"],
-        include:[ 
+      const aluno = await Aluno.findByPk(id, {
+        attributes: ["ra", "nome", "telefone", "anoCurso", "email", "ativo"],
+        include: [
           {
             model: Curso,
-          }, 
+          },
         ],
       });
 
@@ -157,6 +194,7 @@ export default class AlunoService {
         data: aluno,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao buscar aluno"], data: [] };
     }
   }
@@ -165,7 +203,7 @@ export default class AlunoService {
     nome: string,
     ra: string,
     telefone: string,
-    ano: number,
+    anoCurso: number,
     email: string,
     senha: string,
     idCurso: number
@@ -174,12 +212,41 @@ export default class AlunoService {
       const erros: string[] = [
         ...this.verificaRa(ra),
         ...this.verificaNome(nome),
-        ...this.verificaTelefone(telefone),
-        ...this.verificaEmail(email),
+        ...this.verificaAnoCurso(anoCurso),
         ...this.verificaSenha(senha),
       ];
 
-      const novoAluno: any = {}
+      if (telefone) {
+        erros.push(...this.verificaTelefone(telefone));
+      }
+      if (email) {
+        erros.push(...this.verificaEmail(email));
+      }
+
+      if (erros.length > 0) {
+        return {
+          status: 400,
+          erros: erros,
+          data: [],
+        };
+      }
+
+      const alunoExiste = await Aluno.findOne({
+        where: {
+          ra: ra,
+        },
+      });
+
+      if (alunoExiste) {
+        return {
+          status: 400,
+          erros: ["RA já cadastrado"],
+          data: [],
+        };
+      }
+
+      const novoAluno: any = {};
+
       if (ra) {
         novoAluno["ra"] = ra;
       }
@@ -189,8 +256,8 @@ export default class AlunoService {
       if (telefone) {
         novoAluno["telefone"] = telefone;
       }
-      if (ano) {
-        novoAluno["ano"] = ano;
+      if (anoCurso) {
+        novoAluno["anoCurso"] = anoCurso;
       }
       if (email) {
         novoAluno["email"] = email;
@@ -200,16 +267,6 @@ export default class AlunoService {
       }
       if (idCurso) {
         novoAluno["idCurso"] = idCurso;
-      }
-
-
-
-      if (erros.length > 0) {
-        return {
-          status: 400,
-          erros: erros,
-          data: [],
-        };
       }
 
       const aluno = await Aluno.create(novoAluno);
@@ -232,9 +289,31 @@ export default class AlunoService {
     }
   }
 
-  static async updateAluno(ra: string, requisicao: any) {
+  static async updateAluno(
+    id: number,
+    nome?: string,
+    telefone?: string,
+    anoCurso?: number,
+    email?: string,
+    ativo?: boolean
+  ) {
     try {
-      const aluno = await Aluno.findByPk(ra);
+      const aluno = await Aluno.findByPk(id, {
+        attributes: [
+          "id",
+          "ra",
+          "nome",
+          "telefone",
+          "anoCurso",
+          "email",
+          "ativo",
+        ],
+        include: [
+          {
+            model: Curso,
+          },
+        ],
+      });
       if (!aluno) {
         return {
           status: 404,
@@ -245,20 +324,28 @@ export default class AlunoService {
 
       const erros: string[] = [];
 
-      if (requisicao.nome) {
-        const erro = this.verificaNome(requisicao.nome);
+      if (!nome && !telefone && !anoCurso && !email && ativo === undefined) {
+        return {
+          status: 400,
+          erros: ["Pelo menos um campo deve ser informado"],
+          data: [],
+        };
+      }
+
+      if (nome) {
+        const erro = this.verificaNome(nome);
         if (erro.length > 0) {
           erros.push(...erro);
         }
       }
-      if (requisicao.telefone) {
-        const erro = this.verificaTelefone(requisicao.telefone);
+      if (telefone) {
+        const erro = this.verificaTelefone(telefone);
         if (erro.length > 0) {
           erros.push(...erro);
         }
       }
-      if (requisicao.email) {
-        const erro = this.verificaEmail(requisicao.email);
+      if (email) {
+        const erro = this.verificaEmail(email);
         if (erro.length > 0) {
           erros.push(...erro);
         }
@@ -272,7 +359,13 @@ export default class AlunoService {
         };
       }
 
-      const alunoAtualizado = await aluno.update(requisicao);
+      aluno.nome = nome || aluno.nome;
+      aluno.telefone = telefone || aluno.telefone;
+      aluno.anoCurso = anoCurso || aluno.anoCurso;
+      aluno.email = email || aluno.email;
+      aluno.ativo = ativo === undefined ? aluno.ativo : ativo;
+
+      const alunoAtualizado = await aluno.save();
 
       return {
         status: 200,
@@ -280,6 +373,7 @@ export default class AlunoService {
         data: alunoAtualizado,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao atualizar aluno"], data: [] };
     }
   }
@@ -312,6 +406,7 @@ export default class AlunoService {
         data: ["Senha atualizada com sucesso"],
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao atualizar senha"], data: [] };
     }
   }
@@ -335,18 +430,27 @@ export default class AlunoService {
         data: ["Aluno excluído com sucesso"],
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao excluir aluno"], data: [] };
     }
   }
 
   static async loginAluno(ra: string, senha: string) {
     try {
-      const aluno: Aluno|null = await Aluno.findByPk(ra, {
-        attributes: ["ra", "nome", "telefone", "ano", "email","senha", "ativo"],
-        include:[ 
+      const aluno: Aluno | null = await Aluno.findByPk(ra, {
+        attributes: [
+          "ra",
+          "nome",
+          "telefone",
+          "ano",
+          "email",
+          "senha",
+          "ativo",
+        ],
+        include: [
           {
             model: Curso,
-          }, 
+          },
         ],
       });
       if (!aluno) {
@@ -382,6 +486,7 @@ export default class AlunoService {
         data: token,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao fazer login"], data: [] };
     }
   }

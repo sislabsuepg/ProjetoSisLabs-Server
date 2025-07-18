@@ -19,18 +19,18 @@ class AlunoController {
   }
 
   async show(req: Request, res: Response) {
-    const { ra } = req.params;
-    const { status, erros, data } = await AlunoService.getAlunoByRa(ra);
+    const { id } = req.params;
+    const { status, erros, data } = await AlunoService.getAlunoById(Number(id));
     res.status(status).json({ erros, data });
   }
 
   async store(req: Request, res: Response) {
-    const { nome, ra, telefone, ano, email, senha, idCurso } = req.body;
+    const { nome, ra, telefone, anoCurso, email, senha, idCurso } = req.body;
     const { status, erros, data } = await AlunoService.createAluno(
       nome,
       ra,
       telefone,
-      ano,
+      anoCurso,
       email,
       senha,
       idCurso
@@ -39,28 +39,32 @@ class AlunoController {
   }
 
   async update(req: Request, res: Response) {
-    const { ra } = req.params;
-    const { nome, telefone, ano, email, ativo, idCurso } = req.body;
+    const { id } = req.params;
+    const { nome, telefone, anoCurso, email, ativo } = req.body;
     const { status, erros, data } = await AlunoService.updateAluno(
-      ra,
-      req.body
+      Number(id),
+      nome,
+      telefone,
+      anoCurso,
+      email,
+      ativo
     );
     res.status(status).json({ erros, data });
   }
 
   async updateSenha(req: Request, res: Response) {
-    const { ra } = req.params;
+    const { id } = req.params;
     const { novaSenha } = req.body;
     const { status, erros, data } = await AlunoService.updateSenhaAluno(
-      ra,
+      id,
       novaSenha
     );
     res.status(status).json({ erros, data });
   }
 
   async destroy(req: Request, res: Response) {
-    const { ra } = req.params;
-    const { status, erros, data } = await AlunoService.deleteAluno(ra);
+    const { id } = req.params;
+    const { status, erros, data } = await AlunoService.deleteAluno(id);
     res.status(status).json({ erros, data });
   }
 

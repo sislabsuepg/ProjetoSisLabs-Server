@@ -28,6 +28,7 @@ export default class CursoService {
         data: cursos,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao buscar cursos"], data: null };
     }
   }
@@ -48,6 +49,7 @@ export default class CursoService {
         data: curso,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao buscar curso"], data: null };
     }
   }
@@ -62,7 +64,9 @@ export default class CursoService {
           data: null,
         };
       }
-      const curso = await Curso.findAll({ where: { nome: { [Op.like]: `%${nomeBusca}%` } } });
+      const curso = await Curso.findAll({
+        where: { nome: { [Op.like]: `%${nomeBusca}%` } },
+      });
       if (!curso) {
         return {
           status: 404,
@@ -76,6 +80,7 @@ export default class CursoService {
         data: curso,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao buscar curso"], data: null };
     }
   }
@@ -117,6 +122,7 @@ export default class CursoService {
         data: curso,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao criar curso"], data: null };
     }
   }
@@ -166,6 +172,7 @@ export default class CursoService {
         data: curso,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao atualizar curso"], data: null };
     }
   }
@@ -187,6 +194,7 @@ export default class CursoService {
         data: null,
       };
     } catch (e) {
+      console.log(e);
       return { status: 500, erros: ["Erro ao deletar curso"], data: null };
     }
   }

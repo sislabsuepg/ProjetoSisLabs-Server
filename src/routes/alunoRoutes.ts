@@ -6,16 +6,16 @@ const router: Router = Router();
 
 router.get("/", AlunoController.index);
 
-router.get("/:ra", AlunoController.show);
+router.get("/:id", AlunoController.show);
 
 router.post("/", AlunoController.store);
 
 router.post("/login", AlunoController.login);
 
-router.put("/senha/:ra", AlunoController.updateSenha);
+router.put("/senha/:id", AlunoController.updateSenha);
 
-router.put("/:ra", AlunoController.update);
+router.put("/:id", AlunoController.update);
 
-router.delete("/:ra", AlunoController.destroy);
+router.delete("/:id", AlunoController.destroy);
 
 export default router;

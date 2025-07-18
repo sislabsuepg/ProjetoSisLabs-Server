@@ -20,6 +20,7 @@ export default class PermissaoUsuarioService {
         data: permissoes,
       };
     } catch (e) {
+      console.log(e);
       return {
         status: 500,
         erros: ["Erro ao buscar permissoes"],
@@ -45,6 +46,7 @@ export default class PermissaoUsuarioService {
         data: permissaoUsuario,
       };
     } catch (e) {
+      console.log(e);
       return {
         status: 500,
         erros: ["Erro ao buscar permissão"],
@@ -74,6 +76,7 @@ export default class PermissaoUsuarioService {
         data: permissaoUsuario,
       };
     } catch (e) {
+      console.log(e);
       return {
         status: 500,
         erros: ["Erro ao buscar permissao de usuario"],
@@ -190,6 +193,7 @@ export default class PermissaoUsuarioService {
         data: permissaoUsuario,
       };
     } catch (e) {
+      console.log(e);
       return {
         status: 500,
         erros: ["Erro ao atualizar permissão de usuario"],
@@ -217,6 +221,7 @@ export default class PermissaoUsuarioService {
         data: ["Permissão de usuario deletada com sucesso"],
       };
     } catch (e) {
+      console.log(e);
       return {
         status: 500,
         erros: ["Erro ao deletar permissão de usuario"],
