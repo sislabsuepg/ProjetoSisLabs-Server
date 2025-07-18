@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import Aluno from "../models/Aluno";
 import config from "../config/config";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import Curso from "../models/Curso";
 
 export default class AlunoService {
@@ -437,22 +437,11 @@ export default class AlunoService {
 
   static async loginAluno(ra: string, senha: string) {
     try {
-      const aluno: Aluno | null = await Aluno.findByPk(ra, {
-        attributes: [
-          "ra",
-          "nome",
-          "telefone",
-          "ano",
-          "email",
-          "senha",
-          "ativo",
-        ],
-        include: [
-          {
-            model: Curso,
-          },
-        ],
-      });
+      const aluno: Aluno | null = await Aluno.findOne({
+        where: {
+          ra
+        }
+      })
       if (!aluno) {
         return {
           status: 404,
@@ -476,9 +465,8 @@ export default class AlunoService {
           data: [],
         };
       }
-      const token = jwt.sign({ aluno }, config.secret, {
-        expiresIn: "2h",
-      });
+
+      const token: string = jwt.sign({ aluno }, config.secret as string, { expiresIn: config.expires as string || "30min" });
 
       return {
         status: 200,

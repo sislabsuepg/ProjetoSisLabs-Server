@@ -52,7 +52,7 @@ class AlunoController {
     res.status(status).json({ erros, data });
   }
 
-  async updateSenha(req: Request, res: Response) {
+  /* async updateSenha(req: Request, res: Response) {
     const { id } = req.params;
     const { novaSenha } = req.body;
     const { status, erros, data } = await AlunoService.updateSenhaAluno(
@@ -60,7 +60,7 @@ class AlunoController {
       novaSenha
     );
     res.status(status).json({ erros, data });
-  }
+  } */
 
   async destroy(req: Request, res: Response) {
     const { id } = req.params;

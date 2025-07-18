@@ -12,7 +12,7 @@ router.post("/", AlunoController.store);
 
 router.post("/login", AlunoController.login);
 
-router.put("/senha/:id", AlunoController.updateSenha);
+/* router.put("/senha/:id", AlunoController.updateSenha); */
 
 router.put("/:id", AlunoController.update);
 
