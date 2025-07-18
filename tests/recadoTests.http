@@ -1,0 +1,30 @@
+GET http://localhost:3400/recado
+Content-Type: application/json
+
+###
+
+GET http://localhost:3400/recado/1
+Content-Type: application/json
+
+###
+
+POST http://localhost:3400/recado
+Content-Type: application/json
+
+{
+ "texto": "Descrição do novo recado"
+}
+
+###
+
+PUT http://localhost:3400/recado/1
+Content-Type: application/json
+
+{
+ "texto": "Descrição do recado atualizado"
+}
+
+###
+
+DELETE http://localhost:3400/recado/1
+Content-Type: application/json

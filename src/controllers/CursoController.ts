@@ -1,5 +1,3 @@
-import Curso from "../models/Curso";
-
 import CursoService from "../services/cursoService";
 import { Request, Response } from "express";
 

@@ -11,6 +11,7 @@ import PermissaoUsuario from "../models/PermissaoUsuario";
 import Professor from "../models/Professor";
 import Registro from "../models/Registro";
 import Usuario from "../models/Usuario";
+import Recado from "../models/Recado";
 
 const connection: Sequelize = new Sequelize({
   ...databaseConfig,
@@ -25,6 +26,7 @@ const connection: Sequelize = new Sequelize({
     Orientacao,
     PermissaoUsuario,
     Professor,
+    Recado,
     Registro,
     Usuario,
   ],
