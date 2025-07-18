@@ -1,0 +1,39 @@
+###
+
+GET http://localhost:3400/usuario/
+Content-Type: application/json
+
+###
+
+POST http://localhost:3400/usuario/
+Content-Type: application/json
+
+{
+    "nome": "Maria Oliveira",
+    "login": "Maria",
+    "senha": "123456",
+    "idPermissao": 1
+}
+
+###
+
+GET http://localhost:3400/usuario/1
+Content-Type: application/json
+
+###
+
+PUT http://localhost:3400/usuario/1
+Content-Type: application/json
+
+{
+    "ativo": false
+}
+
+###
+POST http://localhost:3400/usuario/login
+Content-Type: application/json
+
+{
+    "login": "Maria",
+    "senha": "123456"
+}

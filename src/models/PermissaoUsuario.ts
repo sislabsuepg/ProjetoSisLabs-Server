@@ -24,7 +24,7 @@ interface PermissaoUsuarioAtributos {
 }
 
 interface PermissaoUsuarioCreationAtributos
-  extends Optional<PermissaoUsuarioAtributos, "id"> {}
+  extends Optional<PermissaoUsuarioAtributos, "id"> { }
 
 @Table({
   tableName: "permissaoUsuario",
@@ -79,7 +79,7 @@ export default class PermissaoUsuario extends Model<
   declare advertencia: boolean;
 
   @HasMany(() => Usuario, {
-    foreignKey: "idpermissao",
+    foreignKey: "idPermissao",
     sourceKey: "id",
   })
   declare usuarios: Usuario[];

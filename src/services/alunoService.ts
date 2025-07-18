@@ -471,7 +471,7 @@ export default class AlunoService {
       return {
         status: 200,
         erros: [],
-        data: token,
+        data: { aluno, token },
       };
     } catch (e) {
       console.log(e);

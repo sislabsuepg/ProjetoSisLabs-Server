@@ -10,12 +10,14 @@ import {
   AutoIncrement,
   Unique,
   HasMany,
+  BeforeCreate,
 } from "sequelize-typescript";
 
 import PermissaoUsuario from "./PermissaoUsuario";
 import Registro from "./Registro";
 import Emprestimo from "./Emprestimo";
 import { Optional } from "sequelize";
+import md5 from "md5";
 
 interface UsuarioAtributos {
   id: number;
@@ -26,7 +28,7 @@ interface UsuarioAtributos {
   idPermissao: number;
 }
 
-interface UsuarioCreationAtributos extends Optional<UsuarioAtributos, "id"> {}
+interface UsuarioCreationAtributos extends Optional<UsuarioAtributos, "id"> { }
 
 @Table({
   tableName: "usuario",
@@ -96,5 +98,26 @@ export default class Usuario extends Model<
     sourceKey: "id",
   })
   declare emprestimosSaida: Emprestimo[];
+
+  @BeforeCreate
+  static preparaNome(instance: Usuario) {
+    instance.nome = instance.nome
+      .split(" ")
+      .map((n) => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase())
+      .join(" ");
+  }
+
+  @BeforeCreate
+  static hashSenha(instance: Usuario) {
+    instance.senha = md5(instance.senha);
+  }
+
+  verificaSenha(senhaInserida: string) {
+    return md5(senhaInserida) === this.senha;
+  }
+
+  atualizaSenha(senha: string) {
+    this.senha = md5(senha);
+  }
 }
 //modificado
