@@ -12,7 +12,7 @@ class App {
   app: any;
 
   constructor() {
-    connection.sync({ force: true }); //remover em produção, essa linha força a recriação do banco de dados, apagando os dados existentes
+    connection.sync({ alter: true }); //remover em produção, essa linha força a recriação do banco de dados, apagando os dados existentes
     this.app = express();
     this.middlewares();
     this.routes();
