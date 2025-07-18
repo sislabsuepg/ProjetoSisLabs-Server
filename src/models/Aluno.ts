@@ -143,7 +143,7 @@ export default class Aluno extends Model<
   }
 
   verificaSenha(senhaInserida: string) {
-    return md5(senhaInserida) == this.senha;
+    return md5(senhaInserida) === this.senha;
   }
 
   atualizaSenha(senha: string) {
