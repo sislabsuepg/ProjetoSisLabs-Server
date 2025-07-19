@@ -9,8 +9,6 @@ import {
   AutoIncrement,
   AllowNull,
   Unique,
-  BelongsTo,
-  BelongsToMany,
   HasMany,
 } from "sequelize-typescript";
 

@@ -67,6 +67,9 @@ export default class AlunoService {
     ) {
       erros.push("Email inválido");
     }
+    if (email.length > 40) {
+      erros.push("Email do aluno deve ter no máximo 40 caracteres");
+    }
     return erros;
   }
 

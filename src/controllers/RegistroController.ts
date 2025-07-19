@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 class RegistroController {
   async index(req: Request, res: Response) {
     const { status, erros, data } = await RegistroService.getAllRegistros();
-    return res.status(status).json({ erros, data });
+    res.status(status).json({ erros, data });
   }
 
   async show(req: Request, res: Response) {
@@ -12,7 +12,7 @@ class RegistroController {
     const { status, erros, data } = await RegistroService.getRegistroById(
       Number(id)
     );
-    return res.status(status).json({ erros, data });
+    res.status(status).json({ erros, data });
   }
 
   async showByUserId(req: Request, res: Response) {
@@ -20,7 +20,7 @@ class RegistroController {
     const { status, erros, data } = await RegistroService.getRegistroByUserId(
       Number(userId)
     );
-    return res.status(status).json({ erros, data });
+    res.status(status).json({ erros, data });
   }
 
   async create(req: Request, res: Response) {
@@ -31,14 +31,7 @@ class RegistroController {
       descricao,
       idUsuario
     );
-    return res.status(status).json({ erros, data });
-  }
-
-  constructor() {
-    this.index = this.index.bind(this);
-    this.show = this.show.bind(this);
-    this.showByUserId = this.showByUserId.bind(this);
-    this.create = this.create.bind(this);
+    res.status(status).json({ erros, data });
   }
 }
 

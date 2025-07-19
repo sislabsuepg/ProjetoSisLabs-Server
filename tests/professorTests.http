@@ -1,0 +1,28 @@
+GET http://localhost:3400/professor
+
+###
+
+GET http://localhost:3400/professor/1
+
+###
+
+POST http://localhost:3400/professor
+Content-Type: application/json
+
+{
+  "nome": "Professor Test",
+  "email": "professor@test.com"
+}
+
+###
+
+PUT http://localhost:3400/professor/1
+Content-Type: application/json
+
+{
+    "email": "Professor Test Updated"
+}
+
+###
+
+DELETE http://localhost:3400/professor/1

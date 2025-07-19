@@ -8,6 +8,7 @@ import permissaoUsuarioRoutes from "./routes/permissaoUsuarioRoutes";
 import UsuarioRoutes from "./routes/usuarioRoutes";
 import RecadoRoutes from "./routes/recadoRoutes";
 import RegistroRoutes from "./routes/registroRoutes";
+import professorRoutes from "./routes/professorRoutes";
 
 class App {
   app: any;
@@ -33,6 +34,7 @@ class App {
     this.app.use("/usuario/", UsuarioRoutes);
     this.app.use("/recado/", RecadoRoutes);
     this.app.use("/registro/", RegistroRoutes);
+    this.app.use("/professor/", professorRoutes);
   }
 }
 
