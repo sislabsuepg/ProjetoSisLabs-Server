@@ -21,8 +21,7 @@ PUT http://localhost:3400/aluno/1
 Content-Type: application/json
 
 {
-    "telefone": "(42) 99845-8741",
-    "ativo": false
+    "anoCurso":6
 }
 
 ###

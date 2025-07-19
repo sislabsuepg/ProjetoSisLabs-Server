@@ -1,0 +1,19 @@
+### Get all registros
+
+GET http://localhost:3400/registro
+
+### Get a specific registro by ID
+GET http://localhost:3400/registro/1
+
+### Get a specific user registro by user ID
+GET http://localhost:3400/registro/user/1
+
+### Create a new registro
+
+POST http://localhost:3400/registro
+Content-Type: application/json
+
+{
+  "descricao": "Novo registro",
+  "idUsuario": 1
+}

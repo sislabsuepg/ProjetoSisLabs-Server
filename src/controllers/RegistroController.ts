@@ -1,0 +1,45 @@
+import RegistroService from "../services/registroService";
+import { Request, Response } from "express";
+
+class RegistroController {
+  async index(req: Request, res: Response) {
+    const { status, erros, data } = await RegistroService.getAllRegistros();
+    return res.status(status).json({ erros, data });
+  }
+
+  async show(req: Request, res: Response) {
+    const { id } = req.params;
+    const { status, erros, data } = await RegistroService.getRegistroById(
+      Number(id)
+    );
+    return res.status(status).json({ erros, data });
+  }
+
+  async showByUserId(req: Request, res: Response) {
+    const { userId } = req.params;
+    const { status, erros, data } = await RegistroService.getRegistroByUserId(
+      Number(userId)
+    );
+    return res.status(status).json({ erros, data });
+  }
+
+  async create(req: Request, res: Response) {
+    const { descricao, idUsuario } = req.body;
+    const dataHora: Date = new Date();
+    const { status, erros, data } = await RegistroService.createRegistro(
+      dataHora,
+      descricao,
+      idUsuario
+    );
+    return res.status(status).json({ erros, data });
+  }
+
+  constructor() {
+    this.index = this.index.bind(this);
+    this.show = this.show.bind(this);
+    this.showByUserId = this.showByUserId.bind(this);
+    this.create = this.create.bind(this);
+  }
+}
+
+export default new RegistroController();

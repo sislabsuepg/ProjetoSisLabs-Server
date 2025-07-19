@@ -23,7 +23,7 @@ PUT http://localhost:3400/curso/1
 Content-Type: application/json
 
 {
-    "nome": "Engenharia de Software Avançada"
+    "anosMax": 8
 }
 
 ###

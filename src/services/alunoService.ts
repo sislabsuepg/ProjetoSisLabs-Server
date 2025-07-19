@@ -350,6 +350,15 @@ export default class AlunoService {
           erros.push(...erro);
         }
       }
+      if (anoCurso) {
+        const erro = this.verificaAnoCurso(anoCurso);
+        if (anoCurso > aluno.curso.anosMaximo) {
+          erro.push("Ano do curso excede o limite máximo");
+        }
+        if (erro.length > 0) {
+          erros.push(...erro);
+        }
+      }
 
       if (erros.length > 0) {
         return {
@@ -439,9 +448,9 @@ export default class AlunoService {
     try {
       const aluno: Aluno | null = await Aluno.findOne({
         where: {
-          ra
-        }
-      })
+          ra,
+        },
+      });
       if (!aluno) {
         return {
           status: 404,
@@ -466,7 +475,9 @@ export default class AlunoService {
         };
       }
 
-      const token: string = jwt.sign({ aluno }, config.secret as string, { expiresIn: config.expires as string || "30min" });
+      const token: string = jwt.sign({ aluno }, config.secret as string, {
+        expiresIn: (config.expires as string) || "30min",
+      });
 
       return {
         status: 200,
