@@ -1,0 +1,30 @@
+GET http://localhost:3400/laboratorio/
+
+###
+
+GET http://localhost:3400/laboratorio/1
+
+###
+
+POST http://localhost:3400/laboratorio/
+Content-Type: application/json
+
+{
+  "numero": "101",
+  "nome": "Laboratório de Informática",
+  "restrito": false
+}
+
+###
+
+PUT http://localhost:3400/laboratorio/1
+Content-Type: application/json
+
+{
+  "nome": "l"
+}
+
+###
+
+
+DELETE http://localhost:3400/laboratorio/1
