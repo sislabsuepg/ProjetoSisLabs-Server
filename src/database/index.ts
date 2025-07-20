@@ -16,6 +16,7 @@ import Recado from "../models/Recado";
 const connection: Sequelize = new Sequelize({
   ...databaseConfig,
   dialect: "postgres",
+  timezone: "+00:00",
   models: [
     Aluno,
     Curso,
