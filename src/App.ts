@@ -11,6 +11,7 @@ import RegistroRoutes from "./routes/registroRoutes";
 import professorRoutes from "./routes/professorRoutes";
 import laboratorioRoutes from "./routes/laboratorioRoutes";
 import eventoRoutes from "./routes/eventoRoutes";
+import horarioRoutes from "./routes/horarioRoutes";
 class App {
   app: any;
 
@@ -38,6 +39,7 @@ class App {
     this.app.use("/professor/", professorRoutes);
     this.app.use("/laboratorio/", laboratorioRoutes);
     this.app.use("/evento/", eventoRoutes);
+    this.app.use("/horario/", horarioRoutes);
   }
 }
 

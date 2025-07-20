@@ -16,6 +16,7 @@ import {
 import Aluno from "./Aluno";
 import Evento from "./Evento";
 import Orientacao from "./Orientacao";
+import Horario from "./Horario";
 interface LaboratorioAtributos {
   id: string;
   nome: string;
@@ -75,4 +76,10 @@ export default class Laboratorio extends Model<
     sourceKey: "id",
   })
   declare orientacoes: Orientacao[];
+
+  @HasMany(() => Horario, {
+    foreignKey: "idLaboratorio",
+    sourceKey: "id",
+  })
+  declare horarios: Horario[];
 }

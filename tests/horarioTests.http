@@ -1,0 +1,28 @@
+GET http://localhost:3400/horario
+
+###
+
+GET http://localhost:3400/horario/1
+
+###
+
+POST http://localhost:3400/horario
+Content-Type: application/json
+
+{
+  "diaSemana":3,
+  "horario":"08:00",
+  "idLaboratorio":1
+}
+
+###
+
+PUT http://localhost:3400/horario/1
+Content-Type: application/json
+
+{
+  "semestral": true,
+  "idProfessor":1
+}
+###
+DELETE http://localhost:3400/horario/1

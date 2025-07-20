@@ -8,9 +8,7 @@ import {
   PrimaryKey,
   AutoIncrement,
   AllowNull,
-  Unique,
-  BelongsToMany,
-  ForeignKey,
+  BelongsTo,
 } from "sequelize-typescript";
 
 import Professor from "./Professor";
@@ -20,15 +18,10 @@ interface HorarioAtributos {
   diaSemana: number;
   horario: string;
   semestral: boolean;
-  idProfessor: number;
-  idLaboratorio: number;
 }
 
 interface HorarioCreationAtributos
-  extends Optional<
-    HorarioAtributos,
-    "id" | "semestral" | "idProfessor" | "idLaboratorio"
-  > {}
+  extends Optional<HorarioAtributos, "id" | "semestral"> {}
 
 @Table({
   tableName: "horario",
@@ -56,7 +49,7 @@ export default class Horario extends Model<
   @Column({
     type: DataType.STRING(5), // formato HH:MM
   })
-  declare hora: string;
+  declare horario: string;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -64,17 +57,15 @@ export default class Horario extends Model<
   })
   declare semestral: boolean;
 
-  @AllowNull(true)
-  @ForeignKey(() => Professor)
-  @Column({
-    type: DataType.INTEGER,
+  @BelongsTo(() => Professor, {
+    foreignKey: "idProfessor",
+    targetKey: "id",
   })
-  declare idProfessor: number;
+  declare professor: Professor;
 
-  @AllowNull(false)
-  @ForeignKey(() => Laboratorio)
-  @Column({
-    type: DataType.INTEGER,
+  @BelongsTo(() => Laboratorio, {
+    foreignKey: "idLaboratorio",
+    targetKey: "id",
   })
-  declare idLaboratorio: number;
+  declare laboratorio: Laboratorio;
 }

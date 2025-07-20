@@ -13,6 +13,7 @@ import {
 } from "sequelize-typescript";
 
 import Orientacao from "./Orientacao";
+import Horario from "./Horario";
 
 interface ProfessorAttributes {
   id: number;
@@ -66,4 +67,10 @@ export default class Professor extends Model<
     sourceKey: "id",
   })
   declare orientacoes: Orientacao[];
+
+  @HasMany(() => Horario, {
+    foreignKey: "idProfessor",
+    sourceKey: "id",
+  })
+  declare horarios: Horario[];
 }
