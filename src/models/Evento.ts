@@ -15,6 +15,7 @@ import Laboratorio from "./Laboratorio";
 
 interface EventoAtributos {
   id: number;
+  nome: string;
   data: Date;
   duracao: number; // Duração em minutos
   responsavel: string;
@@ -38,6 +39,12 @@ export default class Evento extends Model<
     type: DataType.INTEGER,
   })
   declare id: number;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.STRING(40),
+  })
+  declare nome: string;
 
   @AllowNull(false)
   @Column({

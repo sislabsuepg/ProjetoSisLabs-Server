@@ -1,5 +1,6 @@
 import Laboratorio from "../models/Laboratorio";
 import { Op } from "sequelize";
+import codes from "../types/responseCodes";
 
 export default class laboratorioService {
   static verificaNumero(numero: string): string[] {
@@ -35,19 +36,19 @@ export default class laboratorioService {
       const laboratorios = await Laboratorio.findAll();
       if (!laboratorios) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Nenhum laboratório encontrado"],
           data: null,
         };
       }
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: laboratorios,
       };
     } catch (error) {
       return {
-        status: 500,
+        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar laboratórios"],
         data: null,
       };
@@ -59,20 +60,20 @@ export default class laboratorioService {
       const laboratorio = await Laboratorio.findByPk(id);
       if (!laboratorio) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Laboratório não encontrado"],
           data: null,
         };
       }
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: laboratorio,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: 500,
+        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar laboratório"],
         data: null,
       };
@@ -91,7 +92,7 @@ export default class laboratorioService {
       ];
       if (erros.length > 0) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros,
           data: null,
         };
@@ -103,7 +104,7 @@ export default class laboratorioService {
       });
       if (existe) {
         return {
-          status: 409,
+          status: codes.CONFLICT,
           erros: ["Laboratório com o mesmo número ou nome já existe"],
           data: null,
         };
@@ -114,13 +115,13 @@ export default class laboratorioService {
         restrito: restrito || false,
       });
       return {
-        status: 201,
+        status: codes.CREATED,
         erros: [],
         data: laboratorio,
       };
     } catch (error) {
       return {
-        status: 500,
+        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar laboratório"],
         data: null,
       };
@@ -137,14 +138,14 @@ export default class laboratorioService {
       const laboratorio = await Laboratorio.findByPk(id);
       if (!laboratorio) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Laboratório não encontrado"],
           data: null,
         };
       }
       if (!numero && !nome && restrito === undefined) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: ["Nenhum dado para atualizar"],
           data: null,
         };
@@ -155,7 +156,7 @@ export default class laboratorioService {
       ];
       if (erros.length > 0) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros,
           data: null,
         };
@@ -166,13 +167,13 @@ export default class laboratorioService {
         restrito == undefined ? laboratorio.restrito : restrito;
       await laboratorio.save();
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: laboratorio,
       };
     } catch (error) {
       return {
-        status: 500,
+        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar laboratório"],
         data: null,
       };
@@ -184,20 +185,20 @@ export default class laboratorioService {
       const laboratorio = await Laboratorio.findByPk(id);
       if (!laboratorio) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Laboratório não encontrado"],
           data: null,
         };
       }
       await laboratorio.destroy();
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: null,
       };
     } catch (error) {
       return {
-        status: 500,
+        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar laboratório"],
         data: null,
       };

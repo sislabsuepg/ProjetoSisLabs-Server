@@ -1,6 +1,6 @@
 import Registro from "../models/Registro";
 import Usuario from "../models/Usuario";
-
+import codes from "../types/responseCodes";
 export default class RegistroService {
   static async getAllRegistros() {
     try {
@@ -14,15 +14,19 @@ export default class RegistroService {
       });
       if (!registros) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Nenhum registro encontrado"],
           data: null,
         };
       }
-      return { status: 200, erros: [], data: registros };
+      return { status: codes.OK, erros: [], data: registros };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao buscar registros"], data: null };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao buscar registros"],
+        data: null,
+      };
     }
   }
 
@@ -38,12 +42,20 @@ export default class RegistroService {
         ],
       });
       if (!registro) {
-        return { status: 404, erros: ["Registro não encontrado"], data: null };
+        return {
+          status: codes.NO_CONTENT,
+          erros: ["Registro não encontrado"],
+          data: null,
+        };
       }
-      return { status: 200, erros: [], data: registro };
+      return { status: codes.OK, erros: [], data: registro };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao buscar registro"], data: null };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao buscar registro"],
+        data: null,
+      };
     }
   }
 
@@ -60,15 +72,19 @@ export default class RegistroService {
       });
       if (!registros) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Nenhum registro encontrado"],
           data: null,
         };
       }
-      return { status: 200, erros: [], data: registros };
+      return { status: codes.OK, erros: [], data: registros };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao buscar registros"], data: null };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao buscar registros"],
+        data: null,
+      };
     }
   }
 
@@ -80,17 +96,25 @@ export default class RegistroService {
     try {
       const usuario = await Usuario.findByPk(idUsuario);
       if (!usuario) {
-        return { status: 404, erros: ["Usuário não encontrado"], data: null };
+        return {
+          status: codes.NOT_FOUND,
+          erros: ["Usuário não encontrado"],
+          data: null,
+        };
       }
       const registro = await Registro.create({
         dataHora,
         descricao,
         idUsuario,
       });
-      return { status: 201, erros: [], data: registro };
+      return { status: codes.CREATED, erros: [], data: registro };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao criar registro"], data: null };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao criar registro"],
+        data: null,
+      };
     }
   }
 }

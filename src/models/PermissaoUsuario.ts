@@ -17,6 +17,7 @@ import Usuario from "./Usuario";
 interface PermissaoUsuarioAtributos {
   id: number;
   nomePermissao: string;
+  geral: boolean;
   cadastro: boolean;
   alteracao: boolean;
   relatorio: boolean;
@@ -24,7 +25,7 @@ interface PermissaoUsuarioAtributos {
 }
 
 interface PermissaoUsuarioCreationAtributos
-  extends Optional<PermissaoUsuarioAtributos, "id"> { }
+  extends Optional<PermissaoUsuarioAtributos, "id"> {}
 
 @Table({
   tableName: "permissaoUsuario",
@@ -49,6 +50,13 @@ export default class PermissaoUsuario extends Model<
     type: DataType.STRING(30),
   })
   declare nomePermissao: string;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  declare geral: boolean;
 
   @AllowNull(false)
   @Column({

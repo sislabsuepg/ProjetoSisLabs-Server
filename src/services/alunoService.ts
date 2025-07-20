@@ -1,9 +1,9 @@
 import { Op } from "sequelize";
 import Aluno from "../models/Aluno";
 import config from "../config/config";
-import jwt, { SignOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import Curso from "../models/Curso";
-
+import codes from "../types/responseCodes";
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
     const erros: string[] = [];
@@ -98,20 +98,20 @@ export default class AlunoService {
 
       if (!alunos) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Nenhum aluno encontrado"],
           data: [],
         };
       }
 
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: alunos,
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: e, data: [] };
+      return { status: codes.INTERNAL_SERVER_ERROR, erros: e, data: [] };
     }
   }
 
@@ -119,21 +119,19 @@ export default class AlunoService {
     try {
       if (!nome && !ra) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: ["Nome ou RA devem ser informados para busca"],
           data: [],
         };
       }
-      const erros: string[] = [];
-      if (nome && this.verificaNome(nome).length > 0) {
-        erros.push(...this.verificaNome(nome));
-      }
-      if (ra && this.verificaRa(ra).length > 0) {
-        erros.push(...this.verificaRa(ra));
-      }
+      const erros: string[] = [
+        ...(nome ? this.verificaNome(nome) : []),
+        ...(ra ? this.verificaRa(ra) : []),
+      ];
+
       if (erros.length > 0) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -155,20 +153,24 @@ export default class AlunoService {
 
       if (!alunos) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Nenhum aluno encontrado"],
           data: [],
         };
       }
 
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: alunos,
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao buscar alunos"], data: [] };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao buscar alunos"],
+        data: [],
+      };
     }
   }
 
@@ -185,20 +187,24 @@ export default class AlunoService {
 
       if (!aluno) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Aluno não encontrado"],
           data: [],
         };
       }
 
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: aluno,
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao buscar aluno"], data: [] };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao buscar aluno"],
+        data: [],
+      };
     }
   }
 
@@ -217,18 +223,14 @@ export default class AlunoService {
         ...this.verificaNome(nome),
         ...this.verificaAnoCurso(anoCurso),
         ...this.verificaSenha(senha),
+        ...(telefone ? this.verificaTelefone(telefone) : []),
+        ...this.verificaEmail(email),
+        ...(idCurso ? [] : ["ID do curso é obrigatório"]),
       ];
-
-      if (telefone) {
-        erros.push(...this.verificaTelefone(telefone));
-      }
-      if (email) {
-        erros.push(...this.verificaEmail(email));
-      }
 
       if (erros.length > 0) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -242,7 +244,7 @@ export default class AlunoService {
 
       if (alunoExiste) {
         return {
-          status: 400,
+          status: codes.CONFLICT,
           erros: ["RA já cadastrado"],
           data: [],
         };
@@ -275,20 +277,24 @@ export default class AlunoService {
       const aluno = await Aluno.create(novoAluno);
       if (!aluno) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: ["Erro ao criar aluno"],
           data: [],
         };
       }
 
       return {
-        status: 201,
+        status: codes.CREATED,
         erros: [],
         data: aluno,
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao criar aluno"], data: [] };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao criar aluno"],
+        data: [],
+      };
     }
   }
 
@@ -319,53 +325,32 @@ export default class AlunoService {
       });
       if (!aluno) {
         return {
-          status: 404,
+          status: codes.NOT_FOUND,
           erros: ["Aluno não encontrado"],
           data: [],
         };
       }
 
-      const erros: string[] = [];
-
       if (!nome && !telefone && !anoCurso && !email && ativo === undefined) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: ["Pelo menos um campo deve ser informado"],
           data: [],
         };
       }
 
-      if (nome) {
-        const erro = this.verificaNome(nome);
-        if (erro.length > 0) {
-          erros.push(...erro);
-        }
-      }
-      if (telefone) {
-        const erro = this.verificaTelefone(telefone);
-        if (erro.length > 0) {
-          erros.push(...erro);
-        }
-      }
-      if (email) {
-        const erro = this.verificaEmail(email);
-        if (erro.length > 0) {
-          erros.push(...erro);
-        }
-      }
-      if (anoCurso) {
-        const erro = this.verificaAnoCurso(anoCurso);
-        if (anoCurso > aluno.curso.anosMaximo) {
-          erro.push("Ano do curso excede o limite máximo");
-        }
-        if (erro.length > 0) {
-          erros.push(...erro);
-        }
-      }
+      const erros: string[] = [
+        ...(nome ? this.verificaNome(nome) : []),
+        ...(telefone ? this.verificaTelefone(telefone) : []),
+        ...(email ? this.verificaEmail(email) : []),
+        ...(anoCurso || (anoCurso && anoCurso > aluno.curso.anosMaximo)
+          ? this.verificaAnoCurso(anoCurso)
+          : []),
+      ];
 
       if (erros.length > 0) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -380,13 +365,17 @@ export default class AlunoService {
       const alunoAtualizado = await aluno.save();
 
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: alunoAtualizado,
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao atualizar aluno"], data: [] };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao atualizar aluno"],
+        data: [],
+      };
     }
   }
 
@@ -395,7 +384,7 @@ export default class AlunoService {
       const aluno = await Aluno.findByPk(ra);
       if (!aluno) {
         return {
-          status: 404,
+          status: codes.NO_CONTENT,
           erros: ["Aluno não encontrado"],
           data: [],
         };
@@ -403,7 +392,7 @@ export default class AlunoService {
 
       if (this.verificaSenha(novaSenha).length > 0) {
         return {
-          status: 400,
+          status: codes.BAD_REQUEST,
           erros: this.verificaSenha(novaSenha),
           data: [],
         };
@@ -413,13 +402,17 @@ export default class AlunoService {
       await aluno.save();
 
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: ["Senha atualizada com sucesso"],
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao atualizar senha"], data: [] };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao atualizar senha"],
+        data: [],
+      };
     }
   }
 
@@ -428,7 +421,7 @@ export default class AlunoService {
       const aluno = await Aluno.findByPk(ra);
       if (!aluno) {
         return {
-          status: 404,
+          status: codes.NOT_FOUND,
           erros: ["Aluno não encontrado"],
           data: [],
         };
@@ -437,13 +430,17 @@ export default class AlunoService {
       await aluno.destroy();
 
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: ["Aluno excluído com sucesso"],
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao excluir aluno"], data: [] };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao excluir aluno"],
+        data: [],
+      };
     }
   }
 
@@ -456,7 +453,7 @@ export default class AlunoService {
       });
       if (!aluno) {
         return {
-          status: 404,
+          status: codes.NOT_FOUND,
           erros: ["RA não encontrado"],
           data: [],
         };
@@ -464,7 +461,7 @@ export default class AlunoService {
 
       if (!aluno.verificaSenha(senha)) {
         return {
-          status: 401,
+          status: codes.UNAUTHORIZED,
           erros: ["senha inválida"],
           data: [],
         };
@@ -472,7 +469,7 @@ export default class AlunoService {
       aluno.senha = "";
       if (!aluno.ativo) {
         return {
-          status: 401,
+          status: codes.UNAUTHORIZED,
           erros: ["Aluno não está ativo"],
           data: [],
         };
@@ -483,13 +480,17 @@ export default class AlunoService {
       });
 
       return {
-        status: 200,
+        status: codes.OK,
         erros: [],
         data: { aluno, token },
       };
     } catch (e) {
       console.log(e);
-      return { status: 500, erros: ["Erro ao fazer login"], data: [] };
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao fazer login"],
+        data: [],
+      };
     }
   }
 }
