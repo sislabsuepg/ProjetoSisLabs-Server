@@ -1,0 +1,33 @@
+GET http://localhost:3400/orientacao/
+
+###
+
+GET http://localhost:3400/orientacao/1
+
+
+###
+
+
+POST http://localhost:3400/orientacao/
+Content-Type: application/json
+
+{
+    "dataInicio": "2025-10-01T00:00:00.000Z",
+    "dataFim": "2025-10-31T23:59:59.000Z",
+    "idProfessor": 2,
+    "idLaboratorio": 1,
+    "idAluno": 1
+}
+
+###
+
+PUT http://localhost:3400/orientacao/1
+Content-Type: application/json
+
+{
+    "dataInicio": "2025-10-01T00:00:00.000Z"
+}
+
+### 
+
+DELETE http://localhost:3400/orientacao/1
