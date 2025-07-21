@@ -13,6 +13,7 @@ import laboratorioRoutes from "./routes/laboratorioRoutes";
 import eventoRoutes from "./routes/eventoRoutes";
 import horarioRoutes from "./routes/horarioRoutes";
 import OrientacaoRoutes from "./routes/orientacaoRoutes";
+import EmprestimoRoutes from "./routes/emprestimoRoutes";
 class App {
   app: any;
 
@@ -42,6 +43,7 @@ class App {
     this.app.use("/evento/", eventoRoutes);
     this.app.use("/horario/", horarioRoutes);
     this.app.use("/orientacao/", OrientacaoRoutes);
+    this.app.use("/emprestimo/", EmprestimoRoutes);
   }
 }
 

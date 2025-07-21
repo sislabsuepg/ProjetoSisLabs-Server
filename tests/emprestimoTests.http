@@ -1,0 +1,32 @@
+GET http://localhost:3400/emprestimo/
+
+###
+
+GET http://localhost:3400/emprestimo/1
+
+###
+
+POST http://localhost:3400/emprestimo/
+Content-Type: application/json
+
+{
+  "idLaboratorio": 1,
+  "idAluno": 1,
+  "idUsuario": 1
+}
+###
+
+PUT http://localhost:3400/emprestimo/1
+Content-Type: application/json
+
+{
+    "advertencia": "Devolver o equipamento até amanhã"
+}
+###
+
+PUT http://localhost:3400/emprestimo/close/1
+Content-Type: application/json
+
+{
+  "idUsuario": 1
+}

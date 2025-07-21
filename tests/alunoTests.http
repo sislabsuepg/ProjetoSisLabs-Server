@@ -21,7 +21,8 @@ PUT http://localhost:3400/aluno/1
 Content-Type: application/json
 
 {
-    "anoCurso":6
+    "anoCurso":6,
+    "ativo": true
 }
 
 ###

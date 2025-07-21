@@ -21,17 +21,17 @@ interface EmprestimoAtributos {
   dataHoraEntrada: Date;
   dataHoraSaida: Date;
   posseChave: boolean;
-  advertencia: boolean;
-  idLaboratorio: string;
-  idAluno: string;
-  idUsuarioEntrada: string;
-  idUsuarioSaida: string;
+  advertencia: string;
+  idLaboratorio: number;
+  idAluno: number;
+  idUsuarioEntrada: number;
+  idUsuarioSaida: number;
 }
 
 interface EmprestimoCreationAtributos
   extends Optional<
     EmprestimoAtributos,
-    "id" | "dataHoraSaida" | "posseChave" | "advertencia" | "idUsuarioSaida"
+    "id" | "dataHoraSaida" | "advertencia" | "idUsuarioSaida"
   > {}
 
 @Table({
@@ -68,12 +68,10 @@ export default class Emprestimo extends Model<
   })
   declare posseChave: boolean;
 
-  @AllowNull(false)
-  @Default(false)
   @Column({
-    type: DataType.BOOLEAN,
+    type: DataType.STRING(255),
   })
-  declare advertencia: boolean;
+  declare advertencia: string;
 
   @BelongsTo(() => Laboratorio, {
     foreignKey: "idLaboratorio",
