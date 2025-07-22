@@ -34,3 +34,7 @@ Content-Type: application/json
     "ra": "23002302",
     "senha": "123456"
 }
+
+###
+
+DELETE http://localhost:3400/aluno/2

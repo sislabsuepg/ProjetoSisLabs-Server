@@ -218,13 +218,21 @@ export default class AlunoService {
     idCurso: number
   ) {
     try {
+      if (!nome || !ra || !anoCurso || !senha || !idCurso) {
+        return {
+          status: codes.BAD_REQUEST,
+          erros: ["Todos os campos obrigatórios devem ser preenchidos"],
+          data: [],
+        };
+      }
+
       const erros: string[] = [
         ...this.verificaRa(ra),
         ...this.verificaNome(nome),
         ...this.verificaAnoCurso(anoCurso),
         ...this.verificaSenha(senha),
         ...(telefone ? this.verificaTelefone(telefone) : []),
-        ...this.verificaEmail(email),
+        ...(email ? this.verificaEmail(email) : []),
         ...(idCurso ? [] : ["ID do curso é obrigatório"]),
       ];
 
@@ -232,6 +240,15 @@ export default class AlunoService {
         return {
           status: codes.BAD_REQUEST,
           erros: erros,
+          data: [],
+        };
+      }
+
+      const curso = await Curso.findByPk(idCurso);
+      if (!curso) {
+        return {
+          status: codes.BAD_REQUEST,
+          erros: ["ID do curso inválido"],
           data: [],
         };
       }
@@ -282,6 +299,9 @@ export default class AlunoService {
           data: [],
         };
       }
+
+      aluno.senha = ""; // Não retornar a senha no response
+      aluno.curso = curso; // Incluir o curso no response
 
       return {
         status: codes.CREATED,

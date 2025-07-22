@@ -24,11 +24,18 @@ class PermissaoUsuarioController {
   }
 
   async store(req: Request, res: Response) {
-    const { nomePermissao, cadastro, alteracao, relatorio, advertencia } =
-      req.body;
+    const {
+      nomePermissao,
+      geral,
+      cadastro,
+      alteracao,
+      relatorio,
+      advertencia,
+    } = req.body;
     const { status, erros, data } =
       await permissaoUsuarioService.createPermissaoUsuario(
         nomePermissao,
+        geral,
         cadastro,
         alteracao,
         relatorio,
@@ -39,12 +46,19 @@ class PermissaoUsuarioController {
 
   async update(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const { nomePermissao, cadastro, alteracao, relatorio, advertencia } =
-      req.body;
+    const {
+      nomePermissao,
+      geral,
+      cadastro,
+      alteracao,
+      relatorio,
+      advertencia,
+    } = req.body;
     const { status, erros, data } =
       await permissaoUsuarioService.updatePermissaoUsuario(
         id,
         nomePermissao,
+        geral,
         cadastro,
         alteracao,
         relatorio,

@@ -1,19 +1,18 @@
 import express from "express";
 import cors from "cors";
 import connection from "./database";
-import homeRoutes from "./routes/homeRoutes";
-import cursoRoutes from "./routes/cursoRoutes";
 import alunoRoutes from "./routes/alunoRoutes";
-import permissaoUsuarioRoutes from "./routes/permissaoUsuarioRoutes";
-import UsuarioRoutes from "./routes/usuarioRoutes";
-import RecadoRoutes from "./routes/recadoRoutes";
-import RegistroRoutes from "./routes/registroRoutes";
-import professorRoutes from "./routes/professorRoutes";
-import laboratorioRoutes from "./routes/laboratorioRoutes";
+import cursoRoutes from "./routes/cursoRoutes";
+import emprestimoRoutes from "./routes/emprestimoRoutes";
 import eventoRoutes from "./routes/eventoRoutes";
 import horarioRoutes from "./routes/horarioRoutes";
-import OrientacaoRoutes from "./routes/orientacaoRoutes";
-import EmprestimoRoutes from "./routes/emprestimoRoutes";
+import laboratorioRoutes from "./routes/laboratorioRoutes";
+import orientacaoRoutes from "./routes/orientacaoRoutes";
+import permissaoUsuarioRoutes from "./routes/permissaoUsuarioRoutes";
+import professorRoutes from "./routes/professorRoutes";
+import recadoRoutes from "./routes/recadoRoutes";
+import registroRoutes from "./routes/registroRoutes";
+import usuarioRoutes from "./routes/usuarioRoutes";
 class App {
   app: any;
 
@@ -27,23 +26,28 @@ class App {
   middlewares() {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: "*", // Permite requisições de qualquer origem
+        methods: "GET,PUT,POST,DELETE", // Métodos permitidos
+        allowedHeaders: "Content-Type, Authorization", // Cabeçalhos permitidos
+      })
+    );
   }
 
   routes() {
-    this.app.use("/", homeRoutes);
-    this.app.use("/curso/", cursoRoutes);
     this.app.use("/aluno/", alunoRoutes);
-    this.app.use("/permissao/", permissaoUsuarioRoutes);
-    this.app.use("/usuario/", UsuarioRoutes);
-    this.app.use("/recado/", RecadoRoutes);
-    this.app.use("/registro/", RegistroRoutes);
-    this.app.use("/professor/", professorRoutes);
-    this.app.use("/laboratorio/", laboratorioRoutes);
+    this.app.use("/curso/", cursoRoutes);
+    this.app.use("/emprestimo/", emprestimoRoutes);
     this.app.use("/evento/", eventoRoutes);
     this.app.use("/horario/", horarioRoutes);
-    this.app.use("/orientacao/", OrientacaoRoutes);
-    this.app.use("/emprestimo/", EmprestimoRoutes);
+    this.app.use("/laboratorio/", laboratorioRoutes);
+    this.app.use("/orientacao/", orientacaoRoutes);
+    this.app.use("/permissao/", permissaoUsuarioRoutes);
+    this.app.use("/professor/", professorRoutes);
+    this.app.use("/recado/", recadoRoutes);
+    this.app.use("/registro/", registroRoutes);
+    this.app.use("/usuario/", usuarioRoutes);
   }
 }
 

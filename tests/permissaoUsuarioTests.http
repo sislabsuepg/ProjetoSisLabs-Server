@@ -10,7 +10,7 @@ POST http://localhost:3400/permissao/
 Content-Type: application/json
 
 {
-  "nomePermissao": "adm",
+  "nomePermissao": "adm1",
   "cadastro": "true",
   "relatorio": "true",
   "advertencia": "false"
