@@ -177,6 +177,13 @@ export default class EmprestimoService {
           erros: ["Empréstimo não encontrado"],
         };
       }
+      if (emprestimo.dataHoraSaida && emprestimo.usuarioSaida) {
+        return {
+          status: codes.BAD_REQUEST,
+          data: null,
+          erros: ["Empréstimo já fechado"],
+        };
+      }
       const usuarioSaida = await Usuario.findByPk(idUsuarioSaida);
       if (!usuarioSaida || (usuarioSaida && usuarioSaida.ativo === false)) {
         return {
