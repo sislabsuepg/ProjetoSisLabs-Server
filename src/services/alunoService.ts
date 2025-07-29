@@ -475,7 +475,7 @@ export default class AlunoService {
         return {
           status: codes.NOT_FOUND,
           erros: ["RA não encontrado"],
-          data: [],
+          data: null,
         };
       }
 
@@ -483,7 +483,7 @@ export default class AlunoService {
         return {
           status: codes.UNAUTHORIZED,
           erros: ["senha inválida"],
-          data: [],
+          data: null,
         };
       }
       aluno.senha = "";
@@ -491,7 +491,7 @@ export default class AlunoService {
         return {
           status: codes.UNAUTHORIZED,
           erros: ["Aluno não está ativo"],
-          data: [],
+          data: null,
         };
       }
 
@@ -509,7 +509,7 @@ export default class AlunoService {
       return {
         status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao fazer login"],
-        data: [],
+        data: null,
       };
     }
   }

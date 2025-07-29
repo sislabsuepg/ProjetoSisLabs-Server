@@ -33,8 +33,16 @@ class UsuarioController {
 
     public async login(req: Request, res: Response) {
         const { login, senha } = req.body;
-        const { status, erros, data } = await UsuarioService.loginUsuario(login, senha);
-        res.status(status).json({ erros, data });
+        const { status, erros, data } = await UsuarioService.loginUsuario(login, senha);;
+        if (data?.token) {
+            res.cookie("authToken", data.token, {
+                httpOnly: true,
+                sameSite: "strict",
+                path: "/",
+                expires: new Date(Date.now() + (4 * 60 * 60 * 1000)), // 4 horas
+            });
+        }
+        res.status(status).json({ erros, data: data?.usuario });
     }
 }
 

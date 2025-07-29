@@ -71,7 +71,15 @@ class AlunoController {
   async login(req: Request, res: Response) {
     const { ra, senha } = req.body;
     const { status, erros, data } = await AlunoService.loginAluno(ra, senha);
-    res.status(status).json({ erros, data });
+    if (data?.token) {
+            res.cookie("authToken", data.token, {
+                httpOnly: true,
+                sameSite: "strict",
+                path: "/",
+                expires: new Date(Date.now() + (4 * 60 * 60 * 1000)), // 4 horas
+            });
+        }
+    res.status(status).json({ erros, data: data?.aluno });
   }
 }
 
