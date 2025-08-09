@@ -1,49 +1,70 @@
 import { Request, Response } from "express";
 import UsuarioService from "../services/usuarioService";
 class UsuarioController {
-    public async index(req: Request, res: Response) {
-        const { status, erros, data } = await UsuarioService.getAllUsuarios();
-        res.status(status).json({ erros, data });
-    }
+  public async index(req: Request, res: Response) {
+    const { status, erros, data } = await UsuarioService.getAllUsuarios();
+    res.status(status).json({ erros, data });
+  }
 
-    public async show(req: Request, res: Response) {
-        const { id } = req.params;
-        const { status, erros, data } = await UsuarioService.getUsuarioById(Number(id));
-        res.status(status).json({ erros, data });
-    }
+  public async show(req: Request, res: Response) {
+    const { id } = req.params;
+    const { status, erros, data } = await UsuarioService.getUsuarioById(
+      Number(id)
+    );
+    res.status(status).json({ erros, data });
+  }
 
-    public async store(req: Request, res: Response) {
-        const { login, senha, nome, idPermissao } = req.body;
-        const { status, erros, data } = await UsuarioService.createUsuario(login, senha, nome, idPermissao);
-        res.status(status).json({ erros, data });
-    }
+  public async store(req: Request, res: Response) {
+    const { login, senha, nome, idPermissao } = req.body;
+    const { status, erros, data } = await UsuarioService.createUsuario(
+      login,
+      senha,
+      nome,
+      idPermissao
+    );
+    res.status(status).json({ erros, data });
+  }
 
-    public async update(req: Request, res: Response) {
-        const { id } = req.params;
-        const { nome, ativo, idPermissao } = req.body;
-        const { status, erros, data } = await UsuarioService.updateUsuario(Number(id), nome, ativo, idPermissao);
-        res.status(status).json({ erros, data });
-    }
+  public async update(req: Request, res: Response) {
+    const { id } = req.params;
+    const { nome, ativo, idPermissao } = req.body;
+    const { status, erros, data } = await UsuarioService.updateUsuario(
+      Number(id),
+      nome,
+      ativo,
+      idPermissao
+    );
+    res.status(status).json({ erros, data });
+  }
 
-    public async destroy(req: Request, res: Response) {
-        const { id } = req.params;
-        const { status, erros, data } = await UsuarioService.deleteUsuario(Number(id));
-        res.status(status).json({ erros, data });
-    }
+  public async destroy(req: Request, res: Response) {
+    const { id } = req.params;
+    const { status, erros, data } = await UsuarioService.deleteUsuario(
+      Number(id)
+    );
+    res.status(status).json({ erros, data });
+  }
 
-    public async login(req: Request, res: Response) {
-        const { login, senha } = req.body;
-        const { status, erros, data } = await UsuarioService.loginUsuario(login, senha);;
-        if (data?.token) {
-            res.cookie("authToken", data.token, {
-                httpOnly: true,
-                sameSite: "strict",
-                path: "/",
-                expires: new Date(Date.now() + (4 * 60 * 60 * 1000)), // 4 horas
-            });
-        }
-        res.status(status).json({ erros, data: data?.usuario });
+  public async login(req: Request, res: Response) {
+    const { login, senha } = req.body;
+    const { status, erros, data } = await UsuarioService.loginUsuario(
+      login,
+      senha
+    );
+    if (!data?.token) {
+      res.status(status).json({ erros, data });
+    } else {
+      res
+        .status(status)
+        .cookie("authToken", data.token, {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+          expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 horas
+        })
+        .json({ erros, data: data?.usuario });
     }
+  }
 }
 
 export default new UsuarioController();

@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connection from "./database";
 import alunoRoutes from "./routes/alunoRoutes";
 import cursoRoutes from "./routes/cursoRoutes";
@@ -26,11 +27,13 @@ class App {
   middlewares() {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
+    this.app.use(cookieParser());
     this.app.use(
       cors({
-        origin: "*", // Permite requisições de qualquer origem
+        origin: "http://localhost:3000", // Permite requisições de qualquer origem
         methods: "GET,PUT,POST,DELETE", // Métodos permitidos
-        allowedHeaders: "Content-Type, Authorization", // Cabeçalhos permitidos
+        allowedHeaders: "Content-Type, Authorization, Cookie", // Cabeçalhos permitidos
+        credentials: true,
       })
     );
   }
