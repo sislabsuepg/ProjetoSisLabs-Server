@@ -18,6 +18,7 @@ interface HorarioAtributos {
   diaSemana: number;
   horario: string;
   semestral: boolean;
+  idLaboratorio: number;
 }
 
 interface HorarioCreationAtributos

@@ -495,8 +495,10 @@ export default class AlunoService {
         };
       }
 
+      let expires: number = parseInt(config.expires as string) || 1800;
+
       const token: string = jwt.sign({ aluno }, config.secret as string, {
-        expiresIn: (config.expires as string) || "30min",
+        expiresIn: expires,
       });
 
       return {

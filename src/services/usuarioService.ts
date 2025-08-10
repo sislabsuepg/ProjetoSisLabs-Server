@@ -267,8 +267,10 @@ export default class UsuarioService {
       }
       usuario.senha = "";
 
+      let expires: number = parseInt(config.expires as string) || 1800;
+
       const token: string = jwt.sign({ usuario }, config.secret as string, {
-        expiresIn: (config.expires as string) || "30min",
+        expiresIn: expires,
       });
 
       return { status: codes.OK, erros: [], data: { usuario, token } };
