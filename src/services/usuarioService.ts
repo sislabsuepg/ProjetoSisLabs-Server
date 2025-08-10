@@ -240,6 +240,9 @@ export default class UsuarioService {
     try {
       const usuario: Usuario | null = await Usuario.findOne({
         where: { login },
+        include: {
+          model: PermissaoUsuario,
+        },
       });
       if (!usuario) {
         return {
