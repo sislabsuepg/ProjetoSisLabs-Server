@@ -14,6 +14,8 @@ import professorRoutes from "./routes/professorRoutes";
 import recadoRoutes from "./routes/recadoRoutes";
 import registroRoutes from "./routes/registroRoutes";
 import usuarioRoutes from "./routes/usuarioRoutes";
+import emailRoutes from "./routes/emailRoutes";
+
 class App {
   app: any;
 
@@ -51,6 +53,7 @@ class App {
     this.app.use("/recado/", recadoRoutes);
     this.app.use("/registro/", registroRoutes);
     this.app.use("/usuario/", usuarioRoutes);
+    this.app.use("/email/", emailRoutes);
   }
 }
 
