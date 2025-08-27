@@ -38,7 +38,7 @@ export default class AlunoService {
     if (!telefone) {
       erros.push("Telefone do aluno é obrigatório");
     }
-    if (!/\(\d\d\) \d\d\d\d\d-\d\d\d\d/.test(telefone)) {
+    if (!/\d{10}/.test(telefone)) {
       erros.push("Telefone inválido");
     }
     return erros;
