@@ -66,14 +66,13 @@ export default class OrientacaoService {
         },
       });
 
-      if (!orientacoes) {
+      if (!orientacoes || orientacoes.length === 0) {
         return {
           status: codes.NO_CONTENT,
           erros: ["Nenhuma orientação encontrada para este aluno"],
           data: [],
         };
       }
-
       return {
         status: codes.OK,
         erros: [],
@@ -195,6 +194,7 @@ export default class OrientacaoService {
           dataInicio >= orientacao.dataFim ||
           (dataFim && dataInicio >= dataFim))
       ) {
+        console.log(dataInicio, dataFim, orientacao.dataFim);
         return {
           status: codes.BAD_REQUEST,
           erros: ["Data de início deve ser anterior à data de fim"],

@@ -25,7 +25,7 @@ PUT http://localhost:3400/orientacao/1
 Content-Type: application/json
 
 {
-    "dataInicio": "2025-10-01T00:00:00.000Z"
+    "dataInicio": "2025-07-01T00:00:00.000Z"
 }
 
 ### 
