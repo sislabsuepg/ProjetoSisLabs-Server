@@ -1,5 +1,6 @@
 import OrientacaoService from "../services/orientacaoService";
 import { Request, Response } from "express";
+import codes from "..//types/responseCodes"; // Adjust the path if needed
 
 class OrientacaoController {
   async index(req: Request, res: Response) {
@@ -27,6 +28,15 @@ class OrientacaoController {
       dataFim = undefined;
     } else {
       dataFim = new Date(dataFim);
+    }
+
+    const exists = await OrientacaoService.getOrientacaoByAluno(idAluno);
+    if (exists.status === codes.OK) {
+      res.status(codes.CONFLICT).json({
+        erros: ["Já existe uma orientação ativa para este aluno"],
+        data: [],
+      });
+      return;
     }
 
     const { status, erros, data } = await OrientacaoService.createOrientacao(

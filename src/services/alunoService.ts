@@ -140,10 +140,18 @@ export default class AlunoService {
         where: {
           [Op.or]: [
             { nome: { [Op.like]: `%${nome || ""}%` } },
-            { ra: { [Op.like]: `%${ra || ""}%` } },
+            { ra: { [Op.like]: `${ra || ""}` } },
           ],
         },
-        attributes: ["ra", "nome", "telefone", "anoCurso", "email", "ativo"],
+        attributes: [
+          "id",
+          "ra",
+          "nome",
+          "telefone",
+          "anoCurso",
+          "email",
+          "ativo",
+        ],
         include: [
           {
             model: Curso,

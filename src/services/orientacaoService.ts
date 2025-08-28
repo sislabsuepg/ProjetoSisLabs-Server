@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import Aluno from "../models/Aluno";
 import Laboratorio from "../models/Laboratorio";
 import Orientacao from "../models/Orientacao";
@@ -52,6 +53,37 @@ export default class OrientacaoService {
       return {
         status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar orientação"],
+        data: [],
+      };
+    }
+  }
+
+  static async getOrientacaoByAluno(idAluno: number) {
+    try {
+      const orientacoes = await Orientacao.findAll({
+        where: {
+          [Op.and]: [{ idAluno }, { dataFim: { [Op.gt]: new Date() } }],
+        },
+      });
+
+      if (!orientacoes) {
+        return {
+          status: codes.NO_CONTENT,
+          erros: ["Nenhuma orientação encontrada para este aluno"],
+          data: [],
+        };
+      }
+
+      return {
+        status: codes.OK,
+        erros: [],
+        data: orientacoes,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: codes.INTERNAL_SERVER_ERROR,
+        erros: ["Erro ao buscar orientações do aluno"],
         data: [],
       };
     }
