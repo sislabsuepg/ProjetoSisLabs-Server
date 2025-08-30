@@ -3,7 +3,7 @@ import Aluno from "../models/Aluno";
 import config from "../config/config";
 import jwt from "jsonwebtoken";
 import Curso from "../models/Curso";
-import codes from "../types/responseCodes";
+import { off } from "process";
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
     const erros: string[] = [];
@@ -87,39 +87,56 @@ export default class AlunoService {
     return erros;
   }
 
-  static async getAllAlunos() {
+  static async getAllAlunos(offset?: number, limit?: number, ativo?: boolean) {
     try {
-      const alunos = await Aluno.findAll({
-        attributes: ["ra", "nome", "telefone", "anoCurso", "email", "ativo"],
+      const alunos: Aluno[] = await Aluno.findAll({
+        attributes: [
+          "id",
+          "ra",
+          "nome",
+          "telefone",
+          "anoCurso",
+          "email",
+          "ativo",
+        ],
         include: {
           model: Curso,
         },
+        where: {
+          ativo: {
+            [Op.or]: ativo === undefined ? [true, false] : [ativo],
+          },
+        },
+        offset: offset || undefined,
+        limit: limit || undefined,
       });
 
-      if (!alunos) {
+      if (!alunos || alunos.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum aluno encontrado"],
           data: [],
         };
       }
 
       return {
-        status: codes.OK,
         erros: [],
         data: alunos,
       };
     } catch (e) {
       console.log(e);
-      return { status: codes.INTERNAL_SERVER_ERROR, erros: e, data: [] };
+      return { erros: e, data: [] };
     }
   }
 
-  static async searchAlunos(nome?: string, ra?: string) {
+  static async searchAlunos(
+    nome?: string,
+    ra?: string,
+    offset?: number,
+    limit?: number
+  ) {
     try {
       if (!nome && !ra) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Nome ou RA devem ser informados para busca"],
           data: [],
         };
@@ -131,12 +148,11 @@ export default class AlunoService {
 
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
       }
-      const alunos = await Aluno.findAll({
+      const alunos: Aluno[] = await Aluno.findAll({
         where: {
           [Op.or]: [
             { nome: { [Op.like]: `%${nome || ""}%` } },
@@ -157,25 +173,24 @@ export default class AlunoService {
             model: Curso,
           },
         ],
+        offset: offset || 0,
+        limit: limit || 0,
       });
 
-      if (!alunos) {
+      if (!alunos || alunos.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum aluno encontrado"],
           data: [],
         };
       }
 
       return {
-        status: codes.OK,
         erros: [],
         data: alunos,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar alunos"],
         data: [],
       };
@@ -184,8 +199,16 @@ export default class AlunoService {
 
   static async getAlunoById(id: number) {
     try {
-      const aluno = await Aluno.findByPk(id, {
-        attributes: ["ra", "nome", "telefone", "anoCurso", "email", "ativo"],
+      const aluno: Aluno | null = await Aluno.findByPk(id, {
+        attributes: [
+          "id",
+          "ra",
+          "nome",
+          "telefone",
+          "anoCurso",
+          "email",
+          "ativo",
+        ],
         include: [
           {
             model: Curso,
@@ -195,21 +218,18 @@ export default class AlunoService {
 
       if (!aluno) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Aluno não encontrado"],
           data: [],
         };
       }
 
       return {
-        status: codes.OK,
         erros: [],
         data: aluno,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar aluno"],
         data: [],
       };
@@ -228,7 +248,6 @@ export default class AlunoService {
     try {
       if (!nome || !ra || !anoCurso || !senha || !idCurso) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Todos os campos obrigatórios devem ser preenchidos"],
           data: [],
         };
@@ -246,7 +265,6 @@ export default class AlunoService {
 
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -255,7 +273,6 @@ export default class AlunoService {
       const curso = await Curso.findByPk(idCurso);
       if (!curso) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["ID do curso inválido"],
           data: [],
         };
@@ -269,7 +286,6 @@ export default class AlunoService {
 
       if (alunoExiste) {
         return {
-          status: codes.CONFLICT,
           erros: ["RA já cadastrado"],
           data: [],
         };
@@ -277,32 +293,23 @@ export default class AlunoService {
 
       const novoAluno: any = {};
 
-      if (ra) {
-        novoAluno["ra"] = ra;
-      }
-      if (nome) {
-        novoAluno["nome"] = nome;
-      }
-      if (telefone) {
-        novoAluno["telefone"] = telefone;
-      }
-      if (anoCurso) {
-        novoAluno["anoCurso"] = anoCurso;
-      }
-      if (email) {
-        novoAluno["email"] = email;
-      }
-      if (senha) {
-        novoAluno["senha"] = senha;
-      }
-      if (idCurso) {
-        novoAluno["idCurso"] = idCurso;
+      for (const [key, value] of Object.entries({
+        ra,
+        nome,
+        telefone,
+        anoCurso,
+        email,
+        senha,
+        idCurso,
+      })) {
+        if (value) {
+          novoAluno[key] = value;
+        }
       }
 
-      const aluno = await Aluno.create(novoAluno);
+      const aluno: Aluno | null = await Aluno.create(novoAluno);
       if (!aluno) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Erro ao criar aluno"],
           data: [],
         };
@@ -312,14 +319,12 @@ export default class AlunoService {
       aluno.curso = curso; // Incluir o curso no response
 
       return {
-        status: codes.CREATED,
         erros: [],
         data: aluno,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar aluno"],
         data: [],
       };
@@ -353,7 +358,6 @@ export default class AlunoService {
       });
       if (!aluno) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Aluno não encontrado"],
           data: [],
         };
@@ -361,7 +365,6 @@ export default class AlunoService {
 
       if (!nome && !telefone && !anoCurso && !email && ativo === undefined) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Pelo menos um campo deve ser informado"],
           data: [],
         };
@@ -378,7 +381,6 @@ export default class AlunoService {
 
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -393,14 +395,12 @@ export default class AlunoService {
       const alunoAtualizado = await aluno.save();
 
       return {
-        status: codes.OK,
         erros: [],
         data: alunoAtualizado,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar aluno"],
         data: [],
       };
@@ -412,7 +412,6 @@ export default class AlunoService {
       const aluno = await Aluno.findByPk(ra);
       if (!aluno) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Aluno não encontrado"],
           data: [],
         };
@@ -420,7 +419,6 @@ export default class AlunoService {
 
       if (this.verificaSenha(novaSenha).length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: this.verificaSenha(novaSenha),
           data: [],
         };
@@ -430,14 +428,12 @@ export default class AlunoService {
       await aluno.save();
 
       return {
-        status: codes.OK,
         erros: [],
         data: ["Senha atualizada com sucesso"],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar senha"],
         data: [],
       };
@@ -449,7 +445,6 @@ export default class AlunoService {
       const aluno = await Aluno.findByPk(ra);
       if (!aluno) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Aluno não encontrado"],
           data: [],
         };
@@ -458,14 +453,12 @@ export default class AlunoService {
       await aluno.destroy();
 
       return {
-        status: codes.OK,
         erros: [],
         data: ["Aluno excluído com sucesso"],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao excluir aluno"],
         data: [],
       };
@@ -481,7 +474,6 @@ export default class AlunoService {
       });
       if (!aluno) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["RA não encontrado"],
           data: null,
         };
@@ -489,7 +481,6 @@ export default class AlunoService {
 
       if (!aluno.verificaSenha(senha)) {
         return {
-          status: codes.UNAUTHORIZED,
           erros: ["senha inválida"],
           data: null,
         };
@@ -497,7 +488,6 @@ export default class AlunoService {
       aluno.senha = "";
       if (!aluno.ativo) {
         return {
-          status: codes.UNAUTHORIZED,
           erros: ["Aluno não está ativo"],
           data: null,
         };
@@ -510,14 +500,12 @@ export default class AlunoService {
       });
 
       return {
-        status: codes.OK,
         erros: [],
         data: { aluno, token },
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao fazer login"],
         data: null,
       };

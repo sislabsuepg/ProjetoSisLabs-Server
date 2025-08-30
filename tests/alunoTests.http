@@ -1,5 +1,5 @@
 
-GET http://localhost:3400/aluno
+GET http://localhost:3400/aluno?ativo=true&limit=2
 Content-Type: application/json
 
 ###
@@ -22,7 +22,7 @@ Content-Type: application/json
 
 {
     "anoCurso":6,
-    "ativo": true
+    "ativo": false
 }
 
 ###

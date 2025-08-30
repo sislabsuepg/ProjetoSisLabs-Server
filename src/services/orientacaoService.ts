@@ -9,7 +9,22 @@ import codes from "../types/responseCodes";
 export default class OrientacaoService {
   static async getAllOrientacoes() {
     try {
-      const orientacoes = await Orientacao.findAll();
+      const orientacoes = await Orientacao.findAll({
+        include: [
+          {
+            model: Aluno,
+            as: "aluno",
+          },
+          {
+            model: Professor,
+            as: "professor",
+          },
+          {
+            model: Laboratorio,
+            as: "laboratorio",
+          },
+        ],
+      });
 
       if (!orientacoes) {
         return {
