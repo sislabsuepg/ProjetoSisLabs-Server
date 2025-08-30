@@ -111,7 +111,7 @@ export default class AlunoService {
         limit: limit || undefined,
       });
 
-      if (!alunos || alunos.length === 0) {
+      if (alunos.length === 0) {
         return {
           erros: ["Nenhum aluno encontrado"],
           data: [],
