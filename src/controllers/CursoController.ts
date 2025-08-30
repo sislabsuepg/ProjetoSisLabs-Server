@@ -1,49 +1,71 @@
 import CursoService from "../services/cursoService";
 import { Request, Response } from "express";
+import codes from "../types/responseCodes";
 
 class CursoController {
   async index(req: Request, res: Response) {
     if (!req.query.nome) {
-      const { status, erros, data } = await CursoService.getAllCursos();
-      res.status(status).json({ erros, data });
+      const { erros, data } = await CursoService.getAllCursos();
+      if (erros.length > 0) {
+        res.status(codes.BAD_REQUEST).json({ erros, data });
+      } else {
+        res.status(codes.OK).json({ erros, data });
+      }
     } else {
-      const { status, erros, data } = await CursoService.getCursosByNome(
+      const { erros, data } = await CursoService.getCursosByNome(
         req.query.nome as string
       );
-      res.status(status).json({ erros, data });
+      if (erros.length > 0) {
+        res.status(codes.BAD_REQUEST).json({ erros, data });
+      } else {
+        res.status(codes.OK).json({ erros, data });
+      }
     }
   }
 
   async show(req: Request, res: Response) {
     const id: number = parseInt(req.params.id);
-    const { status, erros, data } = await CursoService.getCursoById(id);
-    res.status(status).json({ erros, data });
+    const { erros, data } = await CursoService.getCursoById(id);
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async store(req: Request, res: Response) {
-    const { nome, anosMax } = req.body;
-    const { status, erros, data } = await CursoService.createCurso(
-      nome,
-      anosMax
-    );
-    res.status(status).json({ erros, data });
+    const { nome, anosMaximo } = req.body;
+    const { erros, data } = await CursoService.createCurso(nome, anosMaximo);
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.CREATED).json({ erros, data });
+    }
   }
 
   async update(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const { nome, anosMax } = req.body;
-    const { status, erros, data } = await CursoService.updateCurso(
+    const { nome, anosMaximo } = req.body;
+    const { erros, data } = await CursoService.updateCurso(
       id,
       nome,
-      anosMax
+      anosMaximo
     );
-    res.status(status).json({ erros, data });
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async destroy(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const { status, erros, data } = await CursoService.deleteCurso(id);
-    res.status(status).json({ erros, data });
+    const { erros, data } = await CursoService.deleteCurso(id);
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 }
 

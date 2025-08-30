@@ -1,6 +1,5 @@
 import { Op } from "sequelize";
 import Curso from "../models/Curso";
-import codes from "../types/responseCodes";
 export default class CursoService {
   static verificaNome(nome: string): string[] {
     const erros: string[] = [];
@@ -13,33 +12,33 @@ export default class CursoService {
     return erros;
   }
 
-  static verificaAnosMaximo(anosMax: number): string[] {
+  static verificaAnosMaximo(anosMaximo: number): string[] {
     const erros: string[] = [];
-    if (anosMax < 1 || anosMax > 8) {
+    if (anosMaximo < 1 || anosMaximo > 8) {
       erros.push("Anos máximos deve ser entre 1 e 8");
     }
     return erros;
   }
 
-  static async getAllCursos() {
+  static async getAllCursos(offset?: number, limit?: number) {
     try {
-      const cursos = await Curso.findAll();
-      if (!cursos) {
+      const cursos: Curso[] = await Curso.findAll({
+        offset: offset,
+        limit: limit,
+      });
+      if (cursos.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum curso encontrado"],
           data: null,
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: cursos,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar cursos"],
         data: null,
       };
@@ -51,20 +50,17 @@ export default class CursoService {
       const curso = await Curso.findByPk(id);
       if (!curso) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Curso não encontrado"],
           data: null,
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: curso,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar curso"],
         data: null,
       };
@@ -76,45 +72,40 @@ export default class CursoService {
       const erros: string[] = this.verificaNome(nomeBusca);
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: null,
         };
       }
       const curso = await Curso.findAll({
-        where: { nome: { [Op.like]: `%${nomeBusca}%` } },
+        where: { nome: { [Op.iLike]: `%${nomeBusca}%` } },
       });
       if (!curso) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Curso não encontrado"],
           data: null,
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: curso,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar curso"],
         data: null,
       };
     }
   }
 
-  static async createCurso(nome: string, anosMax: number) {
+  static async createCurso(nome: string, anosMaximo: number) {
     try {
       const erros: string[] = [
         ...CursoService.verificaNome(nome),
-        ...CursoService.verificaAnosMaximo(anosMax),
+        ...CursoService.verificaAnosMaximo(anosMaximo),
       ];
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: null,
         };
@@ -123,33 +114,29 @@ export default class CursoService {
       const existe = await Curso.findOne({ where: { nome: nome } });
       if (existe) {
         return {
-          status: codes.CONFLICT,
           erros: ["Curso já existe"],
           data: null,
         };
       }
 
-      const curso = await Curso.create({ nome: nome, anosMaximo: anosMax });
+      const curso = await Curso.create({ nome: nome, anosMaximo: anosMaximo });
       return {
-        status: codes.CREATED,
         erros: [],
         data: curso,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar curso"],
         data: null,
       };
     }
   }
 
-  static async updateCurso(id: number, nome?: string, anosMax?: number) {
+  static async updateCurso(id: number, nome?: string, anosMaximo?: number) {
     try {
-      if (!nome && !anosMax) {
+      if (!nome && !anosMaximo) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Nome ou anos máximos devem ser informados"],
           data: null,
         };
@@ -157,11 +144,10 @@ export default class CursoService {
 
       const erros: string[] = [
         ...(nome ? CursoService.verificaNome(nome) : []),
-        ...(anosMax ? CursoService.verificaAnosMaximo(anosMax) : []),
+        ...(anosMaximo ? CursoService.verificaAnosMaximo(anosMaximo) : []),
       ];
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: null,
         };
@@ -169,7 +155,6 @@ export default class CursoService {
       const curso = await Curso.findByPk(id);
       if (!curso) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Curso não encontrado"],
           data: null,
         };
@@ -177,19 +162,17 @@ export default class CursoService {
       if (nome) {
         curso.nome = nome;
       }
-      if (anosMax) {
-        curso.anosMaximo = anosMax;
+      if (anosMaximo) {
+        curso.anosMaximo = anosMaximo;
       }
       await curso.save();
       return {
-        status: codes.OK,
         erros: [],
         data: curso,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar curso"],
         data: null,
       };
@@ -201,21 +184,18 @@ export default class CursoService {
       const curso = await Curso.findByPk(id);
       if (!curso) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Curso não encontrado"],
           data: null,
         };
       }
       await curso.destroy();
       return {
-        status: codes.OK,
         erros: [],
         data: null,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar curso"],
         data: null,
       };

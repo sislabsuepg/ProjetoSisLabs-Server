@@ -8,8 +8,8 @@ POST http://localhost:3400/curso
 Content-Type: application/json
 
 {
-    "nome": "Engenharia de Software",
-    "anosMax": 5
+    "nome": "Engenharia de Software Dois",
+    "anosMaximo": 5
 }
 
 ###
