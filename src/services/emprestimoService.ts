@@ -3,10 +3,9 @@ import Aluno from "../models/Aluno";
 import Usuario from "../models/Usuario";
 import Emprestimo from "../models/Emprestimo";
 import Orientacao from "../models/Orientacao";
-import codes from "../types/responseCodes";
-
+import { getPaginationParams } from "../types/pagination";
 export default class EmprestimoService {
-  static async getAllEmprestimos() {
+  static async getAllEmprestimos(offset?: number, limit?: number) {
     try {
       const emprestimos = await Emprestimo.findAll({
         include: [
@@ -25,16 +24,16 @@ export default class EmprestimoService {
             model: Aluno,
           },
         ],
+        ...getPaginationParams(offset, limit),
+        order: [["dataHoraEntrada", "DESC"]],
       });
       return {
-        status: codes.OK,
         data: emprestimos,
         erros: [],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         data: [],
         erros: ["Erro ao buscar empréstimos"],
       };
@@ -63,20 +62,17 @@ export default class EmprestimoService {
       });
       if (!emprestimo) {
         return {
-          status: codes.NO_CONTENT,
           data: null,
           erros: ["Empréstimo não encontrado"],
         };
       }
       return {
-        status: codes.OK,
         data: emprestimo,
         erros: [],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         data: null,
         erros: ["Erro ao buscar empréstimo"],
       };
@@ -92,7 +88,6 @@ export default class EmprestimoService {
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
       if (!laboratorio) {
         return {
-          status: codes.BAD_REQUEST,
           data: null,
           erros: ["Laboratório não encontrado"],
         };
@@ -100,7 +95,6 @@ export default class EmprestimoService {
       const usuario = await Usuario.findByPk(idUsuario);
       if (!usuario || (usuario && usuario.ativo === false)) {
         return {
-          status: codes.BAD_REQUEST,
           data: null,
           erros: ["Usuário não encontrado ou inativo"],
         };
@@ -109,7 +103,6 @@ export default class EmprestimoService {
       const aluno = await Aluno.findByPk(idAluno);
       if (!aluno || (aluno && aluno.ativo === false)) {
         return {
-          status: codes.BAD_REQUEST,
           data: null,
           erros: ["Aluno não encontrado ou inativo"],
         };
@@ -120,7 +113,6 @@ export default class EmprestimoService {
         });
         if (!orientacao) {
           return {
-            status: codes.BAD_REQUEST,
             data: null,
             erros: ["Aluno não possui orientação no laboratório"],
           };
@@ -136,14 +128,12 @@ export default class EmprestimoService {
       });
 
       return {
-        status: codes.CREATED,
         data: emprestimo,
         erros: [],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         data: null,
         erros: ["Erro ao criar empréstimo"],
       };
@@ -172,14 +162,12 @@ export default class EmprestimoService {
       });
       if (!emprestimo) {
         return {
-          status: codes.NO_CONTENT,
           data: null,
           erros: ["Empréstimo não encontrado"],
         };
       }
       if (emprestimo.dataHoraSaida && emprestimo.usuarioSaida) {
         return {
-          status: codes.BAD_REQUEST,
           data: null,
           erros: ["Empréstimo já fechado"],
         };
@@ -187,7 +175,6 @@ export default class EmprestimoService {
       const usuarioSaida = await Usuario.findByPk(idUsuarioSaida);
       if (!usuarioSaida || (usuarioSaida && usuarioSaida.ativo === false)) {
         return {
-          status: codes.BAD_REQUEST,
           data: null,
           erros: ["Usuário de saída não encontrado ou inativo"],
         };
@@ -199,14 +186,12 @@ export default class EmprestimoService {
       });
 
       return {
-        status: codes.OK,
         data: emprestimoAtualizado,
         erros: [],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         data: null,
         erros: ["Erro ao fechar empréstimo"],
       };
@@ -218,7 +203,6 @@ export default class EmprestimoService {
       const emprestimo = await Emprestimo.findByPk(id);
       if (!emprestimo) {
         return {
-          status: codes.NO_CONTENT,
           data: null,
           erros: ["Empréstimo não encontrado"],
         };
@@ -228,14 +212,12 @@ export default class EmprestimoService {
       await emprestimo.save();
 
       return {
-        status: codes.OK,
         data: emprestimo,
         erros: [],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         data: null,
         erros: ["Erro ao atualizar advertência"],
       };

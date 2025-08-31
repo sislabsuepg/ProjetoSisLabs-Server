@@ -1,6 +1,6 @@
 import Evento from "../models/Evento";
 import Laboratorio from "../models/Laboratorio";
-import codes from "../types/responseCodes";
+import { getPaginationParams } from "../types/pagination";
 export default class EventoService {
   static verificaData(data: Date): string[] {
     const erros: string[] = [];
@@ -42,7 +42,7 @@ export default class EventoService {
     return erros;
   }
 
-  static async getAllEventos() {
+  static async getAllEventos(offset?: number, limit?: number) {
     try {
       const eventos = await Evento.findAll({
         include: [
@@ -52,24 +52,22 @@ export default class EventoService {
             attributes: ["id", "nome", "numero"],
           },
         ],
+        ...getPaginationParams(offset, limit),
+        order: [["data", "DESC"]],
       });
       if (!eventos) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum evento encontrado"],
           data: [],
         };
       }
-
       return {
-        status: codes.OK,
         erros: [],
         data: eventos,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar eventos"],
         data: [],
       };
@@ -89,21 +87,18 @@ export default class EventoService {
       });
       if (!evento) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Evento não encontrado"],
           data: [],
         };
       }
 
       return {
-        status: codes.OK,
         erros: [],
         data: evento,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar evento"],
         data: [],
       };
@@ -120,7 +115,6 @@ export default class EventoService {
     try {
       if (!data || !nome || !duracao || !responsavel || !idLaboratorio) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Dados incompletos"],
           data: [],
         };
@@ -134,7 +128,6 @@ export default class EventoService {
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
       if (!laboratorio) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Laboratório não encontrado"],
           data: [],
         };
@@ -148,14 +141,12 @@ export default class EventoService {
         idLaboratorio,
       });
       return {
-        status: codes.CREATED,
         erros: [],
         data: evento,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar evento"],
         data: [],
       };
@@ -174,7 +165,6 @@ export default class EventoService {
       const evento = await Evento.findByPk(id);
       if (!evento) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Evento não encontrado"],
           data: [],
         };
@@ -182,7 +172,6 @@ export default class EventoService {
 
       if (!data && !nome && !duracao && !responsavel && !idLaboratorio) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Dados não foram fornecidos"],
           data: [],
         };
@@ -197,7 +186,6 @@ export default class EventoService {
 
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -206,7 +194,6 @@ export default class EventoService {
         const laboratorio = await Laboratorio.findByPk(idLaboratorio);
         if (!laboratorio) {
           return {
-            status: codes.NOT_FOUND,
             erros: ["Laboratório não encontrado"],
             data: [],
           };
@@ -220,14 +207,12 @@ export default class EventoService {
 
       await evento.save();
       return {
-        status: codes.OK,
         erros: [],
         data: evento,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar evento"],
         data: [],
       };
@@ -239,21 +224,18 @@ export default class EventoService {
       const evento = await Evento.findByPk(id);
       if (!evento) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Evento não encontrado"],
           data: [],
         };
       }
       await evento.destroy();
       return {
-        status: codes.OK,
         erros: [],
         data: [],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar evento"],
         data: [],
       };
