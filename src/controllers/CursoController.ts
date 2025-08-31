@@ -4,8 +4,12 @@ import codes from "../types/responseCodes";
 
 class CursoController {
   async index(req: Request, res: Response) {
+    const { page, items } = req.query;
     if (!req.query.nome) {
-      const { erros, data } = await CursoService.getAllCursos();
+      const { erros, data } = await CursoService.getAllCursos(
+        Number.parseInt(page as string),
+        Number.parseInt(items as string)
+      );
       if (erros.length > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
       } else {
@@ -13,7 +17,9 @@ class CursoController {
       }
     } else {
       const { erros, data } = await CursoService.getCursosByNome(
-        req.query.nome as string
+        req.query.nome as string,
+        Number.parseInt(page as string),
+        Number.parseInt(items as string)
       );
       if (erros.length > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });

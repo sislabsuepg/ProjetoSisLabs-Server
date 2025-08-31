@@ -5,12 +5,12 @@ import codes from "../types/responseCodes";
 
 class AlunoController {
   async index(req: Request, res: Response) {
-    const { nome, ra, page, limit, ativo } = req.query;
+    const { nome, ra, page, items, ativo } = req.query;
     const ativado = ativo === "true";
     if (!nome && !ra) {
       const { erros, data } = await AlunoService.getAllAlunos(
         Number.parseInt(page as string),
-        Number.parseInt(limit as string),
+        Number.parseInt(items as string),
         ativo === undefined ? undefined : ativado
       );
       if ((Array.isArray(erros) ? erros.length : 0) > 0) {
@@ -21,7 +21,9 @@ class AlunoController {
     } else {
       const { erros, data } = await AlunoService.searchAlunos(
         String(nome) || "",
-        String(ra) || ""
+        String(ra) || "",
+        Number.parseInt(page as string),
+        Number.parseInt(items as string)
       );
       if ((Array.isArray(erros) ? erros.length : 0) > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });

@@ -3,7 +3,7 @@ import Aluno from "../models/Aluno";
 import config from "../config/config";
 import jwt from "jsonwebtoken";
 import Curso from "../models/Curso";
-import { off } from "process";
+import { getPaginationParams } from "../types/pagination";
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
     const erros: string[] = [];
@@ -87,6 +87,22 @@ export default class AlunoService {
     return erros;
   }
 
+  static async getCount(ativo?: boolean) {
+    try {
+      const count: number = await Aluno.count({
+        where: {
+          ativo: {
+            [Op.or]: ativo === undefined ? [true, false] : [ativo],
+          },
+        },
+      });
+      return count;
+    } catch (e) {
+      console.log(e);
+      return 0;
+    }
+  }
+
   static async getAllAlunos(offset?: number, limit?: number, ativo?: boolean) {
     try {
       const alunos: Aluno[] = await Aluno.findAll({
@@ -107,8 +123,7 @@ export default class AlunoService {
             [Op.or]: ativo === undefined ? [true, false] : [ativo],
           },
         },
-        offset: offset || undefined,
-        limit: limit || undefined,
+        ...getPaginationParams(offset, limit),
       });
 
       if (alunos.length === 0) {
@@ -155,7 +170,7 @@ export default class AlunoService {
       const alunos: Aluno[] = await Aluno.findAll({
         where: {
           [Op.or]: [
-            { nome: { [Op.like]: `%${nome || ""}%` } },
+            { nome: { [Op.iLike]: `%${nome || ""}%` } },
             { ra: { [Op.like]: `${ra || ""}` } },
           ],
         },
@@ -173,8 +188,7 @@ export default class AlunoService {
             model: Curso,
           },
         ],
-        offset: offset || 0,
-        limit: limit || 0,
+        ...getPaginationParams(offset, limit),
       });
 
       if (!alunos || alunos.length === 0) {

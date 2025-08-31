@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import Curso from "../models/Curso";
+import { getPaginationParams } from "../types/pagination";
 export default class CursoService {
   static verificaNome(nome: string): string[] {
     const erros: string[] = [];
@@ -23,8 +24,7 @@ export default class CursoService {
   static async getAllCursos(offset?: number, limit?: number) {
     try {
       const cursos: Curso[] = await Curso.findAll({
-        offset: offset,
-        limit: limit,
+        ...getPaginationParams(offset, limit),
       });
       if (cursos.length === 0) {
         return {
@@ -67,7 +67,11 @@ export default class CursoService {
     }
   }
 
-  static async getCursosByNome(nomeBusca: string) {
+  static async getCursosByNome(
+    nomeBusca: string,
+    offset?: number,
+    limit?: number
+  ) {
     try {
       const erros: string[] = this.verificaNome(nomeBusca);
       if (erros.length > 0) {
@@ -78,6 +82,7 @@ export default class CursoService {
       }
       const curso = await Curso.findAll({
         where: { nome: { [Op.iLike]: `%${nomeBusca}%` } },
+        ...getPaginationParams(offset, limit),
       });
       if (!curso) {
         return {
