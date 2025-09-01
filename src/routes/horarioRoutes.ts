@@ -4,6 +4,7 @@ import HorarioController from "../controllers/HorarioController";
 const router: Router = Router();
 
 router.get("/", HorarioController.index);
+router.get("/laboratorio/:id", HorarioController.showLaboratorio);
 router.get("/:id", HorarioController.show);
 router.post("/", HorarioController.create);
 router.put("/:id", HorarioController.update);

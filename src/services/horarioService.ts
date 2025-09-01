@@ -1,7 +1,6 @@
 import Horario from "../models/Horario";
 import Professor from "../models/Professor";
 import Laboratorio from "../models/Laboratorio";
-import codes from "../types/responseCodes";
 
 export default class HorarioService {
   static verificaDiaSemana(diaSemana: number): string[] {
@@ -30,23 +29,20 @@ export default class HorarioService {
           { model: Laboratorio, as: "laboratorio" },
         ],
       });
-      if (!horarios) {
+      if (!horarios || horarios.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum horario encontrado"],
           data: [],
         };
       }
 
       return {
-        status: codes.OK,
         erros: [],
         data: horarios,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar horarios"],
         data: null,
       };
@@ -63,22 +59,48 @@ export default class HorarioService {
       });
       if (!horario) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum horario encontrado"],
           data: [],
         };
       }
 
       return {
-        status: codes.OK,
         erros: [],
         data: horario,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar horario"],
+        data: null,
+      };
+    }
+  }
+
+  static async getHorariosByLaboratorio(idLaboratorio: number) {
+    try {
+      const horarios = await Horario.findAll({
+        where: { idLaboratorio },
+        include: [
+          { model: Professor, as: "professor" },
+          { model: Laboratorio, as: "laboratorio" },
+        ],
+      });
+      if (!horarios || horarios.length === 0) {
+        return {
+          erros: ["Nenhum horario encontrado"],
+          data: [],
+        };
+      }
+
+      return {
+        erros: [],
+        data: horarios,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        erros: ["Erro ao buscar horarios"],
         data: null,
       };
     }
@@ -93,7 +115,6 @@ export default class HorarioService {
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
       if (!laboratorio) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Laboratorio não encontrado"],
           data: null,
         };
@@ -106,7 +127,6 @@ export default class HorarioService {
 
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros,
           data: null,
         };
@@ -122,7 +142,6 @@ export default class HorarioService {
 
       if (horarioExistente) {
         return {
-          status: codes.CONFLICT,
           erros: ["Horario já existe para este laboratorio, dia e horário"],
           data: null,
         };
@@ -135,14 +154,12 @@ export default class HorarioService {
       });
 
       return {
-        status: codes.CREATED,
         erros: [],
         data: novoHorario,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar horario"],
         data: null,
       };
@@ -158,7 +175,6 @@ export default class HorarioService {
       const horarioExistente = await Horario.findByPk(id);
       if (!horarioExistente) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Horario não encontrado"],
           data: null,
         };
@@ -166,7 +182,6 @@ export default class HorarioService {
 
       if (!idProfessor && !semestral) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["ID do professor ou semestral são obrigatórios"],
           data: null,
         };
@@ -176,7 +191,6 @@ export default class HorarioService {
         const professor = await Professor.findByPk(idProfessor);
         if (!professor) {
           return {
-            status: codes.NOT_FOUND,
             erros: ["Professor não encontrado"],
             data: null,
           };
@@ -190,14 +204,12 @@ export default class HorarioService {
       await horarioExistente.save();
 
       return {
-        status: codes.OK,
         erros: [],
         data: horarioExistente,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar horario"],
         data: null,
       };
@@ -209,7 +221,6 @@ export default class HorarioService {
       const horario = await Horario.findByPk(id);
       if (!horario) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Horario não encontrado"],
           data: null,
         };
@@ -218,14 +229,12 @@ export default class HorarioService {
       await horario.destroy();
 
       return {
-        status: codes.NO_CONTENT,
         erros: [],
         data: null,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar horario"],
         data: null,
       };
