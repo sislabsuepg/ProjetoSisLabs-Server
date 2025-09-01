@@ -1,6 +1,6 @@
-import RecadoService from "../services/recadoService";
+import RecadoService from "../services/recadoService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 
 class RecadoController {
   async index(req: Request, res: Response) {

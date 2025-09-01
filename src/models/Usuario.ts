@@ -13,9 +13,9 @@ import {
   BeforeCreate,
 } from "sequelize-typescript";
 
-import PermissaoUsuario from "./PermissaoUsuario";
-import Registro from "./Registro";
-import Emprestimo from "./Emprestimo";
+import PermissaoUsuario from "./PermissaoUsuario.js";
+import Registro from "./Registro.js";
+import Emprestimo from "./Emprestimo.js";
 import { Optional } from "sequelize";
 import md5 from "md5";
 
@@ -28,7 +28,7 @@ interface UsuarioAtributos {
   idPermissao: number;
 }
 
-interface UsuarioCreationAtributos extends Optional<UsuarioAtributos, "id"> { }
+interface UsuarioCreationAtributos extends Optional<UsuarioAtributos, "id"> {}
 
 @Table({
   tableName: "usuario",

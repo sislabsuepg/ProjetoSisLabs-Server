@@ -1,8 +1,8 @@
-import PermissaoUsuario from "../models/PermissaoUsuario";
+import PermissaoUsuario from "../models/PermissaoUsuario.js";
 
 import { Op } from "sequelize";
 
-import { getPaginationParams } from "../types/pagination";
+import { getPaginationParams } from "../types/pagination.js";
 export default class PermissaoUsuarioService {
   static verificaNomePermissao(nomePermissao: string): string[] {
     const erros: string[] = [];

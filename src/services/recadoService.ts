@@ -1,5 +1,5 @@
-import Recado from "../models/Recado";
-import { getPaginationParams } from "../types/pagination";
+import Recado from "../models/Recado.js";
+import { getPaginationParams } from "../types/pagination.js";
 export default class RecadoService {
   static verificaTexto(texto: string) {
     const erros: string[] = [];

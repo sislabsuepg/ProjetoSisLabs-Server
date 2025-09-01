@@ -14,7 +14,7 @@ import {
   Max,
   Min,
 } from "sequelize-typescript";
-import Aluno from "./Aluno";
+import Aluno from "./Aluno.js";
 
 interface CursoAtributos {
   id: number;

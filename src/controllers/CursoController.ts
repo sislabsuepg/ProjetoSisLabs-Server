@@ -1,6 +1,6 @@
-import CursoService from "../services/cursoService";
+import CursoService from "../services/cursoService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 
 class CursoController {
   async index(req: Request, res: Response) {

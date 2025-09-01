@@ -1,4 +1,4 @@
-import Curso from "./Curso";
+import Curso from "./Curso.js";
 
 import md5 from "md5";
 
@@ -22,8 +22,8 @@ import {
   HasMany,
 } from "sequelize-typescript";
 
-import Orientacao from "./Orientacao";
-import Emprestimo from "./Emprestimo";
+import Orientacao from "./Orientacao.js";
+import Emprestimo from "./Emprestimo.js";
 
 interface AlunoAtributos {
   id: number;

@@ -1,8 +1,8 @@
-import Usuario from "../models/Usuario";
-import PermissaoUsuario from "../models/PermissaoUsuario";
-import config from "../config/config";
+import Usuario from "../models/Usuario.js";
+import PermissaoUsuario from "../models/PermissaoUsuario.js";
+import config from "../config/config.js";
 import jwt from "jsonwebtoken";
-import { getPaginationParams } from "../types/pagination";
+import { getPaginationParams } from "../types/pagination.js";
 export default class UsuarioService {
   static verificaLogin(login: string): string[] {
     const erros: string[] = [];

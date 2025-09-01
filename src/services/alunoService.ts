@@ -1,9 +1,9 @@
 import { Op } from "sequelize";
-import Aluno from "../models/Aluno";
-import config from "../config/config";
+import Aluno from "../models/Aluno.js";
+import config from "../config/config.js";
 import jwt from "jsonwebtoken";
-import Curso from "../models/Curso";
-import { getPaginationParams } from "../types/pagination";
+import Curso from "../models/Curso.js";
+import { getPaginationParams } from "../types/pagination.js";
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
     const erros: string[] = [];

@@ -1,6 +1,6 @@
-import Registro from "../models/Registro";
-import Usuario from "../models/Usuario";
-import { getPaginationParams } from "../types/pagination";
+import Registro from "../models/Registro.js";
+import Usuario from "../models/Usuario.js";
+import { getPaginationParams } from "../types/pagination.js";
 export default class RegistroService {
   static async getAllRegistros(offset?: number, limit?: number) {
     try {

@@ -13,10 +13,9 @@ import {
   HasMany,
   AutoIncrement,
 } from "sequelize-typescript";
-import Aluno from "./Aluno";
-import Evento from "./Evento";
-import Orientacao from "./Orientacao";
-import Horario from "./Horario";
+import Evento from "./Evento.js";
+import Orientacao from "./Orientacao.js";
+import Horario from "./Horario.js";
 interface LaboratorioAtributos {
   id: string;
   nome: string;

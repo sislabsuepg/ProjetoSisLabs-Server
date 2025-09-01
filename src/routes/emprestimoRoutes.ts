@@ -1,5 +1,5 @@
 import { Router } from "express";
-import EmprestimoController from "../controllers/EmprestimoController";
+import EmprestimoController from "../controllers/EmprestimoController.js";
 
 const router: Router = Router();
 

@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
-import Evento from "../models/Evento";
-import Laboratorio from "../models/Laboratorio";
-import { getPaginationParams } from "../types/pagination";
+import Evento from "../models/Evento.js";
+import Laboratorio from "../models/Laboratorio.js";
+import { getPaginationParams } from "../types/pagination.js";
 export default class EventoService {
   static verificaData(data: Date): string[] {
     const erros: string[] = [];

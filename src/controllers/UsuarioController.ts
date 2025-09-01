@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import UsuarioService from "../services/usuarioService";
-import codes from "../types/responseCodes";
+import UsuarioService from "../services/usuarioService.js";
+import codes from "../types/responseCodes.js";
 class UsuarioController {
   public async index(req: Request, res: Response) {
     const { page, items } = req.query;

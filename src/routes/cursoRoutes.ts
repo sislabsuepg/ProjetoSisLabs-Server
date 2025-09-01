@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import CursoController from "../controllers/CursoController";
+import CursoController from "../controllers/CursoController.js";
 
 const router: Router = Router();
 

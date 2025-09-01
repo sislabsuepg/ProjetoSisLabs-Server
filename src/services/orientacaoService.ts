@@ -1,9 +1,9 @@
 import { Op } from "sequelize";
-import Aluno from "../models/Aluno";
-import Laboratorio from "../models/Laboratorio";
-import Orientacao from "../models/Orientacao";
-import Professor from "../models/Professor";
-import { getPaginationParams } from "../types/pagination";
+import Aluno from "../models/Aluno.js";
+import Laboratorio from "../models/Laboratorio.js";
+import Orientacao from "../models/Orientacao.js";
+import Professor from "../models/Professor.js";
+import { getPaginationParams } from "../types/pagination.js";
 
 function getActive(active: boolean | undefined): {} {
   if (active === true) {

@@ -1,6 +1,6 @@
-import permissaoUsuarioService from "../services/permissaoUsuarioService";
+import permissaoUsuarioService from "../services/permissaoUsuarioService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 
 class PermissaoUsuarioController {
   async index(req: Request, res: Response) {

@@ -1,6 +1,6 @@
-import professorService from "../services/professorService";
+import professorService from "../services/professorService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 
 class ProfessorController {
   async index(req: Request, res: Response) {

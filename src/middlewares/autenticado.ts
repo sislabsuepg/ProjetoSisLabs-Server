@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import config from "../config/config";
-import AlunoRequest from "../types/alunoRequest";
-import UsuarioRequest from "../types/usuarioRequest";
+import config from "../config/config.js";
+import AlunoRequest from "../types/alunoRequest.js";
+import UsuarioRequest from "../types/usuarioRequest.js";
 export function alunoAutenticado(
   req: AlunoRequest,
   res: Response,

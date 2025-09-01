@@ -12,7 +12,7 @@ import {
   HasMany,
 } from "sequelize-typescript";
 
-import Usuario from "./Usuario";
+import Usuario from "./Usuario.js";
 
 interface PermissaoUsuarioAtributos {
   id: number;

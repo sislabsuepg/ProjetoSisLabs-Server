@@ -1,6 +1,6 @@
-import OrientacaoService from "../services/orientacaoService";
+import OrientacaoService from "../services/orientacaoService.js";
 import { Request, Response } from "express";
-import codes from "..//types/responseCodes"; // Adjust the path if needed
+import codes from "../types/responseCodes.js";
 
 class OrientacaoController {
   async index(req: Request, res: Response) {

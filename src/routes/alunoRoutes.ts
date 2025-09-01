@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import AlunoController from "../controllers/AlunoController";
+import AlunoController from "../controllers/AlunoController.js";
 
 const router: Router = Router();
 

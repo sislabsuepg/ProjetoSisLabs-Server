@@ -1,4 +1,4 @@
-import RecadoController from "../controllers/RecadoController";
+import RecadoController from "../controllers/RecadoController.js";
 
 import { Router } from "express";
 

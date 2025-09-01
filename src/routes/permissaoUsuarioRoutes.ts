@@ -1,5 +1,5 @@
 import { Router } from "express";
-import PermissaoUsuarioController from "../controllers/PermissaoUsuarioController";
+import PermissaoUsuarioController from "../controllers/PermissaoUsuarioController.js";
 const router: Router = Router();
 
 router.get("/", PermissaoUsuarioController.index);

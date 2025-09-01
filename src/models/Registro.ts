@@ -10,7 +10,7 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 
-import Usuario from "./Usuario";
+import Usuario from "./Usuario.js";
 import { Optional } from "sequelize";
 
 interface RegistroAtributos {

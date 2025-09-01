@@ -1,5 +1,5 @@
 import { Router } from "express";
-import RegistroController from "../controllers/RegistroController";
+import RegistroController from "../controllers/RegistroController.js";
 
 const router: Router = Router();
 

@@ -10,9 +10,9 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 import { Optional } from "sequelize";
-import Laboratorio from "./Laboratorio";
-import Professor from "./Professor";
-import Aluno from "./Aluno";
+import Laboratorio from "./Laboratorio.js";
+import Professor from "./Professor.js";
+import Aluno from "./Aluno.js";
 
 interface OrientacaoAtributos {
   id: number;

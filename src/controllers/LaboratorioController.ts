@@ -1,6 +1,6 @@
-import laboratorioService from "../services/laboratorioService";
+import laboratorioService from "../services/laboratorioService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 class LaboratorioController {
   async index(req: Request, res: Response) {
     const { page, items } = req.query;

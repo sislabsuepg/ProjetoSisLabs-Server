@@ -1,6 +1,6 @@
-import HorarioService from "../services/horarioService";
+import HorarioService from "../services/horarioService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 
 class HorarioController {
   async index(req: Request, res: Response) {

@@ -11,8 +11,8 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 
-import Professor from "./Professor";
-import Laboratorio from "./Laboratorio";
+import Professor from "./Professor.js";
+import Laboratorio from "./Laboratorio.js";
 interface HorarioAtributos {
   id: number;
   diaSemana: number;

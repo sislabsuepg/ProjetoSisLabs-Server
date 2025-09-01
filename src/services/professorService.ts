@@ -1,6 +1,6 @@
-import Professor from "../models/Professor";
+import Professor from "../models/Professor.js";
 import { Op } from "sequelize";
-import { getPaginationParams } from "../types/pagination";
+import { getPaginationParams } from "../types/pagination.js";
 
 export default class professorService {
   static verificaNome(nome: string): string[] {

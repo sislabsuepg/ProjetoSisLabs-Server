@@ -11,7 +11,7 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 
-import Laboratorio from "./Laboratorio";
+import Laboratorio from "./Laboratorio.js";
 
 interface EventoAtributos {
   id: number;

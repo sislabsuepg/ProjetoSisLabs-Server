@@ -1,5 +1,5 @@
 import { Router, RouterOptions } from "express";
-import OrientacaoController from "../controllers/OrientacaoController";
+import OrientacaoController from "../controllers/OrientacaoController.js";
 
 const router: Router = Router();
 

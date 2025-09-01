@@ -1,6 +1,6 @@
-import AlunoRequest from "../types/alunoRequest";
+import AlunoRequest from "../types/alunoRequest.js";
 import { Response } from "express";
-import UsuarioRequest from "../types/usuarioRequest";
+import UsuarioRequest from "../types/usuarioRequest.js";
 
 class testController {
   public async alunoTest(req: AlunoRequest, res: Response) {

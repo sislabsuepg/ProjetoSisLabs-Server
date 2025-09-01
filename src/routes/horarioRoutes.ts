@@ -1,5 +1,5 @@
 import { Router } from "express";
-import HorarioController from "../controllers/HorarioController";
+import HorarioController from "../controllers/HorarioController.js";
 
 const router: Router = Router();
 

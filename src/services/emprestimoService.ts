@@ -1,9 +1,9 @@
-import Laboratorio from "../models/Laboratorio";
-import Aluno from "../models/Aluno";
-import Usuario from "../models/Usuario";
-import Emprestimo from "../models/Emprestimo";
-import Orientacao from "../models/Orientacao";
-import { getPaginationParams } from "../types/pagination";
+import Laboratorio from "../models/Laboratorio.js";
+import Aluno from "../models/Aluno.js";
+import Usuario from "../models/Usuario.js";
+import Emprestimo from "../models/Emprestimo.js";
+import Orientacao from "../models/Orientacao.js";
+import { getPaginationParams } from "../types/pagination.js";
 import { Op } from "sequelize";
 export default class EmprestimoService {
   static async getAllEmprestimos(offset?: number, limit?: number) {

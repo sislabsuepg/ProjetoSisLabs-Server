@@ -1,20 +1,20 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import connection from "./database";
-import alunoRoutes from "./routes/alunoRoutes";
-import cursoRoutes from "./routes/cursoRoutes";
-import emprestimoRoutes from "./routes/emprestimoRoutes";
-import eventoRoutes from "./routes/eventoRoutes";
-import horarioRoutes from "./routes/horarioRoutes";
-import laboratorioRoutes from "./routes/laboratorioRoutes";
-import orientacaoRoutes from "./routes/orientacaoRoutes";
-import permissaoUsuarioRoutes from "./routes/permissaoUsuarioRoutes";
-import professorRoutes from "./routes/professorRoutes";
-import recadoRoutes from "./routes/recadoRoutes";
-import registroRoutes from "./routes/registroRoutes";
-import usuarioRoutes from "./routes/usuarioRoutes";
-import emailRoutes from "./routes/emailRoutes";
+import connection from "./database/index.js";
+import alunoRoutes from "./routes/alunoRoutes.js";
+import cursoRoutes from "./routes/cursoRoutes.js";
+import emprestimoRoutes from "./routes/emprestimoRoutes.js";
+import eventoRoutes from "./routes/eventoRoutes.js";
+import horarioRoutes from "./routes/horarioRoutes.js";
+import laboratorioRoutes from "./routes/laboratorioRoutes.js";
+import orientacaoRoutes from "./routes/orientacaoRoutes.js";
+import permissaoUsuarioRoutes from "./routes/permissaoUsuarioRoutes.js";
+import professorRoutes from "./routes/professorRoutes.js";
+import recadoRoutes from "./routes/recadoRoutes.js";
+import registroRoutes from "./routes/registroRoutes.js";
+import usuarioRoutes from "./routes/usuarioRoutes.js";
+import emailRoutes from "./routes/emailRoutes.js";
 
 class App {
   app: any;

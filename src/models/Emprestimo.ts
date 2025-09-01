@@ -12,9 +12,9 @@ import {
   Default,
   BelongsTo,
 } from "sequelize-typescript";
-import Aluno from "./Aluno";
-import Usuario from "./Usuario";
-import Laboratorio from "./Laboratorio";
+import Aluno from "./Aluno.js";
+import Usuario from "./Usuario.js";
+import Laboratorio from "./Laboratorio.js";
 
 interface EmprestimoAtributos {
   id: number;

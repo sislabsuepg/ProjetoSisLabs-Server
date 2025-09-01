@@ -1,6 +1,6 @@
-import EventoService from "../services/eventoService";
+import EventoService from "../services/eventoService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 class EventoController {
   async index(req: Request, res: Response) {
     const { page, items } = req.query;

@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
-import Curso from "../models/Curso";
-import { getPaginationParams } from "../types/pagination";
+import Curso from "../models/Curso.js";
+import { getPaginationParams } from "../types/pagination.js";
 export default class CursoService {
   static verificaNome(nome: string): string[] {
     const erros: string[] = [];

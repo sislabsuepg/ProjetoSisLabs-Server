@@ -1,6 +1,6 @@
-import EmprestimoService from "../services/emprestimoService";
+import EmprestimoService from "../services/emprestimoService.js";
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
+import codes from "../types/responseCodes.js";
 
 class EmprestimoController {
   async index(req: Request, res: Response) {

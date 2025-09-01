@@ -1,6 +1,6 @@
-import Laboratorio from "../models/Laboratorio";
+import Laboratorio from "../models/Laboratorio.js";
 import { Op } from "sequelize";
-import { getPaginationParams } from "../types/pagination";
+import { getPaginationParams } from "../types/pagination.js";
 
 export default class laboratorioService {
   static verificaNumero(numero: string): string[] {

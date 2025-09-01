@@ -1,4 +1,4 @@
-import UsuarioController from "../controllers/UsuarioController";
+import UsuarioController from "../controllers/UsuarioController.js";
 
 import { Router } from "express";
 

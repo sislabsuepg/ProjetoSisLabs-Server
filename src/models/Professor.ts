@@ -12,8 +12,8 @@ import {
   HasMany,
 } from "sequelize-typescript";
 
-import Orientacao from "./Orientacao";
-import Horario from "./Horario";
+import Orientacao from "./Orientacao.js";
+import Horario from "./Horario.js";
 
 interface ProfessorAttributes {
   id: number;

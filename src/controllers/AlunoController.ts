@@ -1,8 +1,7 @@
-import AlunoService from "../services/alunoService";
+import AlunoService from "../services/alunoService.js";
 
 import { Request, Response } from "express";
-import codes from "../types/responseCodes";
-import { type } from "node:os";
+import codes from "../types/responseCodes.js";
 
 class AlunoController {
   async index(req: Request, res: Response) {

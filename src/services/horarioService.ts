@@ -1,6 +1,6 @@
-import Horario from "../models/Horario";
-import Professor from "../models/Professor";
-import Laboratorio from "../models/Laboratorio";
+import Horario from "../models/Horario.js";
+import Professor from "../models/Professor.js";
+import Laboratorio from "../models/Laboratorio.js";
 
 export default class HorarioService {
   static verificaDiaSemana(diaSemana: number): string[] {
