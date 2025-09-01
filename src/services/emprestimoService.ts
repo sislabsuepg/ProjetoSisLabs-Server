@@ -30,20 +30,20 @@ export default class EmprestimoService {
       });
       if (emprestimos.length === 0) {
         return {
-          data: null,
           erros: ["Nenhum empréstimo encontrado"],
+          data: null,
         };
       } else {
         return {
-          data: emprestimos,
           erros: [],
+          data: emprestimos,
         };
       }
     } catch (e) {
       console.log(e);
       return {
-  data: null,
-  erros: ["Erro ao buscar empréstimos"],
+        erros: ["Erro ao buscar empréstimos"],
+        data: null,
       };
     }
   }
@@ -70,19 +70,19 @@ export default class EmprestimoService {
       });
       if (!emprestimo) {
         return {
-          data: null,
           erros: ["Empréstimo não encontrado"],
+          data: null,
         };
       }
       return {
-        data: emprestimo,
         erros: [],
+        data: emprestimo,
       };
     } catch (e) {
       console.log(e);
       return {
-        data: null,
         erros: ["Erro ao buscar empréstimo"],
+        data: null,
       };
     }
   }
@@ -96,23 +96,23 @@ export default class EmprestimoService {
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
       if (!laboratorio) {
         return {
-          data: null,
           erros: ["Laboratório não encontrado"],
+          data: null,
         };
       }
       const usuario = await Usuario.findByPk(idUsuario);
       if (!usuario || (usuario && usuario.ativo === false)) {
         return {
-          data: null,
           erros: ["Usuário não encontrado ou inativo"],
+          data: null,
         };
       }
 
       const aluno = await Aluno.findByPk(idAluno);
       if (!aluno || (aluno && aluno.ativo === false)) {
         return {
-          data: null,
           erros: ["Aluno não encontrado ou inativo"],
+          data: null,
         };
       }
       if (laboratorio.restrito) {
@@ -121,8 +121,8 @@ export default class EmprestimoService {
         });
         if (!orientacao) {
           return {
-            data: null,
             erros: ["Aluno não possui orientação no laboratório"],
+            data: null,
           };
         }
       }
@@ -136,14 +136,14 @@ export default class EmprestimoService {
       });
 
       return {
-        data: emprestimo,
-        erros: [],
+  erros: [],
+  data: emprestimo,
       };
     } catch (e) {
       console.log(e);
       return {
-        data: null,
-        erros: ["Erro ao criar empréstimo"],
+  erros: ["Erro ao criar empréstimo"],
+  data: null,
       };
     }
   }
@@ -170,21 +170,21 @@ export default class EmprestimoService {
       });
       if (!emprestimo) {
         return {
-          data: null,
           erros: ["Empréstimo não encontrado"],
+          data: null,
         };
       }
       if (emprestimo.dataHoraSaida && emprestimo.usuarioSaida) {
         return {
-          data: null,
           erros: ["Empréstimo já fechado"],
+          data: null,
         };
       }
       const usuarioSaida = await Usuario.findByPk(idUsuarioSaida);
       if (!usuarioSaida || (usuarioSaida && usuarioSaida.ativo === false)) {
         return {
-          data: null,
           erros: ["Usuário de saída não encontrado ou inativo"],
+          data: null,
         };
       }
 
@@ -194,14 +194,14 @@ export default class EmprestimoService {
       });
 
       return {
-        data: emprestimoAtualizado,
-        erros: [],
+  erros: [],
+  data: emprestimoAtualizado,
       };
     } catch (e) {
       console.log(e);
       return {
-        data: null,
-        erros: ["Erro ao fechar empréstimo"],
+  erros: ["Erro ao fechar empréstimo"],
+  data: null,
       };
     }
   }
@@ -211,8 +211,8 @@ export default class EmprestimoService {
       const emprestimo = await Emprestimo.findByPk(id);
       if (!emprestimo) {
         return {
-          data: null,
           erros: ["Empréstimo não encontrado"],
+          data: null,
         };
       }
 
@@ -220,14 +220,14 @@ export default class EmprestimoService {
       await emprestimo.save();
 
       return {
-        data: emprestimo,
-        erros: [],
+  erros: [],
+  data: emprestimo,
       };
     } catch (e) {
       console.log(e);
       return {
-        data: null,
-        erros: ["Erro ao atualizar advertência"],
+  erros: ["Erro ao atualizar advertência"],
+  data: null,
       };
     }
   }

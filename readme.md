@@ -1,10 +1,4 @@
-<div align="center">
-
 # API ProjetoSisLabs
-
-Documentação detalhada e gerada a partir do código-fonte atual (branch `main`).
-
-</div>
 
 > Esta versão substitui a documentação anterior e reflete fielmente validações, formatos de resposta e diferenças reais do código. Onde houver divergência entre README anterior e código, aqui prevalece o comportamento implementado.
 
@@ -31,8 +25,6 @@ Documentação detalhada e gerada a partir do código-fonte atual (branch `main`
    - [Home / Healthcheck](#home--healthcheck)
 6. [Validações Resumidas](#validações-resumidas)
 7. [Mensagens de Erro Comuns](#mensagens-de-erro-comuns)
-8. [Inconsistências Conhecidas](#inconsistências-conhecidas)
-9. [Melhorias Futuras Sugeridas](#melhorias-futuras-sugeridas)
 
 ---
 
@@ -82,7 +74,7 @@ Falha:
 { "erros": ["Mensagem de erro"], "data": null }
 ```
 
-Exceção histórica: rotas de Empréstimo mantêm ordem `{ "data": ..., "erros": [] }` por retrocompatibilidade.
+Todas as rotas seguem a mesma ordem `{ "erros", "data" }`.
 
 `/count` endpoints retornam `{ "count": <number> }`.
 
@@ -367,16 +359,6 @@ Respostas:
 * "Dados incompletos" / "Dados faltantes" / "Pelo menos um campo deve ser informado"
 * "Horario já existe para este laboratorio, dia e horário"
 * "Já existe uma orientação ativa para este aluno"
-
-## Inconsistências Conhecidas
-
-| Tema | Observação |
-|------|------------|
-| Formato resposta | Padrão `{ erros, data }` em todas as rotas (Empréstimo mantém ordem inversa) |
-| Professor lista | Padronizado: apenas `page` + `items` |
-| Horário diaSemana | Historicamente ambíguo; definido: 0 = Segunda-feira |
-| Middleware auth | Implementado mas não aplicado (todas rotas expostas) |
-| Campo Evento | Body usa `dataEvento`, model armazena `data` |
 
 ## Exemplos de Requisições
 
