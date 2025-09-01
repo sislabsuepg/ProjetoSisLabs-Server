@@ -1,5 +1,5 @@
 import Recado from "../models/Recado";
-import codes from "../types/responseCodes";
+import { getPaginationParams } from "../types/pagination";
 export default class RecadoService {
   static verificaTexto(texto: string) {
     const erros: string[] = [];
@@ -12,26 +12,25 @@ export default class RecadoService {
     return erros;
   }
 
-  static async getAllRecados() {
+  static async getAllRecados(offset?: number, limit?: number) {
     try {
-      const recados = await Recado.findAll();
+      const recados = await Recado.findAll({
+        ...getPaginationParams(offset, limit),
+      });
 
       if (!recados) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum recado encontrado"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: recados,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar recados"],
         data: [],
       };
@@ -44,20 +43,17 @@ export default class RecadoService {
 
       if (!recado) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Recado não encontrado"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: recado,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar recado"],
         data: [],
       };
@@ -69,7 +65,6 @@ export default class RecadoService {
       const erros: string[] = this.verificaTexto(texto);
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -77,14 +72,12 @@ export default class RecadoService {
 
       const recado = await Recado.create({ texto });
       return {
-        status: codes.CREATED,
         erros: [],
         data: recado,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar recado"],
         data: [],
       };
@@ -96,7 +89,6 @@ export default class RecadoService {
       const recado = await Recado.findByPk(id);
       if (!recado) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Recado não encontrado"],
           data: [],
         };
@@ -104,7 +96,6 @@ export default class RecadoService {
       const erros: string[] = this.verificaTexto(texto);
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: [],
         };
@@ -113,14 +104,12 @@ export default class RecadoService {
       recado.texto = texto;
       await recado.save();
       return {
-        status: codes.OK,
         erros: [],
         data: recado,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar recado"],
         data: [],
       };
@@ -132,24 +121,31 @@ export default class RecadoService {
       const recado = await Recado.findByPk(id);
       if (!recado) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Recado não encontrado"],
           data: [],
         };
       }
       await recado.destroy();
       return {
-        status: codes.OK,
         erros: [],
         data: recado,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar recado"],
         data: [],
       };
+    }
+  }
+
+  static async getCount() {
+    try {
+      const count = await Recado.count();
+      return count;
+    } catch (error) {
+      console.log(error);
+      return 0;
     }
   }
 }

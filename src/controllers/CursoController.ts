@@ -73,6 +73,11 @@ class CursoController {
       res.status(codes.OK).json({ erros, data });
     }
   }
+
+  async count(req: Request, res: Response) {
+    const count = await CursoService.getCount();
+    res.status(codes.OK).json({ count });
+  }
 }
 
 export default new CursoController();

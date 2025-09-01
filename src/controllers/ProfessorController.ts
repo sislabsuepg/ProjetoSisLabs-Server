@@ -1,47 +1,76 @@
 import professorService from "../services/professorService";
 import { Request, Response } from "express";
+import codes from "../types/responseCodes";
 
 class ProfessorController {
   async index(req: Request, res: Response) {
-    const { status, erros, data } = await professorService.getAllProfessores();
-    res.status(status).json({ erros, data });
+    const { pages, items } = req.query;
+    const { erros, data } = await professorService.getAllProfessores(
+      Number(pages),
+      Number(items)
+    );
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async show(req: Request, res: Response) {
     const { id } = req.params;
-    const { status, erros, data } = await professorService.getProfessorById(
-      Number(id)
-    );
-    res.status(status).json({ erros, data });
+    const { erros, data } = await professorService.getProfessorById(Number(id));
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async create(req: Request, res: Response) {
     const { nome, email } = req.body;
-    const { status, erros, data } = await professorService.createProfessor(
-      nome,
-      email
-    );
-    res.status(status).json({ erros, data });
+    const { erros, data } = await professorService.createProfessor(nome, email);
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.CREATED).json({ erros, data });
+    }
   }
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const { nome, email, ativo } = req.body;
-    const { status, erros, data } = await professorService.updateProfessor(
+    const { erros, data } = await professorService.updateProfessor(
       Number(id),
       nome,
       email,
       ativo
     );
-    res.status(status).json({ erros, data });
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async destroy(req: Request, res: Response) {
     const { id } = req.params;
-    const { status, erros, data } = await professorService.deleteProfessor(
-      Number(id)
-    );
-    res.status(status).json({ erros, data });
+    const { erros, data } = await professorService.deleteProfessor(Number(id));
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
+  async count(req: Request, res: Response) {
+    const { ativo } = req.query;
+    let ativado = undefined;
+    if (typeof ativo === "undefined") ativado = undefined;
+    else {
+      ativado = ativo === "true";
+    }
+    const count = await professorService.getCount(ativado);
+    res.status(codes.OK).json({ count });
   }
 }
 

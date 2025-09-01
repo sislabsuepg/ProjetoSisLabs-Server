@@ -6,6 +6,8 @@ const router: Router = Router();
 
 router.get("/", UsuarioController.index);
 
+router.get("/count", UsuarioController.count);
+
 router.get("/:id", UsuarioController.show);
 
 router.post("/", UsuarioController.store);

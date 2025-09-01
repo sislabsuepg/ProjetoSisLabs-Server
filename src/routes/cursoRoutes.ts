@@ -1,17 +1,19 @@
 import { Router } from "express";
 
-import CursoController from "../controllers/CursoController"
+import CursoController from "../controllers/CursoController";
 
-const router: Router = Router()
+const router: Router = Router();
 
-router.get('/', CursoController.index)
+router.get("/", CursoController.index);
 
-router.get('/:id', CursoController.show)
+router.get("/count", CursoController.count);
 
-router.post('/', CursoController.store)
+router.get("/:id", CursoController.show);
 
-router.put('/:id', CursoController.update)
+router.post("/", CursoController.store);
 
-router.delete('/:id', CursoController.destroy)
+router.put("/:id", CursoController.update);
 
-export default router
+router.delete("/:id", CursoController.destroy);
+
+export default router;

@@ -1,29 +1,29 @@
 import Registro from "../models/Registro";
 import Usuario from "../models/Usuario";
-import codes from "../types/responseCodes";
+import { getPaginationParams } from "../types/pagination";
 export default class RegistroService {
-  static async getAllRegistros() {
+  static async getAllRegistros(offset?: number, limit?: number) {
     try {
       const registros = await Registro.findAll({
+        ...getPaginationParams(offset, limit),
         include: [
           {
             model: Usuario,
             as: "usuario",
           },
         ],
+        order: [["dataHora", "DESC"]],
       });
-      if (!registros) {
+      if (!registros || registros.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum registro encontrado"],
           data: null,
         };
       }
-      return { status: codes.OK, erros: [], data: registros };
+      return { erros: [], data: registros };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar registros"],
         data: null,
       };
@@ -43,16 +43,14 @@ export default class RegistroService {
       });
       if (!registro) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Registro não encontrado"],
           data: null,
         };
       }
-      return { status: codes.OK, erros: [], data: registro };
+      return { erros: [], data: registro };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar registro"],
         data: null,
       };
@@ -69,19 +67,18 @@ export default class RegistroService {
             as: "usuario",
           },
         ],
+        order: [["dataHora", "DESC"]],
       });
-      if (!registros) {
+      if (!registros || registros.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum registro encontrado"],
           data: null,
         };
       }
-      return { status: codes.OK, erros: [], data: registros };
+      return { erros: [], data: registros };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar registros"],
         data: null,
       };
@@ -97,7 +94,6 @@ export default class RegistroService {
       const usuario = await Usuario.findByPk(idUsuario);
       if (!usuario) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Usuário não encontrado"],
           data: null,
         };
@@ -107,14 +103,27 @@ export default class RegistroService {
         descricao,
         idUsuario,
       });
-      return { status: codes.CREATED, erros: [], data: registro };
+      return { erros: [], data: registro };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar registro"],
         data: null,
       };
+    }
+  }
+
+  static async getCount(userId?: number) {
+    try {
+      const count = await Registro.count({
+        where: {
+          ...(userId !== undefined && { idUsuario: userId }),
+        },
+      });
+      return count;
+    } catch (error) {
+      console.log(error);
+      return 0;
     }
   }
 }

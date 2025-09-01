@@ -2,7 +2,7 @@ import Usuario from "../models/Usuario";
 import PermissaoUsuario from "../models/PermissaoUsuario";
 import config from "../config/config";
 import jwt from "jsonwebtoken";
-import codes from "../types/responseCodes";
+import { getPaginationParams } from "../types/pagination";
 export default class UsuarioService {
   static verificaLogin(login: string): string[] {
     const erros: string[] = [];
@@ -37,30 +37,28 @@ export default class UsuarioService {
     return erros;
   }
 
-  static async getAllUsuarios() {
+  static async getAllUsuarios(offset?: number, limit?: number) {
     try {
       const usuarios = await Usuario.findAll({
+        ...getPaginationParams(offset, limit),
         attributes: ["id", "nome", "login", "ativo"],
         include: {
           model: PermissaoUsuario,
         },
       });
-      if (!usuarios) {
+      if (!usuarios || usuarios.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum usuário encontrado"],
           data: null,
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: usuarios,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar usuários"],
         data: null,
       };
@@ -77,20 +75,17 @@ export default class UsuarioService {
       });
       if (!usuario) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Usuário não encontrado"],
           data: null,
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: usuario,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar usuário"],
         data: null,
       };
@@ -109,14 +104,16 @@ export default class UsuarioService {
       ...this.verificaNome(nome),
     ];
     if (erros.length > 0) {
-      return { status: codes.BAD_REQUEST, erros, data: null };
+      return {
+        erros,
+        data: null,
+      };
     }
 
     try {
       const usuarioExistente = await Usuario.findOne({ where: { login } });
       if (usuarioExistente) {
         return {
-          status: codes.CONFLICT,
           erros: ["Login já existe"],
           data: null,
         };
@@ -124,7 +121,6 @@ export default class UsuarioService {
       const permissao = await PermissaoUsuario.findByPk(idPermissao);
       if (!permissao) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Permissão não encontrada"],
           data: null,
         };
@@ -137,7 +133,6 @@ export default class UsuarioService {
         ativo: true,
       });
       return {
-        status: codes.CREATED,
         erros: [],
         data: {
           id: usuario.id,
@@ -150,7 +145,6 @@ export default class UsuarioService {
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar usuário"],
         data: null,
       };
@@ -172,7 +166,6 @@ export default class UsuarioService {
       });
       if (!usuario) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Usuário não encontrado"],
           data: null,
         };
@@ -182,7 +175,6 @@ export default class UsuarioService {
 
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: null,
         };
@@ -195,7 +187,6 @@ export default class UsuarioService {
         const permissao = await PermissaoUsuario.findByPk(idPermissao);
         if (!permissao) {
           return {
-            status: codes.NO_CONTENT,
             erros: ["Permissão não encontrada"],
             data: null,
           };
@@ -203,11 +194,10 @@ export default class UsuarioService {
         usuario.permissaoUsuario = permissao;
       }
       await usuario.save();
-      return { status: codes.OK, erros: [], data: usuario };
+      return { erros: [], data: usuario };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar usuário"],
         data: null,
       };
@@ -219,17 +209,15 @@ export default class UsuarioService {
       const usuario = await Usuario.findByPk(id);
       if (!usuario) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Usuário não encontrado"],
           data: null,
         };
       }
       await usuario.destroy();
-      return { status: codes.OK, erros: [], data: null };
+      return { erros: [], data: null };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar usuário"],
         data: null,
       };
@@ -246,21 +234,18 @@ export default class UsuarioService {
       });
       if (!usuario) {
         return {
-          status: codes.NOT_FOUND,
           erros: ["Login inválido"],
           data: null,
         };
       }
       if (!usuario.verificaSenha(senha)) {
         return {
-          status: codes.UNAUTHORIZED,
           erros: ["Senha inválida"],
           data: null,
         };
       }
       if (!usuario.ativo) {
         return {
-          status: codes.FORBIDDEN,
           erros: ["Usuário inativo"],
           data: null,
         };
@@ -272,15 +257,27 @@ export default class UsuarioService {
       const token: string = jwt.sign({ usuario }, config.secret as string, {
         expiresIn: expires,
       });
-
-      return { status: codes.OK, erros: [], data: { usuario, token } };
+      return { erros: [], data: { usuario, token } };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao realizar login"],
         data: null,
       };
+    }
+  }
+
+  static async getCount(ativo?: boolean) {
+    try {
+      const count = await Usuario.count({
+        where: {
+          ...(ativo !== undefined && { ativo }),
+        },
+      });
+      return count;
+    } catch (error) {
+      console.log(error);
+      return 0;
     }
   }
 }

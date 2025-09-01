@@ -4,6 +4,9 @@ import EventoController from "../controllers/EventoController";
 const router: Router = Router();
 
 router.get("/", EventoController.index);
+
+router.get("/count", EventoController.count);
+
 router.get("/:id", EventoController.show);
 router.post("/", EventoController.create);
 router.put("/:id", EventoController.update);

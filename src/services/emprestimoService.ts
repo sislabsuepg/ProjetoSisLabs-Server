@@ -4,6 +4,7 @@ import Usuario from "../models/Usuario";
 import Emprestimo from "../models/Emprestimo";
 import Orientacao from "../models/Orientacao";
 import { getPaginationParams } from "../types/pagination";
+import { Op } from "sequelize";
 export default class EmprestimoService {
   static async getAllEmprestimos(offset?: number, limit?: number) {
     try {
@@ -27,10 +28,17 @@ export default class EmprestimoService {
         ...getPaginationParams(offset, limit),
         order: [["dataHoraEntrada", "DESC"]],
       });
-      return {
-        data: emprestimos,
-        erros: [],
-      };
+      if (emprestimos.length === 0) {
+        return {
+          data: null,
+          erros: ["Nenhum empréstimo encontrado"],
+        };
+      } else {
+        return {
+          data: emprestimos,
+          erros: [],
+        };
+      }
     } catch (e) {
       console.log(e);
       return {
@@ -221,6 +229,25 @@ export default class EmprestimoService {
         data: null,
         erros: ["Erro ao atualizar advertência"],
       };
+    }
+  }
+
+  static async getCount(ativo?: boolean) {
+    try {
+      const where: any = {};
+      if (ativo !== undefined) {
+        where.dataHoraSaida = {
+          [Op.eq]: null,
+        };
+      }
+
+      const count: number = await Emprestimo.count({
+        where,
+      });
+      return count;
+    } catch (e) {
+      console.log(e);
+      return 0;
     }
   }
 }

@@ -2,6 +2,7 @@ import AlunoService from "../services/alunoService";
 
 import { Request, Response } from "express";
 import codes from "../types/responseCodes";
+import { type } from "node:os";
 
 class AlunoController {
   async index(req: Request, res: Response) {
@@ -117,6 +118,17 @@ class AlunoController {
         res.status(codes.FORBIDDEN).json({ erros, data: null });
       }
     }
+  }
+
+  async count(req: Request, res: Response) {
+    const { ativo } = req.query;
+    let ativado = undefined;
+    if (typeof ativo === "undefined") ativado = undefined;
+    else {
+      ativado = ativo === "true";
+    }
+    const count = await AlunoService.getCount(ativado);
+    res.status(codes.OK).json({ count });
   }
 }
 

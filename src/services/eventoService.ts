@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import Evento from "../models/Evento";
 import Laboratorio from "../models/Laboratorio";
 import { getPaginationParams } from "../types/pagination";
@@ -239,6 +240,22 @@ export default class EventoService {
         erros: ["Erro ao deletar evento"],
         data: [],
       };
+    }
+  }
+
+  static async getCount(ativo?: boolean) {
+    try {
+      const where: any = {};
+      if (ativo !== undefined) {
+        where.dataHora = {
+          [Op.gt]: new Date(),
+        };
+      }
+      const count = await Evento.count({ where });
+      return count;
+    } catch (e) {
+      console.log(e);
+      return 0;
     }
   }
 }

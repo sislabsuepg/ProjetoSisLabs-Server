@@ -3,11 +3,21 @@ import Aluno from "../models/Aluno";
 import Laboratorio from "../models/Laboratorio";
 import Orientacao from "../models/Orientacao";
 import Professor from "../models/Professor";
+import { getPaginationParams } from "../types/pagination";
 
-import codes from "../types/responseCodes";
+function getActive(active: boolean | undefined): {} {
+  if (active === true) {
+    return { where: { [Op.and]: [{ dataFim: { [Op.gt]: new Date() } }] } };
+  }
+  return {};
+}
 
 export default class OrientacaoService {
-  static async getAllOrientacoes() {
+  static async getAllOrientacoes(
+    offset?: number,
+    limit?: number,
+    active?: boolean
+  ) {
     try {
       const orientacoes = await Orientacao.findAll({
         include: [
@@ -24,23 +34,22 @@ export default class OrientacaoService {
             as: "laboratorio",
           },
         ],
+        ...getActive(active),
+        ...getPaginationParams(offset, limit),
       });
 
-      if (!orientacoes) {
+      if (!orientacoes || orientacoes.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhuma orientação encontrada"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: orientacoes,
       };
     } catch (error) {
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar orientações"],
         data: [],
       };
@@ -53,20 +62,17 @@ export default class OrientacaoService {
 
       if (!orientacao) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Orientação não encontrada"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: orientacao,
       };
     } catch (error) {
       console.log(error);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar orientação"],
         data: [],
       };
@@ -83,20 +89,17 @@ export default class OrientacaoService {
 
       if (!orientacoes || orientacoes.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhuma orientação encontrada para este aluno"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: orientacoes,
       };
     } catch (error) {
       console.log(error);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar orientações do aluno"],
         data: [],
       };
@@ -113,7 +116,6 @@ export default class OrientacaoService {
     try {
       if (!dataFim || !idAluno || !idProfessor || !idLaboratorio) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Dados faltantes"],
           data: [],
         };
@@ -142,7 +144,6 @@ export default class OrientacaoService {
 
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros,
           data: [],
         };
@@ -157,14 +158,12 @@ export default class OrientacaoService {
       });
 
       return {
-        status: codes.CREATED,
         erros: [],
         data: novaOrientacao,
       };
     } catch (error) {
       console.log(error);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar orientação"],
         data: [],
       };
@@ -188,7 +187,6 @@ export default class OrientacaoService {
         !idLaboratorio
       ) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Nenhum campo para atualização foi fornecido"],
           data: [],
         };
@@ -197,7 +195,6 @@ export default class OrientacaoService {
       const orientacao = await Orientacao.findByPk(id);
       if (!orientacao) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Orientação não encontrada"],
           data: [],
         };
@@ -211,7 +208,6 @@ export default class OrientacaoService {
       ) {
         console.log(dataInicio, dataFim, orientacao.dataFim);
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Data de início deve ser anterior à data de fim"],
           data: [],
         };
@@ -224,7 +220,6 @@ export default class OrientacaoService {
           (dataInicio && dataFim <= dataInicio))
       ) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Data de fim deve ser posterior à data de início"],
           data: [],
         };
@@ -234,7 +229,6 @@ export default class OrientacaoService {
         const aluno = await Aluno.findByPk(idAluno);
         if (!aluno) {
           return {
-            status: codes.BAD_REQUEST,
             erros: ["Aluno não encontrado"],
             data: [],
           };
@@ -246,7 +240,6 @@ export default class OrientacaoService {
         const professor = await Professor.findByPk(idProfessor);
         if (!professor) {
           return {
-            status: codes.BAD_REQUEST,
             erros: ["Professor não encontrado"],
             data: [],
           };
@@ -258,7 +251,6 @@ export default class OrientacaoService {
         const laboratorio = await Laboratorio.findByPk(idLaboratorio);
         if (!laboratorio) {
           return {
-            status: codes.BAD_REQUEST,
             erros: ["Laboratório não encontrado"],
             data: [],
           };
@@ -272,14 +264,12 @@ export default class OrientacaoService {
       await orientacao.save();
 
       return {
-        status: codes.OK,
         erros: [],
         data: orientacao,
       };
     } catch (error) {
       console.log(error);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar orientação"],
         data: [],
       };
@@ -291,7 +281,6 @@ export default class OrientacaoService {
       const orientacao = await Orientacao.findByPk(id);
       if (!orientacao) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Orientação não encontrada"],
           data: [],
         };
@@ -300,17 +289,34 @@ export default class OrientacaoService {
       await orientacao.destroy();
 
       return {
-        status: codes.OK,
         erros: [],
         data: ["Orientação deletada com sucesso"],
       };
     } catch (error) {
       console.log(error);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar orientação"],
         data: [],
       };
+    }
+  }
+
+  static async getCount(active?: boolean) {
+    try {
+      let where: any = {};
+      if (active === true) {
+        where.dataFim = { [Op.gt]: Date.now() };
+      }
+      if (active === false) {
+        where.dataFim = { [Op.lt]: Date.now() };
+      }
+      const count = await Orientacao.count({
+        where,
+      });
+      return count;
+    } catch (error) {
+      console.log(error);
+      return 0;
     }
   }
 }

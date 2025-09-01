@@ -68,5 +68,16 @@ class EventoController {
       res.status(codes.OK).json({ erros, data });
     }
   }
+
+  async count(req: Request, res: Response) {
+    const { ativo } = req.query;
+    let ativado = undefined;
+    if (typeof ativo === "undefined") ativado = undefined;
+    else {
+      ativado = ativo === "true";
+    }
+    const count = await EventoService.getCount(ativado);
+    res.status(codes.OK).json({ count });
+  }
 }
 export default new EventoController();

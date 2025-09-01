@@ -5,6 +5,8 @@ const router: Router = Router();
 
 router.get("/", RegistroController.index);
 
+router.get("/count", RegistroController.count);
+
 router.get("/:id", RegistroController.show);
 
 router.get("/user/:userId", RegistroController.showByUserId);

@@ -67,5 +67,16 @@ class EmprestimoController {
       res.status(codes.OK).json({ data, erros });
     }
   }
+
+  async count(req: Request, res: Response) {
+    const { ativo } = req.query;
+    let ativado = undefined;
+    if (typeof ativo === "undefined") ativado = undefined;
+    else {
+      ativado = ativo === "true";
+    }
+    const count = await EmprestimoService.getCount(ativado);
+    res.status(codes.OK).json({ count });
+  }
 }
 export default new EmprestimoController();

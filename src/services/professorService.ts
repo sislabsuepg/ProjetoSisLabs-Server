@@ -1,6 +1,7 @@
 import Professor from "../models/Professor";
 import { Op } from "sequelize";
-import codes from "../types/responseCodes";
+import { getPaginationParams } from "../types/pagination";
+
 export default class professorService {
   static verificaNome(nome: string): string[] {
     const erros: string[] = [];
@@ -43,25 +44,24 @@ export default class professorService {
       .join(" ");
   }
 
-  static async getAllProfessores() {
+  static async getAllProfessores(offset?: number, limit?: number) {
     try {
-      const professores = await Professor.findAll();
+      const professores = await Professor.findAll({
+        ...getPaginationParams(offset, limit),
+      });
       if (!professores) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhum professor encontrado"],
           data: null,
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: professores,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar professores"],
         data: null,
       };
@@ -73,20 +73,17 @@ export default class professorService {
       const professor = await Professor.findByPk(id);
       if (!professor) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Professor não encontrado"],
           data: null,
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: professor,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar professor"],
         data: null,
       };
@@ -98,7 +95,6 @@ export default class professorService {
       const erros = [...this.verificaNome(nome), ...this.verificaEmail(email)];
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: null,
         };
@@ -111,21 +107,18 @@ export default class professorService {
       });
       if (existe) {
         return {
-          status: codes.CONFLICT,
           erros: ["Professor já cadastrado"],
           data: null,
         };
       }
       const professor = await Professor.create({ nome, email, ativo: true });
       return {
-        status: codes.CREATED,
         erros: [],
         data: professor,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar professor"],
         data: null,
       };
@@ -141,7 +134,6 @@ export default class professorService {
     try {
       if (!nome && !email && ativo === undefined) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Nenhum dado para atualizar"],
           data: null,
         };
@@ -152,7 +144,6 @@ export default class professorService {
       ];
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros: erros,
           data: null,
         };
@@ -160,7 +151,6 @@ export default class professorService {
       const professor = await Professor.findByPk(id);
       if (!professor) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Professor não encontrado"],
           data: null,
         };
@@ -171,14 +161,12 @@ export default class professorService {
 
       await professor.save();
       return {
-        status: codes.OK,
         erros: [],
         data: professor,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar professor"],
         data: null,
       };
@@ -190,24 +178,35 @@ export default class professorService {
       const professor = await Professor.findByPk(id);
       if (!professor) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Professor não encontrado"],
           data: null,
         };
       }
       await professor.destroy();
       return {
-        status: codes.OK,
         erros: [],
         data: "Professor deletado com sucesso",
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar professor"],
         data: null,
       };
+    }
+  }
+
+  static async getCount(ativo?: boolean) {
+    try {
+      const count = await Professor.count({
+        where: {
+          ...(ativo !== undefined && { ativo }),
+        },
+      });
+      return count;
+    } catch (error) {
+      console.log(error);
+      return 0;
     }
   }
 }

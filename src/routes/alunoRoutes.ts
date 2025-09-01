@@ -6,6 +6,8 @@ const router: Router = Router();
 
 router.get("/", AlunoController.index);
 
+router.get("/count", AlunoController.count);
+
 router.get("/:id", AlunoController.show);
 
 router.post("/", AlunoController.store);

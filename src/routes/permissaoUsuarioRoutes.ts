@@ -4,6 +4,8 @@ const router: Router = Router();
 
 router.get("/", PermissaoUsuarioController.index);
 
+router.get("/count", PermissaoUsuarioController.count);
+
 router.get("/:id", PermissaoUsuarioController.show);
 
 router.post("/", PermissaoUsuarioController.store);

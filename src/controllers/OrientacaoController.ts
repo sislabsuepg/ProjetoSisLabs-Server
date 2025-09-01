@@ -4,16 +4,29 @@ import codes from "..//types/responseCodes"; // Adjust the path if needed
 
 class OrientacaoController {
   async index(req: Request, res: Response) {
-    const { status, erros, data } = await OrientacaoService.getAllOrientacoes();
-    res.status(status).json({ erros, data });
+    const { page, items, ativo } = req.query;
+    const { erros, data } = await OrientacaoService.getAllOrientacoes(
+      Number(page),
+      Number(items),
+      ativo === "true"
+    );
+    if (erros.length) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async show(req: Request, res: Response) {
     const { id } = req.params;
-    const { status, erros, data } = await OrientacaoService.getOrientacaoById(
+    const { erros, data } = await OrientacaoService.getOrientacaoById(
       Number(id)
     );
-    res.status(status).json({ erros, data });
+    if (erros.length) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async store(req: Request, res: Response) {
@@ -31,22 +44,25 @@ class OrientacaoController {
     }
 
     const exists = await OrientacaoService.getOrientacaoByAluno(idAluno);
-    if (exists.status === codes.OK) {
+    if (exists.erros.length === 0 && exists.data.length > 0) {
       res.status(codes.CONFLICT).json({
         erros: ["Já existe uma orientação ativa para este aluno"],
         data: [],
       });
-      return;
     }
 
-    const { status, erros, data } = await OrientacaoService.createOrientacao(
+    const { erros, data } = await OrientacaoService.createOrientacao(
       dataInicio,
       dataFim,
       idAluno,
       idProfessor,
       idLaboratorio
     );
-    res.status(status).json({ erros, data });
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.CREATED).json({ erros, data });
+    }
   }
 
   async update(req: Request, res: Response) {
@@ -63,7 +79,7 @@ class OrientacaoController {
     } else {
       dataFim = new Date(dataFim);
     }
-    const { status, erros, data } = await OrientacaoService.updateOrientacao(
+    const { erros, data } = await OrientacaoService.updateOrientacao(
       Number(id),
 
       dataInicio,
@@ -72,15 +88,35 @@ class OrientacaoController {
       idLaboratorio,
       idProfessor
     );
-    res.status(status).json({ erros, data });
+
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
   }
 
   async destroy(req: Request, res: Response) {
     const { id } = req.params;
-    const { status, erros, data } = await OrientacaoService.deleteOrientacao(
+    const { erros, data } = await OrientacaoService.deleteOrientacao(
       Number(id)
     );
-    res.status(status).json({ erros, data });
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
+  async count(req: Request, res: Response) {
+    const { ativo } = req.query;
+    let ativado = undefined;
+    if (typeof ativo === "undefined") ativado = undefined;
+    else {
+      ativado = ativo === "true";
+    }
+    const count = await OrientacaoService.getCount(ativado);
+    res.status(codes.OK).json({ count });
   }
 }
 

@@ -2,7 +2,7 @@ import PermissaoUsuario from "../models/PermissaoUsuario";
 
 import { Op } from "sequelize";
 
-import codes from "../types/responseCodes";
+import { getPaginationParams } from "../types/pagination";
 export default class PermissaoUsuarioService {
   static verificaNomePermissao(nomePermissao: string): string[] {
     const erros: string[] = [];
@@ -18,26 +18,26 @@ export default class PermissaoUsuarioService {
     return erros;
   }
 
-  static async getAllPermissoes() {
+  static async getAllPermissoes(page?: number, items?: number) {
     try {
-      const permissoes = await PermissaoUsuario.findAll();
+      const permissoes = await PermissaoUsuario.findAll({
+        order: [["id", "ASC"]],
+        ...getPaginationParams(page, items),
+      });
 
-      if (!permissoes) {
+      if (!permissoes || permissoes.length === 0) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Nenhuma permissão encontrada"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: permissoes,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar permissoes"],
         data: [],
       };
@@ -50,50 +50,49 @@ export default class PermissaoUsuarioService {
 
       if (!permissaoUsuario) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Permissão não encontrada"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: permissaoUsuario,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar permissão"],
         data: [],
       };
     }
   }
 
-  static async getPermissaoUsuarioByNome(nome: string) {
+  static async getPermissaoUsuarioByNome(
+    nome: string,
+    page?: number,
+    items?: number
+  ) {
     try {
       const permissaoUsuario = await PermissaoUsuario.findOne({
         where: {
-          nomePermissao: { [Op.like]: `%${nome}%` },
+          nomePermissao: { [Op.iLike]: `%${nome}%` },
         },
+        ...getPaginationParams(page, items),
       });
 
       if (!permissaoUsuario) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Tipo de usuario não encontrado"],
           data: [],
         };
       }
       return {
-        status: codes.OK,
         erros: [],
         data: permissaoUsuario,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao buscar permissao de usuario"],
         data: [],
       };
@@ -114,14 +113,12 @@ export default class PermissaoUsuarioService {
       });
       if (permissaoUsuarioExistente) {
         return {
-          status: codes.CONFLICT,
           erros: ["Permissão de usuario já existe"],
           data: [],
         };
       }
       if (!nomePermissao) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Nome da permissão é obrigatório"],
           data: [],
         };
@@ -141,14 +138,12 @@ export default class PermissaoUsuarioService {
       );
 
       return {
-        status: codes.CREATED,
         erros: [],
         data: permissaoUsuario,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao criar permissão de usuario"],
         data: [],
       };
@@ -168,7 +163,6 @@ export default class PermissaoUsuarioService {
       const permissaoUsuario = await PermissaoUsuario.findByPk(id);
       if (!permissaoUsuario) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Permissão de usuario não encontrada"],
           data: [],
         };
@@ -183,7 +177,6 @@ export default class PermissaoUsuarioService {
         !geral
       ) {
         return {
-          status: codes.BAD_REQUEST,
           erros: ["Nenhum campo para atualização foi fornecido"],
           data: [],
         };
@@ -194,7 +187,6 @@ export default class PermissaoUsuarioService {
       ];
       if (erros.length > 0) {
         return {
-          status: codes.BAD_REQUEST,
           erros,
           data: [],
         };
@@ -212,14 +204,12 @@ export default class PermissaoUsuarioService {
       await permissaoUsuario.save();
 
       return {
-        status: codes.OK,
         erros: [],
         data: permissaoUsuario,
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao atualizar permissão de usuario"],
         data: [],
       };
@@ -231,7 +221,6 @@ export default class PermissaoUsuarioService {
       const permissaoUsuario = await PermissaoUsuario.findByPk(id);
       if (!permissaoUsuario) {
         return {
-          status: codes.NO_CONTENT,
           erros: ["Permissão de usuario não encontrada"],
           data: [],
         };
@@ -240,17 +229,25 @@ export default class PermissaoUsuarioService {
       await permissaoUsuario.destroy();
 
       return {
-        status: codes.OK,
         erros: [],
         data: ["Permissão de usuario deletada com sucesso"],
       };
     } catch (e) {
       console.log(e);
       return {
-        status: codes.INTERNAL_SERVER_ERROR,
         erros: ["Erro ao deletar permissão de usuario"],
         data: [],
       };
+    }
+  }
+
+  static async getCount(ativo?: boolean) {
+    try {
+      const count = await PermissaoUsuario.count();
+      return count;
+    } catch (error) {
+      console.log(error);
+      return 0;
     }
   }
 }

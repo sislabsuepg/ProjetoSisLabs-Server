@@ -206,4 +206,14 @@ export default class CursoService {
       };
     }
   }
+
+  static async getCount() {
+    try {
+      const count: number = await Curso.count();
+      return count;
+    } catch (e) {
+      console.log(e);
+      return 0;
+    }
+  }
 }
