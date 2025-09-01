@@ -378,41 +378,6 @@ Respostas:
 | Middleware auth | Implementado mas não aplicado (todas rotas expostas) |
 | Campo Evento | Body usa `dataEvento`, model armazena `data` |
 
-## Melhorias Futuras Sugeridas
-
-1. Aplicar middleware de autenticação nas rotas sensíveis.
-2. Uniformizar formato de resposta (ordem consistente e inclusão opcional de `status`).
-3. Normalizar mensagens de erro (capitalização, idioma único, evitar variações de "usuario/usuário").
-4. Adicionar testes automatizados de contrato (ex: Supertest) para garantir estabilidade de respostas.
-5. Centralizar esquema de resposta em middleware.
-
-### Detalhamento (Itens 4 e 5 – planejamento)
-
-**Item 4 – Testes de Contrato / Supertest**
-Objetivo: Garantir que mudanças futuras não quebrem o contrato público.
-Escopo inicial sugerido:
-* Suites por recurso (Aluno, Usuário, Laboratório, Empréstimo...)
-* Casos mínimos: criação válida, validação inválida, busca paginada, detalhe inexistente, update parcial, delete, fluxos específicos (fechamento de empréstimo, login, restrição de laboratório restrito sem orientação)
-* Testar headers/cookies de autenticação após implementar middleware
-* Cobrir códigos de status e shape JSON (usar matcher parcial para tolerar campos extras)
-Pipeline:
-* Executar em CI antes de merge (branch protection)
-Ferramentas:
-* Jest + Supertest
-* Factories simples para dados (ou seeds controlados)
-
-**Item 5 – Middleware de Resposta Uniforme**
-Objetivo: Reduzir duplicação e prevenir inconsistências (ex: ordem de chaves em Empréstimo).
-Abordagem:
-1. Criar utilitário `respond(res, { data, erros, status? })`
-2. Padrão único: `{ success: boolean, erros: string[], data: any }`
-3. Converter controllers gradualmente (pull requests pequenos)
-4. Log centralizado de erros (winston/pino) antes de enviar resposta
-5. Hook opcional para métricas (contar erros por rota)
-Considerações:
-* Manter compatibilidade durante transição com feature flag
-* Documentar alteração no CHANGELOG
-
 ## Exemplos de Requisições
 
 ### Criar Aluno
