@@ -184,8 +184,8 @@ export default class professorService {
       }
       await professor.destroy();
       return {
-        erros: [],
-        data: "Professor deletado com sucesso",
+  erros: [],
+  data: null,
       };
     } catch (e) {
       console.log(e);

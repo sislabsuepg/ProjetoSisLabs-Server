@@ -38,8 +38,8 @@ export default class AlunoService {
     if (!telefone) {
       erros.push("Telefone do aluno é obrigatório");
     }
-    if (!/\d{10}/.test(telefone)) {
-      erros.push("Telefone inválido");
+    if (!/^\d{10,15}$/.test(telefone)) {
+      erros.push("Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)");
     }
     return erros;
   }
@@ -47,10 +47,10 @@ export default class AlunoService {
   static verificaAnoCurso(ano: number): string[] {
     const erros: string[] = [];
     if (ano < 1) {
-      erros.push("Ano do curso nao pode ser inferior a 1");
+  erros.push("Ano do curso não pode ser inferior a 1");
     }
     if (ano > 8) {
-      erros.push("Ano do curso nao pode ser superior à 8");
+  erros.push("Ano do curso não pode ser superior a 8");
     }
     return erros;
   }
@@ -495,7 +495,7 @@ export default class AlunoService {
 
       if (!aluno.verificaSenha(senha)) {
         return {
-          erros: ["senha inválida"],
+          erros: ["Senha inválida"],
           data: null,
         };
       }

@@ -142,7 +142,7 @@ export default class CursoService {
     try {
       if (!nome && !anosMaximo) {
         return {
-          erros: ["Nome ou anos máximos devem ser informados"],
+          erros: ["Nenhum dado para atualizar"],
           data: null,
         };
       }

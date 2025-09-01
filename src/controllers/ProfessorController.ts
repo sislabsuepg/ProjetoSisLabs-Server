@@ -4,9 +4,9 @@ import codes from "../types/responseCodes.js";
 
 class ProfessorController {
   async index(req: Request, res: Response) {
-    const { pages, items } = req.query;
+    const { page, items } = req.query;
     const { erros, data } = await professorService.getAllProfessores(
-      Number(pages),
+      Number(page),
       Number(items)
     );
     if (erros.length > 0) {

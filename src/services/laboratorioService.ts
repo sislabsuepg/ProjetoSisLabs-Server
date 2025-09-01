@@ -22,8 +22,8 @@ export default class laboratorioService {
     if (!nome) {
       erros.push("O nome do laboratório é obrigatório.");
     }
-    if (nome.length < 3 || nome.length > 40) {
-      erros.push("O nome deve ter entre 3 e 40 caracteres.");
+    if (nome.length < 3 || nome.length > 60) {
+      erros.push("O nome deve ter entre 3 e 60 caracteres.");
     }
     if (!/^[a-zA-Z\u00C0-\u00FF0-9 ]+$/.test(nome)) {
       erros.push("O nome deve conter apenas letras e números.");

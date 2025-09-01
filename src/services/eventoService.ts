@@ -56,10 +56,11 @@ export default class EventoService {
         ...getPaginationParams(offset, limit),
         order: [["data", "DESC"]],
       });
-      if (!eventos) {
+      // Lista vazia deve retornar erro específico conforme padrão adotado
+      if (!eventos || eventos.length === 0) {
         return {
           erros: ["Nenhum evento encontrado"],
-          data: [],
+          data: null,
         };
       }
       return {
@@ -70,7 +71,7 @@ export default class EventoService {
       console.log(e);
       return {
         erros: ["Erro ao buscar eventos"],
-        data: [],
+        data: null,
       };
     }
   }
@@ -89,7 +90,7 @@ export default class EventoService {
       if (!evento) {
         return {
           erros: ["Evento não encontrado"],
-          data: [],
+          data: null,
         };
       }
 
@@ -101,7 +102,7 @@ export default class EventoService {
       console.log(e);
       return {
         erros: ["Erro ao buscar evento"],
-        data: [],
+        data: null,
       };
     }
   }
@@ -117,7 +118,7 @@ export default class EventoService {
       if (!data || !nome || !duracao || !responsavel || !idLaboratorio) {
         return {
           erros: ["Dados incompletos"],
-          data: [],
+          data: null,
         };
       }
       const erros: string[] = [
@@ -130,7 +131,7 @@ export default class EventoService {
       if (!laboratorio) {
         return {
           erros: ["Laboratório não encontrado"],
-          data: [],
+          data: null,
         };
       }
 
@@ -148,8 +149,8 @@ export default class EventoService {
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao criar evento"],
-        data: [],
+  erros: ["Erro ao criar evento"],
+  data: null,
       };
     }
   }
@@ -167,14 +168,14 @@ export default class EventoService {
       if (!evento) {
         return {
           erros: ["Evento não encontrado"],
-          data: [],
+          data: null,
         };
       }
 
       if (!data && !nome && !duracao && !responsavel && !idLaboratorio) {
         return {
-          erros: ["Dados não foram fornecidos"],
-          data: [],
+          erros: ["Nenhum dado para atualizar"],
+          data: null,
         };
       }
 
@@ -188,7 +189,7 @@ export default class EventoService {
       if (erros.length > 0) {
         return {
           erros: erros,
-          data: [],
+          data: null,
         };
       }
       if (idLaboratorio) {
@@ -196,7 +197,7 @@ export default class EventoService {
         if (!laboratorio) {
           return {
             erros: ["Laboratório não encontrado"],
-            data: [],
+            data: null,
           };
         }
         evento.laboratorio = laboratorio;
@@ -214,8 +215,8 @@ export default class EventoService {
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao atualizar evento"],
-        data: [],
+  erros: ["Erro ao atualizar evento"],
+  data: null,
       };
     }
   }
@@ -226,19 +227,19 @@ export default class EventoService {
       if (!evento) {
         return {
           erros: ["Evento não encontrado"],
-          data: [],
+          data: null,
         };
       }
       await evento.destroy();
       return {
         erros: [],
-        data: [],
+        data: null,
       };
     } catch (e) {
       console.log(e);
       return {
         erros: ["Erro ao deletar evento"],
-        data: [],
+        data: null,
       };
     }
   }

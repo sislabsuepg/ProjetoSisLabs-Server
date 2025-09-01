@@ -42,8 +42,8 @@ export default class EmprestimoService {
     } catch (e) {
       console.log(e);
       return {
-        data: [],
-        erros: ["Erro ao buscar empréstimos"],
+  data: null,
+  erros: ["Erro ao buscar empréstimos"],
       };
     }
   }

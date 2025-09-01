@@ -1,5 +1,4 @@
 import AlunoService from "../services/alunoService.js";
-
 import { Request, Response } from "express";
 import codes from "../types/responseCodes.js";
 

@@ -6,7 +6,7 @@ export default class HorarioService {
   static verificaDiaSemana(diaSemana: number): string[] {
     const erros: string[] = [];
     if (diaSemana < 0 || diaSemana > 6) {
-      erros.push("Dia da semana deve ser entre 0 (Segunda) e 6 (Sábado)");
+      erros.push("Dia da semana deve ser entre 0 (Segunda-feira) e 6 (Sábado)");
     }
     return erros;
   }
