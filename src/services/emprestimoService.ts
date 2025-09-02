@@ -34,8 +34,8 @@ export default class EmprestimoService {
             },
           },
         ],
-        where:{
-          idUsuarioSaida: { [Op.eq]: null }
+        where: {
+          idUsuarioSaida: { [Op.is]: null },
         },
         ...getPaginationParams(offset, limit),
         order: [["dataHoraEntrada", "DESC"]],
@@ -248,9 +248,7 @@ export default class EmprestimoService {
     try {
       const where: any = {};
       if (ativo !== undefined) {
-        where.dataHoraSaida = {
-          [Op.eq]: null,
-        };
+  where.dataHoraSaida = { [Op.is]: null };
       }
 
       const count: number = await Emprestimo.count({

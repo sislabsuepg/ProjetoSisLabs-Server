@@ -19,13 +19,13 @@ import Laboratorio from "./Laboratorio.js";
 interface EmprestimoAtributos {
   id: number;
   dataHoraEntrada: Date;
-  dataHoraSaida: Date;
+  dataHoraSaida: Date | null;
   posseChave: boolean;
-  advertencia: string;
+  advertencia: string | null;
   idLaboratorio: number;
   idAluno: number;
   idUsuarioEntrada: number;
-  idUsuarioSaida: number;
+  idUsuarioSaida: number | null;
 }
 
 interface EmprestimoCreationAtributos
@@ -56,6 +56,7 @@ export default class Emprestimo extends Model<
   })
   declare dataHoraEntrada: Date;
 
+  @AllowNull(true)
   @Column({
     type: DataType.DATE,
   })
@@ -68,6 +69,7 @@ export default class Emprestimo extends Model<
   })
   declare posseChave: boolean;
 
+  @AllowNull(true)
   @Column({
     type: DataType.STRING(255),
   })
