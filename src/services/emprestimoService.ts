@@ -13,18 +13,30 @@ export default class EmprestimoService {
           {
             model: Usuario,
             as: "usuarioSaida",
+            attributes: {
+              exclude: ["senha"],
+            },
           },
           {
             model: Usuario,
             as: "usuarioEntrada",
+            attributes: {
+              exclude: ["senha"],
+            },
           },
           {
             model: Laboratorio,
           },
           {
             model: Aluno,
+            attributes: {
+              exclude: ["senha"],
+            },
           },
         ],
+        where:{
+          idUsuarioSaida: { [Op.eq]: null }
+        },
         ...getPaginationParams(offset, limit),
         order: [["dataHoraEntrada", "DESC"]],
       });
