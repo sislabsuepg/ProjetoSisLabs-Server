@@ -3,8 +3,15 @@ import { Request, Response } from "express";
 import codes from "../types/responseCodes.js";
 class LaboratorioController {
   async index(req: Request, res: Response) {
-    const { page, items } = req.query;
+    const { restrito, page, items } = req.query;
+    let restritoTest: boolean | undefined;
+    if (restrito === undefined) {
+      restritoTest = undefined;
+    } else {
+      restritoTest = restrito === "true";
+    }
     const { erros, data } = await laboratorioService.getAllLaboratorios(
+      restritoTest,
       Number(page),
       Number(items)
     );

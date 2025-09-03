@@ -10,8 +10,8 @@ POST http://localhost:3400/emprestimo/
 Content-Type: application/json
 
 {
-  "idLaboratorio": 1,
-  "idAluno": 1,
+  "idLaboratorio": 3,
+  "idAluno": 2,
   "idUsuario": 1
 }
 ###

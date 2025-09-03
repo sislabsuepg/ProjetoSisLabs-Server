@@ -31,10 +31,17 @@ export default class laboratorioService {
     return erros;
   }
 
-  static async getAllLaboratorios(offset: number, limit: number) {
+  static async getAllLaboratorios(
+    restrito?: boolean,
+    offset?: number,
+    limit?: number
+  ) {
     try {
       const laboratorios = await Laboratorio.findAll({
         ...getPaginationParams(offset, limit),
+        where: {
+          ...(restrito !== undefined && { restrito }),
+        },
       });
       if (!laboratorios || laboratorios.length === 0) {
         return {
