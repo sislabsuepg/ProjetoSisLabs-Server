@@ -58,7 +58,22 @@ export default class OrientacaoService {
 
   static async getOrientacaoById(id: number) {
     try {
-      const orientacao = await Orientacao.findByPk(id);
+      const orientacao = await Orientacao.findByPk(id, {
+        include: [
+          {
+            model: Aluno,
+            as: "aluno",
+          },
+          {
+            model: Professor,
+            as: "professor",
+          },
+          {
+            model: Laboratorio,
+            as: "laboratorio",
+          },
+        ],
+      });
 
       if (!orientacao) {
         return {
@@ -85,6 +100,20 @@ export default class OrientacaoService {
         where: {
           [Op.and]: [{ idAluno }, { dataFim: { [Op.gt]: new Date() } }],
         },
+        include: [
+          {
+            model: Aluno,
+            as: "aluno",
+          },
+          {
+            model: Professor,
+            as: "professor",
+          },
+          {
+            model: Laboratorio,
+            as: "laboratorio",
+          },
+        ],
       });
 
       if (!orientacoes || orientacoes.length === 0) {
