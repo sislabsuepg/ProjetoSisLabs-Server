@@ -41,7 +41,7 @@ export default class UsuarioService {
     try {
       const usuarios = await Usuario.findAll({
         ...getPaginationParams(offset, limit),
-        attributes: ["id", "nome", "login", "ativo"],
+        attributes: ["id", "nome", "login", "ativo", "idPermissao"],
         include: {
           model: PermissaoUsuario,
         },
@@ -68,7 +68,7 @@ export default class UsuarioService {
   static async getUsuarioById(id: number) {
     try {
       const usuario = await Usuario.findByPk(id, {
-        attributes: ["id", "nome", "login", "ativo"],
+        attributes: ["id", "nome", "login", "ativo", "idPermissao"],
         include: {
           model: PermissaoUsuario,
         },
@@ -159,7 +159,7 @@ export default class UsuarioService {
   ) {
     try {
       const usuario = await Usuario.findByPk(id, {
-        attributes: ["id", "nome", "login", "ativo"],
+        attributes: ["id", "nome", "login", "ativo", "idPermissao"],
         include: {
           model: PermissaoUsuario,
         },
