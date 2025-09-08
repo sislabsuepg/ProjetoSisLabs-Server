@@ -191,6 +191,7 @@ export default class UsuarioService {
             data: null,
           };
         }
+        usuario.idPermissao = idPermissao;
         usuario.permissaoUsuario = permissao;
       }
       await usuario.save();

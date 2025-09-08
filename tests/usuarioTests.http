@@ -1,6 +1,6 @@
 ###
 
-GET http://localhost:3400/usuario/
+GET http://localhost:3400/usuario/1
 Content-Type: application/json
 
 ###
@@ -26,7 +26,7 @@ PUT http://localhost:3400/usuario/1
 Content-Type: application/json
 
 {
-    "ativo": true
+    "idPermissao": 2
 }
 
 ###

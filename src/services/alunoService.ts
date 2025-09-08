@@ -35,10 +35,11 @@ export default class AlunoService {
 
   static verificaTelefone(telefone: string): string[] {
     const erros: string[] = [];
-    if (!telefone) {
+    let telefoneLimpo = telefone.replace(/\D/g, "");
+    if (!telefoneLimpo) {
       erros.push("Telefone do aluno é obrigatório");
     }
-    if (!/^\d{10,15}$/.test(telefone)) {
+    if (!/^\d{10,15}$/.test(telefoneLimpo)) {
       erros.push("Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)");
     }
     return erros;
@@ -307,10 +308,12 @@ export default class AlunoService {
 
       const novoAluno: any = {};
 
+      const telefoneLimpo = telefone ? telefone.replace(/\D/g, "") : null;
+
       for (const [key, value] of Object.entries({
         ra,
         nome,
-        telefone,
+        telefone: telefoneLimpo,
         anoCurso,
         email,
         senha,
@@ -401,7 +404,7 @@ export default class AlunoService {
       }
 
       aluno.nome = nome || aluno.nome;
-      aluno.telefone = telefone || aluno.telefone;
+      aluno.telefone = telefone?.replace(/\D/g, "") || aluno.telefone;
       aluno.anoCurso = anoCurso || aluno.anoCurso;
       aluno.email = email || aluno.email;
       aluno.ativo = ativo === undefined ? aluno.ativo : ativo;
