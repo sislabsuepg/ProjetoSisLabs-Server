@@ -40,7 +40,9 @@ export default class AlunoService {
       erros.push("Telefone do aluno é obrigatório");
     }
     if (!/^\d{10,15}$/.test(telefoneLimpo)) {
-      erros.push("Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)");
+      erros.push(
+        "Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)"
+      );
     }
     return erros;
   }
@@ -48,10 +50,10 @@ export default class AlunoService {
   static verificaAnoCurso(ano: number): string[] {
     const erros: string[] = [];
     if (ano < 1) {
-  erros.push("Ano do curso não pode ser inferior a 1");
+      erros.push("Ano do curso não pode ser inferior a 1");
     }
     if (ano > 8) {
-  erros.push("Ano do curso não pode ser superior a 8");
+      erros.push("Ano do curso não pode ser superior a 8");
     }
     return erros;
   }
@@ -147,6 +149,7 @@ export default class AlunoService {
   static async searchAlunos(
     nome?: string,
     ra?: string,
+    ativo?: boolean,
     offset?: number,
     limit?: number
   ) {
@@ -173,6 +176,7 @@ export default class AlunoService {
           [Op.or]: [
             { nome: { [Op.iLike]: `%${nome || ""}%` } },
             { ra: { [Op.like]: `${ra || ""}` } },
+            { ativo: { [Op.eq]: ativo === undefined ? true : ativo } },
           ],
         },
         attributes: [
@@ -404,9 +408,9 @@ export default class AlunoService {
       }
 
       aluno.nome = nome || aluno.nome;
-      aluno.telefone = telefone?.replace(/\D/g, "") || aluno.telefone;
+      aluno.telefone = telefone ? telefone.replace(/\D/g, "") : aluno.telefone;
       aluno.anoCurso = anoCurso || aluno.anoCurso;
-      aluno.email = email || aluno.email;
+      aluno.email = email ? email : aluno.email;
       aluno.ativo = ativo === undefined ? aluno.ativo : ativo;
 
       const alunoAtualizado = await aluno.save();
