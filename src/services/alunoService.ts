@@ -175,8 +175,8 @@ export default class AlunoService {
       const alunos: Aluno[] = await Aluno.findAll({
         where: {
           [Op.or]: [
-            { nome: { [Op.iLike]: `%${nome || ""}%` } },
-            { ra: { [Op.like]: `${ra || ""}` } },
+            ...(nome ? [{ nome: { [Op.like]: `%${nome}%` } }] : []),
+            ...(ra ? [{ ra: { [Op.like]: `${ra || ""}` } }] : []),
           ],
           [Op.and]: [
               { ativo: { [Op.eq]: ativo === undefined ? true : ativo } },
