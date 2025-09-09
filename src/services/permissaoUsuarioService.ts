@@ -18,11 +18,12 @@ export default class PermissaoUsuarioService {
     return erros;
   }
 
-  static async getAllPermissoes(page?: number, items?: number) {
+  static async getAllPermissoes(page?: number, items?: number, ativo?: boolean) {
     try {
       const permissoes = await PermissaoUsuario.findAll({
-        order: [["id", "ASC"]],
+        order: [["nomePermissao", "ASC"]],
         ...getPaginationParams(page, items),
+        ...(ativo !== undefined && { where: { ativo } }),
       });
 
       if (!permissoes || permissoes.length === 0) {
@@ -70,13 +71,16 @@ export default class PermissaoUsuarioService {
   static async getPermissaoUsuarioByNome(
     nome: string,
     page?: number,
-    items?: number
+    items?: number,
+    ativo?: boolean
   ) {
     try {
       const permissaoUsuario = await PermissaoUsuario.findOne({
         where: {
           nomePermissao: { [Op.iLike]: `%${nome}%` },
+          ...(ativo !== undefined && { ativo }),
         },
+        order: [["nomePermissao", "ASC"]],
         ...getPaginationParams(page, items),
       });
 
@@ -157,7 +161,8 @@ export default class PermissaoUsuarioService {
     cadastro?: boolean,
     alteracao?: boolean,
     relatorio?: boolean,
-    advertencia?: boolean
+    advertencia?: boolean,
+    ativo?: boolean
   ) {
     try {
       const permissaoUsuario = await PermissaoUsuario.findByPk(id);
@@ -174,7 +179,9 @@ export default class PermissaoUsuarioService {
         !alteracao &&
         !relatorio &&
         !advertencia &&
-        !geral
+        !geral &&
+        ativo === undefined
+
       ) {
         return {
           erros: ["Nenhum campo para atualização foi fornecido"],
@@ -192,14 +199,14 @@ export default class PermissaoUsuarioService {
         };
       }
 
-      permissaoUsuario.nomePermissao =
-        nomePermissao || permissaoUsuario.nomePermissao;
-      permissaoUsuario.cadastro = cadastro || permissaoUsuario.cadastro;
-      permissaoUsuario.alteracao = alteracao || permissaoUsuario.alteracao;
-      permissaoUsuario.relatorio = relatorio || permissaoUsuario.relatorio;
+      permissaoUsuario.nomePermissao = nomePermissao == undefined ? permissaoUsuario.nomePermissao : nomePermissao;
+      permissaoUsuario.cadastro = cadastro == undefined ? permissaoUsuario.cadastro : cadastro;
+      permissaoUsuario.alteracao = alteracao == undefined ? permissaoUsuario.alteracao : alteracao;
+      permissaoUsuario.relatorio = relatorio == undefined ? permissaoUsuario.relatorio : relatorio;
       permissaoUsuario.advertencia =
-        advertencia || permissaoUsuario.advertencia;
-      permissaoUsuario.geral = geral || permissaoUsuario.geral;
+        advertencia == undefined ? permissaoUsuario.advertencia : advertencia;
+      permissaoUsuario.geral = geral == undefined ? permissaoUsuario.geral : geral;
+      permissaoUsuario.ativo = ativo == undefined ? permissaoUsuario.ativo : ativo;
 
       await permissaoUsuario.save();
 
@@ -226,16 +233,17 @@ export default class PermissaoUsuarioService {
         };
       }
 
-      await permissaoUsuario.destroy();
+      permissaoUsuario.ativo = false;
+      await permissaoUsuario.save();
 
       return {
         erros: [],
-        data: ["Permissão de usuario deletada com sucesso"],
+        data: ["Permissão de usuario desativada com sucesso"],
       };
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao deletar permissão de usuario"],
+        erros: ["Erro ao desativar permissão de usuario"],
         data: [],
       };
     }

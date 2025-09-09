@@ -44,10 +44,14 @@ export default class professorService {
       .join(" ");
   }
 
-  static async getAllProfessores(offset?: number, limit?: number) {
+  static async getAllProfessores(offset?: number, limit?: number, nome?: string, ativo?: boolean) {
     try {
       const professores = await Professor.findAll({
         ...getPaginationParams(offset, limit),
+        where: {
+          ...(nome ? { nome: { [Op.iLike]: `%${nome}%` } } : {}),
+          ...(ativo !== undefined ? { ativo: { [Op.eq]: ativo } } : {}),
+        },
       });
       if (!professores) {
         return {
@@ -155,9 +159,9 @@ export default class professorService {
           data: null,
         };
       }
-      professor.nome = nome || professor.nome;
-      professor.email = email || professor.email;
-      professor.ativo = ativo !== undefined ? ativo : professor.ativo;
+      professor.nome = nome == undefined ? professor.nome : nome;
+      professor.email = email == undefined ? professor.email : email;
+      professor.ativo = ativo == undefined ? professor.ativo : ativo;
 
       await professor.save();
       return {
@@ -182,7 +186,8 @@ export default class professorService {
           data: null,
         };
       }
-      await professor.destroy();
+      professor.ativo = false;
+      await professor.save();
       return {
   erros: [],
   data: null,
@@ -190,7 +195,7 @@ export default class professorService {
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao deletar professor"],
+        erros: ["Erro ao desativar professor"],
         data: null,
       };
     }

@@ -37,7 +37,7 @@ export default class AlunoService {
     const erros: string[] = [];
     let telefoneLimpo = telefone.replace(/\D/g, "");
     if (!telefoneLimpo) {
-      erros.push("Telefone do aluno é obrigatório");
+      return []
     }
     if (!/^\d{10,15}$/.test(telefoneLimpo)) {
       erros.push(
@@ -121,6 +121,7 @@ export default class AlunoService {
         include: {
           model: Curso,
         },
+        order: [["nome", "ASC"]],
         where: {
           ativo: {
             [Op.or]: ativo === undefined ? [true, false] : [ativo],
@@ -161,8 +162,8 @@ export default class AlunoService {
         };
       }
       const erros: string[] = [
-        ...(nome ? this.verificaNome(nome) : []),
-        ...(ra ? this.verificaRa(ra) : []),
+        ...(nome ? this.verificaNome(nome as string) : []),
+        ...(ra ? this.verificaRa(ra as string) : []),
       ];
 
       if (erros.length > 0) {
@@ -176,9 +177,12 @@ export default class AlunoService {
           [Op.or]: [
             { nome: { [Op.iLike]: `%${nome || ""}%` } },
             { ra: { [Op.like]: `${ra || ""}` } },
-            { ativo: { [Op.eq]: ativo === undefined ? true : ativo } },
           ],
+          [Op.and]: [
+              { ativo: { [Op.eq]: ativo === undefined ? true : ativo } },
+            ],
         },
+        order: [["nome", "ASC"]],
         attributes: [
           "id",
           "ra",
@@ -395,9 +399,8 @@ export default class AlunoService {
         ...(nome ? this.verificaNome(nome) : []),
         ...(telefone ? this.verificaTelefone(telefone) : []),
         ...(email ? this.verificaEmail(email) : []),
-        ...(anoCurso || (anoCurso && anoCurso > aluno.curso.anosMaximo)
-          ? this.verificaAnoCurso(anoCurso)
-          : []),
+        ...(anoCurso ? this.verificaAnoCurso(anoCurso) : []),
+        ...((anoCurso && anoCurso > aluno.curso.anosMaximo) ? ["Ano do curso inválido"] : [])
       ];
 
       if (erros.length > 0) {
@@ -407,10 +410,10 @@ export default class AlunoService {
         };
       }
 
-      aluno.nome = nome || aluno.nome;
-      aluno.telefone = telefone ? telefone.replace(/\D/g, "") : aluno.telefone;
-      aluno.anoCurso = anoCurso || aluno.anoCurso;
-      aluno.email = email ? email : aluno.email;
+      aluno.nome = nome == undefined ? aluno.nome : nome;
+      aluno.telefone = telefone == undefined ? "" : telefone.replace(/\D/g, "");
+      aluno.anoCurso = anoCurso == undefined ? aluno.anoCurso : anoCurso;
+      aluno.email = email == undefined ? aluno.email : email;
       aluno.ativo = ativo === undefined ? aluno.ativo : ativo;
 
       const alunoAtualizado = await aluno.save();
@@ -471,16 +474,17 @@ export default class AlunoService {
         };
       }
 
-      await aluno.destroy();
+      aluno.ativo = false;
+      await aluno.save();
 
       return {
         erros: [],
-        data: ["Aluno excluído com sucesso"],
+        data: null,
       };
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao excluir aluno"],
+        erros: ["Erro ao desativar aluno"],
         data: [],
       };
     }

@@ -19,8 +19,9 @@ class AlunoController {
       }
     } else {
       const { erros, data } = await AlunoService.searchAlunos(
-        String(nome) || "",
-        String(ra) || "",
+        nome === undefined ? undefined: String(nome),
+        ra === undefined ? undefined : String(ra),
+        ativo === undefined ? undefined : ativado,
         Number.parseInt(page as string),
         Number.parseInt(items as string)
       );

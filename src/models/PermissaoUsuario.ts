@@ -22,6 +22,7 @@ interface PermissaoUsuarioAtributos {
   alteracao: boolean;
   relatorio: boolean;
   advertencia: boolean;
+  ativo: boolean;
 }
 
 interface PermissaoUsuarioCreationAtributos
@@ -85,6 +86,13 @@ export default class PermissaoUsuario extends Model<
     defaultValue: false,
   })
   declare advertencia: boolean;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: true,
+  })
+  declare ativo: boolean;
 
   @HasMany(() => Usuario, {
     foreignKey: "idPermissao",

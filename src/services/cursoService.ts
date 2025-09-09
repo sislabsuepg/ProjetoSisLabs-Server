@@ -21,10 +21,13 @@ export default class CursoService {
     return erros;
   }
 
-  static async getAllCursos(offset?: number, limit?: number) {
+  static async getAllCursos(offset?: number, limit?: number, ativo?: boolean) {
     try {
       const cursos: Curso[] = await Curso.findAll({
         ...getPaginationParams(offset, limit),
+        where: {
+          ...(ativo !== undefined && { ativo }),
+        },
       });
       if (cursos.length === 0) {
         return {
@@ -70,7 +73,8 @@ export default class CursoService {
   static async getCursosByNome(
     nomeBusca: string,
     offset?: number,
-    limit?: number
+    limit?: number,
+    ativo?: boolean
   ) {
     try {
       const erros: string[] = this.verificaNome(nomeBusca);
@@ -81,7 +85,12 @@ export default class CursoService {
         };
       }
       const curso = await Curso.findAll({
-        where: { nome: { [Op.iLike]: `%${nomeBusca}%` } },
+        where: { 
+          [Op.and]: {
+            nome: { [Op.iLike]: `%${nomeBusca}%` },
+            ...(ativo !== undefined && { ativo }),
+          },
+        },
         ...getPaginationParams(offset, limit),
       });
       if (!curso) {
@@ -138,9 +147,9 @@ export default class CursoService {
     }
   }
 
-  static async updateCurso(id: number, nome?: string, anosMaximo?: number) {
+  static async updateCurso(id: number, nome?: string, anosMaximo?: number, ativo?: boolean) {
     try {
-      if (!nome && !anosMaximo) {
+      if (!nome && !anosMaximo && ativo === undefined) {
         return {
           erros: ["Nenhum dado para atualizar"],
           data: null,
@@ -164,12 +173,9 @@ export default class CursoService {
           data: null,
         };
       }
-      if (nome) {
-        curso.nome = nome;
-      }
-      if (anosMaximo) {
-        curso.anosMaximo = anosMaximo;
-      }
+      curso.nome = nome == undefined ? curso.nome : nome;
+      curso.anosMaximo = anosMaximo == undefined ? curso.anosMaximo : anosMaximo;
+      curso.ativo = ativo === undefined ? curso.ativo : ativo;
       await curso.save();
       return {
         erros: [],
@@ -193,7 +199,8 @@ export default class CursoService {
           data: null,
         };
       }
-      await curso.destroy();
+      curso.ativo = false;
+      await curso.save();
       return {
         erros: [],
         data: null,
@@ -201,15 +208,17 @@ export default class CursoService {
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao deletar curso"],
+        erros: ["Erro ao desativar curso"],
         data: null,
       };
     }
   }
 
-  static async getCount() {
+  static async getCount(ativo?: boolean) {
     try {
-      const count: number = await Curso.count();
+      const count: number = await Curso.count({
+        ...(ativo !== undefined && { where: { ativo } }),
+      });
       return count;
     } catch (e) {
       console.log(e);

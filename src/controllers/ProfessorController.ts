@@ -4,10 +4,13 @@ import codes from "../types/responseCodes.js";
 
 class ProfessorController {
   async index(req: Request, res: Response) {
-    const { page, items } = req.query;
+    const { page, items, nome, ativo } = req.query;
+    const ativado = ativo === "true";
     const { erros, data } = await professorService.getAllProfessores(
       Number(page),
-      Number(items)
+      Number(items),
+      nome === undefined ? undefined : String(nome),
+      ativo === undefined ? undefined : ativado,
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });

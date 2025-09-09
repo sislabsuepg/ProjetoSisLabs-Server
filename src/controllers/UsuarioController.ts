@@ -3,10 +3,12 @@ import UsuarioService from "../services/usuarioService.js";
 import codes from "../types/responseCodes.js";
 class UsuarioController {
   public async index(req: Request, res: Response) {
-    const { page, items } = req.query;
+    const { page, items, ativo, nome } = req.query;
     const { erros, data } = await UsuarioService.getAllUsuarios(
       Number(page),
-      Number(items)
+      Number(items),
+      ativo === undefined ? undefined : ativo === "true",
+      nome === undefined ? undefined : String(nome)
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });

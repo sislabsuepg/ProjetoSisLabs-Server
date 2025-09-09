@@ -4,11 +4,12 @@ import codes from "../types/responseCodes.js";
 
 class PermissaoUsuarioController {
   async index(req: Request, res: Response) {
-    const { page, items } = req.query;
+    const { page, items, ativo } = req.query;
     if (!req.query.nome) {
       const { erros, data } = await permissaoUsuarioService.getAllPermissoes(
         Number(page),
-        Number(items)
+        Number(items),
+        ativo === undefined ? undefined : ativo === "true"
       );
       if (erros.length > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -20,7 +21,8 @@ class PermissaoUsuarioController {
         await permissaoUsuarioService.getPermissaoUsuarioByNome(
           req.query.nomePermissao as string,
           Number(page),
-          Number(items)
+          Number(items),
+          ativo === undefined ? undefined : ativo === "true"
         );
       if (erros.length > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -75,6 +77,7 @@ class PermissaoUsuarioController {
       alteracao,
       relatorio,
       advertencia,
+      ativo
     } = req.body;
     const { erros, data } =
       await permissaoUsuarioService.updatePermissaoUsuario(
@@ -84,7 +87,8 @@ class PermissaoUsuarioController {
         cadastro,
         alteracao,
         relatorio,
-        advertencia
+        advertencia,
+        ativo
       );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });

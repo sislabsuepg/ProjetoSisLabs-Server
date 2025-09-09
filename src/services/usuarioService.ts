@@ -3,6 +3,7 @@ import PermissaoUsuario from "../models/PermissaoUsuario.js";
 import config from "../config/config.js";
 import jwt from "jsonwebtoken";
 import { getPaginationParams } from "../types/pagination.js";
+import { Op } from "sequelize";
 export default class UsuarioService {
   static verificaLogin(login: string): string[] {
     const erros: string[] = [];
@@ -37,7 +38,7 @@ export default class UsuarioService {
     return erros;
   }
 
-  static async getAllUsuarios(offset?: number, limit?: number) {
+  static async getAllUsuarios(offset?: number, limit?: number, ativo?: boolean, nome?: string) {
     try {
       const usuarios = await Usuario.findAll({
         ...getPaginationParams(offset, limit),
@@ -45,6 +46,11 @@ export default class UsuarioService {
         include: {
           model: PermissaoUsuario,
         },
+        where: {
+          ...(nome && { [Op.or]: { nome: { [Op.iLike]: `%${nome}%` }, login: { [Op.iLike]: `%${nome}%` } } }),
+          ...(ativo !== undefined && { ativo }),
+        },
+        order: [["nome", "ASC"]],
       });
       if (!usuarios || usuarios.length === 0) {
         return {
@@ -214,12 +220,13 @@ export default class UsuarioService {
           data: null,
         };
       }
-      await usuario.destroy();
+      usuario.ativo = false;
+      await usuario.save();
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao deletar usuário"],
+        erros: ["Erro ao desativar usuário"],
         data: null,
       };
     }

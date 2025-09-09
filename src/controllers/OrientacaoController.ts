@@ -4,11 +4,12 @@ import codes from "../types/responseCodes.js";
 
 class OrientacaoController {
   async index(req: Request, res: Response) {
-    const { page, items, ativo } = req.query;
+    const { page, items, ativo, nome } = req.query;
     const { erros, data } = await OrientacaoService.getAllOrientacoes(
       Number(page),
       Number(items),
-      ativo === "true"
+      ativo === undefined ? undefined : ativo === "true",
+      nome === undefined ? undefined : String(nome)
     );
     if (erros.length) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -67,7 +68,7 @@ class OrientacaoController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    let { dataInicio, dataFim, idAluno, idLaboratorio, idProfessor } = req.body;
+    let { dataInicio, dataFim } = req.body;
     if (isNaN(Date.parse(dataInicio))) {
       dataInicio = undefined;
     } else {
@@ -81,12 +82,8 @@ class OrientacaoController {
     }
     const { erros, data } = await OrientacaoService.updateOrientacao(
       Number(id),
-
       dataInicio,
-      dataFim,
-      idAluno,
-      idLaboratorio,
-      idProfessor
+      dataFim
     );
 
     if (erros.length > 0) {
