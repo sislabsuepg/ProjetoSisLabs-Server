@@ -19,7 +19,7 @@ class AlunoController {
       }
     } else {
       const { erros, data } = await AlunoService.searchAlunos(
-        nome === undefined ? undefined: String(nome),
+        nome === undefined ? undefined : String(nome),
         ra === undefined ? undefined : String(ra),
         ativo === undefined ? undefined : ativado,
         Number.parseInt(page as string),
@@ -34,8 +34,8 @@ class AlunoController {
   }
 
   async show(req: Request, res: Response) {
-    const { id } = req.params;
-    const { erros, data } = await AlunoService.getAlunoById(Number(id));
+    const { ra } = req.params;
+    const { erros, data } = await AlunoService.getAlunoByRa(String(ra));
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {

@@ -8,7 +8,7 @@ router.get("/", AlunoController.index);
 
 router.get("/count", AlunoController.count);
 
-router.get("/:id", AlunoController.show);
+router.get("/:ra", AlunoController.show);
 
 router.post("/", AlunoController.store);
 
