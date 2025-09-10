@@ -275,6 +275,20 @@ export default class UsuarioService {
     }
   }
 
+  static async verificaAtivo(id: number, nome: string, login: string) {
+    try {
+      const usuario: Usuario | null = await Usuario.findOne({
+        where: {
+          [Op.and]: [{ id: id }, { nome: nome }, { login: login }, { ativo: true }],
+        },
+      });
+      return usuario !== null;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
   static async getCount(ativo?: boolean) {
     try {
       const count = await Usuario.count({

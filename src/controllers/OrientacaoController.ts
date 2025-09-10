@@ -57,7 +57,7 @@ class OrientacaoController {
     }
 
     const exists = await OrientacaoService.getOrientacaoByAluno(idAluno);
-    if (exists.erros.length === 0 && exists.data.length > 0) {
+    if (exists.erros.length === 0 && exists.data) {
       res.status(codes.CONFLICT).json({
         erros: ["Já existe uma orientação ativa para este aluno"],
         data: [],
