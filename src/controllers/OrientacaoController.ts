@@ -30,6 +30,18 @@ class OrientacaoController {
     }
   }
 
+  async showByAluno(req: Request, res: Response) {
+    const { idAluno } = req.params;
+    const { erros, data } = await OrientacaoService.getOrientacaoByAluno(
+      Number(idAluno)
+    );
+    if (erros.length) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
   async store(req: Request, res: Response) {
     let { dataInicio, dataFim, idAluno, idLaboratorio, idProfessor } = req.body;
     if (isNaN(Date.parse(dataInicio))) {

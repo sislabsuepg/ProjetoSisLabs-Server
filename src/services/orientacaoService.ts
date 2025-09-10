@@ -137,7 +137,7 @@ export default class OrientacaoService {
         ],
       });
 
-      if (!orientacoes || orientacoes.length === 0) {
+      if (orientacoes.length === 0) {
         return {
           erros: ["Nenhuma orientação encontrada para este aluno"],
           data: [],
@@ -145,7 +145,7 @@ export default class OrientacaoService {
       }
       return {
         erros: [],
-        data: orientacoes,
+        data: orientacoes[0],
       };
     } catch (error) {
       console.log(error);
