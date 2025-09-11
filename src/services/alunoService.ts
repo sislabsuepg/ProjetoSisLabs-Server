@@ -161,22 +161,12 @@ export default class AlunoService {
           data: [],
         };
       }
-      const erros: string[] = [
-        ...(nome ? this.verificaNome(nome as string) : []),
-        ...(ra ? this.verificaRa(ra as string) : []),
-      ];
 
-      if (erros.length > 0) {
-        return {
-          erros: erros,
-          data: [],
-        };
-      }
       const alunos: Aluno[] = await Aluno.findAll({
         where: {
           [Op.or]: [
-            ...(nome ? [{ nome: { [Op.like]: `%${nome}%` } }] : []),
-            ...(ra ? [{ ra: { [Op.like]: `${ra || ""}` } }] : []),
+            ...(nome ? [{ nome: { [Op.iLike]: `%${nome}%` } }] : []),
+            ...(ra ? [{ ra: { [Op.like]: `%${ra || ""}%` } }] : []),
           ],
           [Op.and]: [
             { ativo: { [Op.eq]: ativo === undefined ? true : ativo } },
