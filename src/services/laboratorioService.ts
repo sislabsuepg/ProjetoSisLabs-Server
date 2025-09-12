@@ -39,21 +39,29 @@ export default class laboratorioService {
     ativo?: boolean
   ) {
     try {
-      const laboratorios = await Laboratorio.findAll({
-        ...getPaginationParams(offset, limit),
-        where: {
-          ...(restrito !== undefined && { restrito }),
-          ...(nome && { nome: { [Op.iLike]: `%${nome}%` } }),
-          ...(ativo !== undefined && { ativo }),
-        },
-        order: [["numero", "ASC"]],
-      });
+      const { rows: laboratorios, count: total } =
+        await Laboratorio.findAndCountAll({
+          ...getPaginationParams(offset, limit),
+          where: {
+            ...(restrito !== undefined && { restrito }),
+            ...(nome && { nome: { [Op.iLike]: `%${nome}%` } }),
+            ...(ativo !== undefined && { ativo }),
+          },
+          order: [["numero", "ASC"]],
+        });
       if (!laboratorios || laboratorios.length === 0) {
         return {
           erros: ["Nenhum laboratório encontrado"],
           data: null,
         };
       } else {
+        if (nome) {
+          return {
+            erros: [],
+            data: { laboratorios, total },
+          };
+        } else {
+        }
         return {
           erros: [],
           data: laboratorios,

@@ -5,7 +5,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --watch 'src' --exec tsx src/server.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "seed": "npm run build && node dist/seeders/000-seedAll.js",
+    "seed:fresh": "npm run build && node dist/seeders/000-seedAll.js --fresh"
   },
   "repository": {
     "type": "git",
@@ -45,6 +47,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@faker-js/faker": "^10.0.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.1",

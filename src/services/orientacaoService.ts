@@ -8,7 +8,7 @@ import { getPaginationParams } from "../types/pagination.js";
 function getAtivo(ativo: boolean | undefined): {} {
   if (ativo === true) {
     return { [Op.and]: [{ dataFim: { [Op.gt]: new Date() } }] };
-  }else{
+  } else {
     return { [Op.and]: [{ dataFim: { [Op.lt]: new Date() } }] };
   }
 }
@@ -21,26 +21,27 @@ export default class OrientacaoService {
     nome?: string
   ) {
     try {
-      const orientacoes = await Orientacao.findAll({
-        include: [
-          {
-            model: Aluno,
-            as: "aluno",
+      const { rows: orientacoes, count: total } =
+        await Orientacao.findAndCountAll({
+          include: [
+            {
+              model: Aluno,
+              as: "aluno",
+            },
+            {
+              model: Professor,
+              as: "professor",
+            },
+            {
+              model: Laboratorio,
+              as: "laboratorio",
+            },
+          ],
+          where: {
+            ...getAtivo(ativo),
           },
-          {
-            model: Professor,
-            as: "professor",
-          },
-          {
-            model: Laboratorio,
-            as: "laboratorio",
-          },
-        ],
-        where: {
-          ...getAtivo(ativo),
-        },
-        ...getPaginationParams(offset, limit),
-      });
+          ...getPaginationParams(offset, limit),
+        });
 
       if (!orientacoes || orientacoes.length === 0) {
         return {
@@ -61,7 +62,7 @@ export default class OrientacaoService {
         }
         return {
           erros: [],
-          data: orientacoesFiltradas,
+          data: { orientacoes: orientacoesFiltradas, total },
         };
       }
 
@@ -180,16 +181,16 @@ export default class OrientacaoService {
       ];
 
       const aluno = await Aluno.findByPk(idAluno);
-      if (!aluno) {
-        erros.push("Aluno não encontrado");
+      if (!aluno || (aluno && !aluno.ativo)) {
+        erros.push("Aluno não encontrado ou inativo");
       }
       const professor = await Professor.findByPk(idProfessor);
-      if (!professor) {
-        erros.push("Professor não encontrado");
+      if (!professor || (professor && !professor.ativo)) {
+        erros.push("Professor não encontrado ou inativo");
       }
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
-      if (!laboratorio) {
-        erros.push("Laboratório não encontrado");
+      if (!laboratorio || (laboratorio && !laboratorio.ativo)) {
+        erros.push("Laboratório não encontrado ou inativo");
       }
 
       if (erros.length > 0) {
@@ -220,16 +221,9 @@ export default class OrientacaoService {
     }
   }
 
-  static async updateOrientacao(
-    id: number,
-    dataInicio?: Date,
-    dataFim?: Date,
-  ) {
+  static async updateOrientacao(id: number, dataInicio?: Date, dataFim?: Date) {
     try {
-      if (
-        !dataInicio &&
-        !dataFim
-      ) {
+      if (!dataInicio && !dataFim) {
         return {
           erros: ["Nenhum campo para atualização foi fornecido"],
           data: [],
@@ -244,26 +238,27 @@ export default class OrientacaoService {
         };
       }
 
-      if( dataInicio && dataFim && dataInicio >= dataFim ) {
+      if (dataInicio && dataFim && dataInicio >= dataFim) {
         return {
           erros: ["Data de início deve ser anterior à data de fim"],
           data: [],
         };
       }
       if (
-          dataInicio && !dataFim &&
-            (dataInicio.getTime() <= Date.now() - 1000 * 60 * 60 * 24 ||
-              dataInicio >= orientacao.dataFim
-            )) {
-          return {
-            erros: ["Data de início deve ser anterior à data de fim"],
-            data: [],
-          };
-          }
+        dataInicio &&
+        !dataFim &&
+        (dataInicio.getTime() <= Date.now() - 1000 * 60 * 60 * 24 ||
+          dataInicio >= orientacao.dataFim)
+      ) {
+        return {
+          erros: ["Data de início deve ser anterior à data de fim"],
+          data: [],
+        };
+      }
       if (
-        dataFim && !dataInicio &&
-        (dataFim.getTime() <= Date.now() ||
-          dataFim <= orientacao.dataInicio)
+        dataFim &&
+        !dataInicio &&
+        (dataFim.getTime() <= Date.now() || dataFim <= orientacao.dataInicio)
       ) {
         return {
           erros: ["Data de fim deve ser posterior à data de início"],
@@ -299,14 +294,14 @@ export default class OrientacaoService {
         };
       }
 
-      if( orientacao.dataFim < new Date() ){
+      if (orientacao.dataFim < new Date()) {
         return {
           erros: ["Não é possível desativar uma orientação já finalizada"],
           data: [],
         };
       }
 
-      if( orientacao.dataInicio > new Date() ){
+      if (orientacao.dataInicio > new Date()) {
         orientacao.dataInicio = new Date();
       }
       orientacao.dataFim = new Date();

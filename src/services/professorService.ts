@@ -44,25 +44,38 @@ export default class professorService {
       .join(" ");
   }
 
-  static async getAllProfessores(offset?: number, limit?: number, nome?: string, ativo?: boolean) {
+  static async getAllProfessores(
+    offset?: number,
+    limit?: number,
+    nome?: string,
+    ativo?: boolean
+  ) {
     try {
-      const professores = await Professor.findAll({
-        ...getPaginationParams(offset, limit),
-        where: {
-          ...(nome ? { nome: { [Op.iLike]: `%${nome}%` } } : {}),
-          ...(ativo !== undefined ? { ativo: { [Op.eq]: ativo } } : {}),
-        },
-      });
+      const { rows: professores, count: total } =
+        await Professor.findAndCountAll({
+          ...getPaginationParams(offset, limit),
+          where: {
+            ...(nome ? { nome: { [Op.iLike]: `%${nome}%` } } : {}),
+            ...(ativo !== undefined ? { ativo: { [Op.eq]: ativo } } : {}),
+          },
+        });
       if (!professores) {
         return {
           erros: ["Nenhum professor encontrado"],
           data: null,
         };
       }
-      return {
-        erros: [],
-        data: professores,
-      };
+      if (!nome) {
+        return {
+          erros: [],
+          data: { professores },
+        };
+      } else {
+        return {
+          erros: [],
+          data: { professores, total },
+        };
+      }
     } catch (e) {
       console.log(e);
       return {
@@ -189,8 +202,8 @@ export default class professorService {
       professor.ativo = false;
       await professor.save();
       return {
-  erros: [],
-  data: null,
+        erros: [],
+        data: null,
       };
     } catch (e) {
       console.log(e);

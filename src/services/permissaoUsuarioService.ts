@@ -18,7 +18,11 @@ export default class PermissaoUsuarioService {
     return erros;
   }
 
-  static async getAllPermissoes(page?: number, items?: number, ativo?: boolean) {
+  static async getAllPermissoes(
+    page?: number,
+    items?: number,
+    ativo?: boolean
+  ) {
     try {
       const permissoes = await PermissaoUsuario.findAll({
         order: [["nomePermissao", "ASC"]],
@@ -75,16 +79,17 @@ export default class PermissaoUsuarioService {
     ativo?: boolean
   ) {
     try {
-      const permissaoUsuario = await PermissaoUsuario.findOne({
-        where: {
-          nomePermissao: { [Op.iLike]: `%${nome}%` },
-          ...(ativo !== undefined && { ativo }),
-        },
-        order: [["nomePermissao", "ASC"]],
-        ...getPaginationParams(page, items),
-      });
+      const { rows: permissaoUsuario, count: total } =
+        await PermissaoUsuario.findAndCountAll({
+          where: {
+            nomePermissao: { [Op.iLike]: `%${nome}%` },
+            ...(ativo !== undefined && { ativo }),
+          },
+          order: [["nomePermissao", "ASC"]],
+          ...getPaginationParams(page, items),
+        });
 
-      if (!permissaoUsuario) {
+      if (!permissaoUsuario || permissaoUsuario.length === 0) {
         return {
           erros: ["Tipo de usuario não encontrado"],
           data: [],
@@ -92,7 +97,7 @@ export default class PermissaoUsuarioService {
       }
       return {
         erros: [],
-        data: permissaoUsuario,
+        data: { permissaoUsuario, total },
       };
     } catch (e) {
       console.log(e);
@@ -181,7 +186,6 @@ export default class PermissaoUsuarioService {
         !advertencia &&
         !geral &&
         ativo === undefined
-
       ) {
         return {
           erros: ["Nenhum campo para atualização foi fornecido"],
@@ -199,14 +203,22 @@ export default class PermissaoUsuarioService {
         };
       }
 
-      permissaoUsuario.nomePermissao = nomePermissao == undefined ? permissaoUsuario.nomePermissao : nomePermissao;
-      permissaoUsuario.cadastro = cadastro == undefined ? permissaoUsuario.cadastro : cadastro;
-      permissaoUsuario.alteracao = alteracao == undefined ? permissaoUsuario.alteracao : alteracao;
-      permissaoUsuario.relatorio = relatorio == undefined ? permissaoUsuario.relatorio : relatorio;
+      permissaoUsuario.nomePermissao =
+        nomePermissao == undefined
+          ? permissaoUsuario.nomePermissao
+          : nomePermissao;
+      permissaoUsuario.cadastro =
+        cadastro == undefined ? permissaoUsuario.cadastro : cadastro;
+      permissaoUsuario.alteracao =
+        alteracao == undefined ? permissaoUsuario.alteracao : alteracao;
+      permissaoUsuario.relatorio =
+        relatorio == undefined ? permissaoUsuario.relatorio : relatorio;
       permissaoUsuario.advertencia =
         advertencia == undefined ? permissaoUsuario.advertencia : advertencia;
-      permissaoUsuario.geral = geral == undefined ? permissaoUsuario.geral : geral;
-      permissaoUsuario.ativo = ativo == undefined ? permissaoUsuario.ativo : ativo;
+      permissaoUsuario.geral =
+        geral == undefined ? permissaoUsuario.geral : geral;
+      permissaoUsuario.ativo =
+        ativo == undefined ? permissaoUsuario.ativo : ativo;
 
       await permissaoUsuario.save();
 

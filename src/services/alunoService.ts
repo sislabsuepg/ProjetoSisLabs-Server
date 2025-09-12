@@ -162,7 +162,7 @@ export default class AlunoService {
         };
       }
 
-      const alunos: Aluno[] = await Aluno.findAll({
+      const { rows: alunos, count: total } = await Aluno.findAndCountAll({
         where: {
           [Op.or]: [
             ...(nome ? [{ nome: { [Op.iLike]: `%${nome}%` } }] : []),
@@ -199,7 +199,7 @@ export default class AlunoService {
 
       return {
         erros: [],
-        data: alunos,
+        data: { alunos, total },
       };
     } catch (e) {
       console.log(e);
@@ -287,9 +287,9 @@ export default class AlunoService {
       }
 
       const curso = await Curso.findByPk(idCurso);
-      if (!curso) {
+      if (!curso || (curso && !curso.ativo)) {
         return {
-          erros: ["ID do curso inválido"],
+          erros: ["ID do curso inválido ou inativo"],
           data: [],
         };
       }

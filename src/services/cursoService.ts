@@ -84,8 +84,8 @@ export default class CursoService {
           data: null,
         };
       }
-      const curso = await Curso.findAll({
-        where: { 
+      const { rows: cursos, count: total } = await Curso.findAndCountAll({
+        where: {
           [Op.and]: {
             nome: { [Op.iLike]: `%${nomeBusca}%` },
             ...(ativo !== undefined && { ativo }),
@@ -93,7 +93,7 @@ export default class CursoService {
         },
         ...getPaginationParams(offset, limit),
       });
-      if (!curso) {
+      if (!cursos || cursos.length === 0) {
         return {
           erros: ["Curso não encontrado"],
           data: null,
@@ -101,7 +101,7 @@ export default class CursoService {
       }
       return {
         erros: [],
-        data: curso,
+        data: { cursos, total },
       };
     } catch (e) {
       console.log(e);
@@ -147,7 +147,12 @@ export default class CursoService {
     }
   }
 
-  static async updateCurso(id: number, nome?: string, anosMaximo?: number, ativo?: boolean) {
+  static async updateCurso(
+    id: number,
+    nome?: string,
+    anosMaximo?: number,
+    ativo?: boolean
+  ) {
     try {
       if (!nome && !anosMaximo && ativo === undefined) {
         return {
@@ -174,7 +179,8 @@ export default class CursoService {
         };
       }
       curso.nome = nome == undefined ? curso.nome : nome;
-      curso.anosMaximo = anosMaximo == undefined ? curso.anosMaximo : anosMaximo;
+      curso.anosMaximo =
+        anosMaximo == undefined ? curso.anosMaximo : anosMaximo;
       curso.ativo = ativo === undefined ? curso.ativo : ativo;
       await curso.save();
       return {

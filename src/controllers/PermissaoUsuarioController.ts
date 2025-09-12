@@ -19,7 +19,7 @@ class PermissaoUsuarioController {
     } else {
       const { erros, data } =
         await permissaoUsuarioService.getPermissaoUsuarioByNome(
-          req.query.nomePermissao as string,
+          req.query.nome as string,
           Number(page),
           Number(items),
           ativo === undefined ? undefined : ativo === "true"
@@ -77,7 +77,7 @@ class PermissaoUsuarioController {
       alteracao,
       relatorio,
       advertencia,
-      ativo
+      ativo,
     } = req.body;
     const { erros, data } =
       await permissaoUsuarioService.updatePermissaoUsuario(

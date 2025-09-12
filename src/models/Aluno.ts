@@ -132,7 +132,7 @@ export default class Aluno extends Model<
 
   @BeforeCreate
   static defineEmail(instance: Aluno) {
-    if (!instance.email) {
+    if (!instance.email || instance.email.trim() === "") {
       instance.email = instance.ra + "@uepg.br";
     }
   }

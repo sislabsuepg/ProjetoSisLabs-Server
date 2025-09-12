@@ -38,16 +38,26 @@ export default class UsuarioService {
     return erros;
   }
 
-  static async getAllUsuarios(offset?: number, limit?: number, ativo?: boolean, nome?: string) {
+  static async getAllUsuarios(
+    offset?: number,
+    limit?: number,
+    ativo?: boolean,
+    nome?: string
+  ) {
     try {
-      const usuarios = await Usuario.findAll({
+      const { rows: usuarios, count: total } = await Usuario.findAndCountAll({
         ...getPaginationParams(offset, limit),
         attributes: ["id", "nome", "login", "ativo", "idPermissao"],
         include: {
           model: PermissaoUsuario,
         },
         where: {
-          ...(nome && { [Op.or]: { nome: { [Op.iLike]: `%${nome}%` }, login: { [Op.iLike]: `%${nome}%` } } }),
+          ...(nome && {
+            [Op.or]: {
+              nome: { [Op.iLike]: `%${nome}%` },
+              login: { [Op.iLike]: `%${nome}%` },
+            },
+          }),
           ...(ativo !== undefined && { ativo }),
         },
         order: [["nome", "ASC"]],
@@ -58,10 +68,17 @@ export default class UsuarioService {
           data: null,
         };
       }
-      return {
-        erros: [],
-        data: usuarios,
-      };
+      if (!nome) {
+        return {
+          erros: [],
+          data: usuarios,
+        };
+      } else {
+        return {
+          erros: [],
+          data: { usuarios, total },
+        };
+      }
     } catch (e) {
       console.log(e);
       return {
@@ -125,7 +142,7 @@ export default class UsuarioService {
         };
       }
       const permissao = await PermissaoUsuario.findByPk(idPermissao);
-      if (!permissao) {
+      if (!permissao || (permissao && !permissao.ativo)) {
         return {
           erros: ["Permissão não encontrada"],
           data: null,
@@ -279,7 +296,12 @@ export default class UsuarioService {
     try {
       const usuario: Usuario | null = await Usuario.findOne({
         where: {
-          [Op.and]: [{ id: id }, { nome: nome }, { login: login }, { ativo: true }],
+          [Op.and]: [
+            { id: id },
+            { nome: nome },
+            { login: login },
+            { ativo: true },
+          ],
         },
       });
       return usuario !== null;
