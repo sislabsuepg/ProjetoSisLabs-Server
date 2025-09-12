@@ -1,4 +1,5 @@
 import Laboratorio from "../models/Laboratorio.js";
+import horarioCreatorHelper from "../utils/horarioCreatorHelper.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
 
@@ -100,7 +101,8 @@ export default class laboratorioService {
   static async createLaboratorio(
     numero: string,
     nome: string,
-    restrito?: boolean
+    restrito?: boolean,
+    gerarHorarios?: boolean
   ) {
     try {
       const erros = [
@@ -127,11 +129,19 @@ export default class laboratorioService {
       const laboratorio = await Laboratorio.create({
         numero,
         nome,
-        restrito: restrito || false,
+        restrito: restrito === true,
       });
+      let horarios: any[] = [];
+      if (gerarHorarios) {
+        try {
+          horarios = await horarioCreatorHelper(laboratorio.id);
+        } catch (e) {
+          console.error("Falha ao gerar horários automaticamente", e);
+        }
+      }
       return {
         erros: [],
-        data: laboratorio,
+        data: { laboratorio, horarios },
       };
     } catch (error) {
       return {

@@ -44,11 +44,22 @@ class LaboratorioController {
   }
 
   async create(req: Request, res: Response) {
-    const { numero, nome, restrito } = req.body;
+    const { numero, nome, restrito, gerarHorarios } = req.body;
+    // Aceita gerarHorarios como string "true"/"false", boolean, 1/0
+    const gerarFlag = ((): boolean => {
+      if (typeof gerarHorarios === "boolean") return gerarHorarios;
+      if (typeof gerarHorarios === "number") return gerarHorarios === 1;
+      if (typeof gerarHorarios === "string") {
+        const val = gerarHorarios.trim().toLowerCase();
+        return val === "true" || val === "1" || val === "yes";
+      }
+      return false;
+    })();
     const { erros, data } = await laboratorioService.createLaboratorio(
       numero,
       nome,
-      restrito
+      restrito,
+      gerarFlag
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });

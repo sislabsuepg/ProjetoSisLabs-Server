@@ -22,6 +22,20 @@ class HorarioController {
     }
   }
 
+  async showDiaSemana(req: Request, res: Response) {
+    const { diaSemana } = req.params;
+    if (isNaN(Number(diaSemana)) || Number(diaSemana) < 1 || Number(diaSemana) > 6) {
+      res.status(codes.BAD_REQUEST).json({ erros: ["diaSemana deve ser um número entre 1 e 6"], data: null });
+    }else{
+      const { erros, data } = await HorarioService.getHorariosByDiaSemana(Number(diaSemana));
+      if (erros.length > 0) {
+        res.status(codes.BAD_REQUEST).json({ erros, data });
+      } else {
+        res.status(codes.OK).json({ erros, data });
+      }
+    }
+  }
+
   async showLaboratorio(req: Request, res: Response) {
     const { id } = req.params;
     const { erros, data } = await HorarioService.getHorariosByLaboratorio(

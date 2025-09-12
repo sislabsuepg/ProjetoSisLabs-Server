@@ -10,9 +10,10 @@ POST http://localhost:3400/laboratorio/
 Content-Type: application/json
 
 {
-  "numero": "101",
-  "nome": "Laboratório de Informática",
-  "restrito": false
+  "numero": "1011",
+  "nome": "Laborató1rio de Informática",
+  "restrito": false,
+  "gerarHorarios": true
 }
 
 ###
