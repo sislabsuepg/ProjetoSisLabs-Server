@@ -3,17 +3,26 @@ import { Request, Response } from "express";
 import codes from "../types/responseCodes.js";
 class LaboratorioController {
   async index(req: Request, res: Response) {
-    const { restrito, page, items } = req.query;
+    const { restrito, page, items, ativo, nome } = req.query;
     let restritoTest: boolean | undefined;
+    let ativado: boolean | undefined;
+    
     if (restrito === undefined) {
       restritoTest = undefined;
     } else {
       restritoTest = restrito === "true";
     }
+    if (ativo === undefined) {
+      ativado = undefined;
+    } else {
+      ativado = ativo === "true";
+    }
     const { erros, data } = await laboratorioService.getAllLaboratorios(
       restritoTest,
       Number(page),
-      Number(items)
+      Number(items),
+      nome === undefined ? undefined : String(nome),
+      ativo === undefined ? undefined : ativado
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -35,11 +44,22 @@ class LaboratorioController {
   }
 
   async create(req: Request, res: Response) {
-    const { numero, nome, restrito } = req.body;
+    const { numero, nome, restrito, gerarHorarios } = req.body;
+    // Aceita gerarHorarios como string "true"/"false", boolean, 1/0
+    const gerarFlag = ((): boolean => {
+      if (typeof gerarHorarios === "boolean") return gerarHorarios;
+      if (typeof gerarHorarios === "number") return gerarHorarios === 1;
+      if (typeof gerarHorarios === "string") {
+        const val = gerarHorarios.trim().toLowerCase();
+        return val === "true" || val === "1" || val === "yes";
+      }
+      return false;
+    })();
     const { erros, data } = await laboratorioService.createLaboratorio(
       numero,
       nome,
-      restrito
+      restrito,
+      gerarFlag
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -50,12 +70,13 @@ class LaboratorioController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { numero, nome, restrito } = req.body;
+    const { numero, nome, restrito, ativo } = req.body;
     const { erros, data } = await laboratorioService.updateLaboratorio(
       Number(id),
       numero,
       nome,
-      restrito
+      restrito,
+      ativo
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });

@@ -23,13 +23,11 @@ export default class HorarioService {
 
   static async getAllHorarios() {
     try {
-      const horarios = await Horario.findAll({
-        include: [
-          { model: Professor, as: "professor" },
-          { model: Laboratorio, as: "laboratorio" },
-        ],
+      const labsComHorarios = await Laboratorio.findAll({
+        include: [{ model: Horario, as: "horarios" }],
       });
-      if (!horarios || horarios.length === 0) {
+
+      if (!labsComHorarios || labsComHorarios.length === 0) {
         return {
           erros: ["Nenhum horario encontrado"],
           data: [],
@@ -38,7 +36,7 @@ export default class HorarioService {
 
       return {
         erros: [],
-        data: horarios,
+        data: labsComHorarios,
       };
     } catch (e) {
       console.log(e);
@@ -81,6 +79,35 @@ export default class HorarioService {
     try {
       const horarios = await Horario.findAll({
         where: { idLaboratorio },
+        include: [
+          { model: Professor, as: "professor" },
+          { model: Laboratorio, as: "laboratorio" },
+        ],
+      });
+      if (!horarios || horarios.length === 0) {
+        return {
+          erros: ["Nenhum horario encontrado"],
+          data: [],
+        };
+      }
+
+      return {
+        erros: [],
+        data: horarios,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        erros: ["Erro ao buscar horarios"],
+        data: null,
+      };
+    }
+  }
+
+  static async getHorariosByDiaSemana(diaSemana: number) {
+    try {
+      const horarios = await Horario.findAll({
+        where: { diaSemana },
         include: [
           { model: Professor, as: "professor" },
           { model: Laboratorio, as: "laboratorio" },

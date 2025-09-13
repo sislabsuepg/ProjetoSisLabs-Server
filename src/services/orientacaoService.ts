@@ -5,38 +5,43 @@ import Orientacao from "../models/Orientacao.js";
 import Professor from "../models/Professor.js";
 import { getPaginationParams } from "../types/pagination.js";
 
-function getActive(active: boolean | undefined): {} {
-  if (active === true) {
-    return { where: { [Op.and]: [{ dataFim: { [Op.gt]: new Date() } }] } };
+function getAtivo(ativo: boolean | undefined): {} {
+  if (ativo === true) {
+    return { [Op.and]: [{ dataFim: { [Op.gt]: new Date() } }] };
+  } else {
+    return { [Op.and]: [{ dataFim: { [Op.lt]: new Date() } }] };
   }
-  return {};
 }
 
 export default class OrientacaoService {
   static async getAllOrientacoes(
     offset?: number,
     limit?: number,
-    active?: boolean
+    ativo?: boolean,
+    nome?: string
   ) {
     try {
-      const orientacoes = await Orientacao.findAll({
-        include: [
-          {
-            model: Aluno,
-            as: "aluno",
+      const { rows: orientacoes, count: total } =
+        await Orientacao.findAndCountAll({
+          include: [
+            {
+              model: Aluno,
+              as: "aluno",
+            },
+            {
+              model: Professor,
+              as: "professor",
+            },
+            {
+              model: Laboratorio,
+              as: "laboratorio",
+            },
+          ],
+          where: {
+            ...getAtivo(ativo),
           },
-          {
-            model: Professor,
-            as: "professor",
-          },
-          {
-            model: Laboratorio,
-            as: "laboratorio",
-          },
-        ],
-        ...getActive(active),
-        ...getPaginationParams(offset, limit),
-      });
+          ...getPaginationParams(offset, limit),
+        });
 
       if (!orientacoes || orientacoes.length === 0) {
         return {
@@ -44,6 +49,23 @@ export default class OrientacaoService {
           data: [],
         };
       }
+
+      if (nome) {
+        const orientacoesFiltradas = orientacoes.filter((orientacao) =>
+          orientacao.aluno.nome.toLowerCase().includes(nome.toLowerCase())
+        );
+        if (orientacoesFiltradas.length === 0) {
+          return {
+            erros: ["Nenhuma orientação encontrada com o nome informado"],
+            data: [],
+          };
+        }
+        return {
+          erros: [],
+          data: { orientacoes: orientacoesFiltradas, total },
+        };
+      }
+
       return {
         erros: [],
         data: orientacoes,
@@ -116,7 +138,7 @@ export default class OrientacaoService {
         ],
       });
 
-      if (!orientacoes || orientacoes.length === 0) {
+      if (orientacoes.length === 0) {
         return {
           erros: ["Nenhuma orientação encontrada para este aluno"],
           data: [],
@@ -124,7 +146,7 @@ export default class OrientacaoService {
       }
       return {
         erros: [],
-        data: orientacoes,
+        data: orientacoes[0],
       };
     } catch (error) {
       console.log(error);
@@ -159,16 +181,16 @@ export default class OrientacaoService {
       ];
 
       const aluno = await Aluno.findByPk(idAluno);
-      if (!aluno) {
-        erros.push("Aluno não encontrado");
+      if (!aluno || (aluno && !aluno.ativo)) {
+        erros.push("Aluno não encontrado ou inativo");
       }
       const professor = await Professor.findByPk(idProfessor);
-      if (!professor) {
-        erros.push("Professor não encontrado");
+      if (!professor || (professor && !professor.ativo)) {
+        erros.push("Professor não encontrado ou inativo");
       }
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
-      if (!laboratorio) {
-        erros.push("Laboratório não encontrado");
+      if (!laboratorio || (laboratorio && !laboratorio.ativo)) {
+        erros.push("Laboratório não encontrado ou inativo");
       }
 
       if (erros.length > 0) {
@@ -199,22 +221,9 @@ export default class OrientacaoService {
     }
   }
 
-  static async updateOrientacao(
-    id: number,
-    dataInicio: Date,
-    dataFim: Date,
-    idAluno: number,
-    idProfessor: number,
-    idLaboratorio: number
-  ) {
+  static async updateOrientacao(id: number, dataInicio?: Date, dataFim?: Date) {
     try {
-      if (
-        !dataInicio &&
-        !dataFim &&
-        !idAluno &&
-        !idProfessor &&
-        !idLaboratorio
-      ) {
+      if (!dataInicio && !dataFim) {
         return {
           erros: ["Nenhum campo para atualização foi fornecido"],
           data: [],
@@ -229,62 +238,32 @@ export default class OrientacaoService {
         };
       }
 
-      if (
-        dataInicio &&
-        (dataInicio.getTime() <= Date.now() - 1000 * 60 * 60 * 24 ||
-          dataInicio >= orientacao.dataFim ||
-          (dataFim && dataInicio >= dataFim))
-      ) {
-        console.log(dataInicio, dataFim, orientacao.dataFim);
+      if (dataInicio && dataFim && dataInicio >= dataFim) {
         return {
           erros: ["Data de início deve ser anterior à data de fim"],
           data: [],
         };
       }
-
+      if (
+        dataInicio &&
+        !dataFim &&
+        (dataInicio.getTime() <= Date.now() - 1000 * 60 * 60 * 24 ||
+          dataInicio >= orientacao.dataFim)
+      ) {
+        return {
+          erros: ["Data de início deve ser anterior à data de fim"],
+          data: [],
+        };
+      }
       if (
         dataFim &&
-        (dataFim.getTime() <= Date.now() ||
-          dataFim <= orientacao.dataInicio ||
-          (dataInicio && dataFim <= dataInicio))
+        !dataInicio &&
+        (dataFim.getTime() <= Date.now() || dataFim <= orientacao.dataInicio)
       ) {
         return {
           erros: ["Data de fim deve ser posterior à data de início"],
           data: [],
         };
-      }
-
-      if (idAluno) {
-        const aluno = await Aluno.findByPk(idAluno);
-        if (!aluno) {
-          return {
-            erros: ["Aluno não encontrado"],
-            data: [],
-          };
-        }
-        orientacao.aluno = aluno;
-      }
-
-      if (idProfessor) {
-        const professor = await Professor.findByPk(idProfessor);
-        if (!professor) {
-          return {
-            erros: ["Professor não encontrado"],
-            data: [],
-          };
-        }
-        orientacao.professor = professor;
-      }
-
-      if (idLaboratorio) {
-        const laboratorio = await Laboratorio.findByPk(idLaboratorio);
-        if (!laboratorio) {
-          return {
-            erros: ["Laboratório não encontrado"],
-            data: [],
-          };
-        }
-        orientacao.laboratorio = laboratorio;
       }
 
       orientacao.dataInicio = dataInicio || orientacao.dataInicio;
@@ -315,16 +294,27 @@ export default class OrientacaoService {
         };
       }
 
-      await orientacao.destroy();
+      if (orientacao.dataFim < new Date()) {
+        return {
+          erros: ["Não é possível desativar uma orientação já finalizada"],
+          data: [],
+        };
+      }
+
+      if (orientacao.dataInicio > new Date()) {
+        orientacao.dataInicio = new Date();
+      }
+      orientacao.dataFim = new Date();
+      await orientacao.save();
 
       return {
         erros: [],
-        data: ["Orientação deletada com sucesso"],
+        data: ["Orientação desativada com sucesso"],
       };
     } catch (error) {
       console.log(error);
       return {
-        erros: ["Erro ao deletar orientação"],
+        erros: ["Erro ao desativar orientação"],
         data: [],
       };
     }

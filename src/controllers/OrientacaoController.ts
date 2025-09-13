@@ -4,11 +4,12 @@ import codes from "../types/responseCodes.js";
 
 class OrientacaoController {
   async index(req: Request, res: Response) {
-    const { page, items, ativo } = req.query;
+    const { page, items, ativo, nome } = req.query;
     const { erros, data } = await OrientacaoService.getAllOrientacoes(
       Number(page),
       Number(items),
-      ativo === "true"
+      ativo === undefined ? undefined : ativo === "true",
+      nome === undefined ? undefined : String(nome)
     );
     if (erros.length) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -21,6 +22,18 @@ class OrientacaoController {
     const { id } = req.params;
     const { erros, data } = await OrientacaoService.getOrientacaoById(
       Number(id)
+    );
+    if (erros.length) {
+      res.status(codes.BAD_REQUEST).json({ erros, data });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
+  async showByAluno(req: Request, res: Response) {
+    const { idAluno } = req.params;
+    const { erros, data } = await OrientacaoService.getOrientacaoByAluno(
+      Number(idAluno)
     );
     if (erros.length) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -44,7 +57,7 @@ class OrientacaoController {
     }
 
     const exists = await OrientacaoService.getOrientacaoByAluno(idAluno);
-    if (exists.erros.length === 0 && exists.data.length > 0) {
+    if (exists.erros.length === 0 && exists.data) {
       res.status(codes.CONFLICT).json({
         erros: ["Já existe uma orientação ativa para este aluno"],
         data: [],
@@ -67,7 +80,7 @@ class OrientacaoController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    let { dataInicio, dataFim, idAluno, idLaboratorio, idProfessor } = req.body;
+    let { dataInicio, dataFim } = req.body;
     if (isNaN(Date.parse(dataInicio))) {
       dataInicio = undefined;
     } else {
@@ -81,12 +94,8 @@ class OrientacaoController {
     }
     const { erros, data } = await OrientacaoService.updateOrientacao(
       Number(id),
-
       dataInicio,
-      dataFim,
-      idAluno,
-      idLaboratorio,
-      idProfessor
+      dataFim
     );
 
     if (erros.length > 0) {

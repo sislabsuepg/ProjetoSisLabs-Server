@@ -1,8 +1,8 @@
-GET http://localhost:3400/horario/laboratorio/2
+GET http://localhost:3400/horario/laboratorio/13
 
 ###
 
-GET http://localhost:3400/horario/1
+GET http://localhost:3400/horario/
 
 ###
 

@@ -20,9 +20,11 @@ interface CursoAtributos {
   id: number;
   nome: string;
   anosMaximo: number;
+  ativo: boolean;
 }
 
-interface CursoCreationAtributos extends Optional<CursoAtributos, "id"> {}
+interface CursoCreationAtributos
+  extends Optional<CursoAtributos, "id" | "ativo"> {}
 
 @Table({
   tableName: "curso",
@@ -56,6 +58,13 @@ export default class Curso extends Model<
     type: DataType.INTEGER,
   })
   declare anosMaximo: number;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: true,
+  })
+  declare ativo: boolean;
 
   @HasMany(() => Aluno, {
     foreignKey: "idCurso",

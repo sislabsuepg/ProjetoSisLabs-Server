@@ -16,6 +16,7 @@ import registroRoutes from "./routes/registroRoutes.js";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import emailRoutes from "./routes/emailRoutes.js";
 import relatorioRoutes from "./routes/relatorioRoutes.js";
+import { interceptUserCookie } from "./middlewares/interceptUserCookie.js";
 
 class App {
   app: any;
@@ -43,16 +44,16 @@ class App {
 
   routes() {
     this.app.use("/aluno/", alunoRoutes);
-    this.app.use("/curso/", cursoRoutes);
-    this.app.use("/emprestimo/", emprestimoRoutes);
-    this.app.use("/evento/", eventoRoutes);
-    this.app.use("/horario/", horarioRoutes);
-    this.app.use("/laboratorio/", laboratorioRoutes);
-    this.app.use("/orientacao/", orientacaoRoutes);
-    this.app.use("/permissao/", permissaoUsuarioRoutes);
-    this.app.use("/professor/", professorRoutes);
-    this.app.use("/recado/", recadoRoutes);
-    this.app.use("/registro/", registroRoutes);
+    this.app.use("/curso/", interceptUserCookie, cursoRoutes);
+    this.app.use("/emprestimo/", interceptUserCookie, emprestimoRoutes);
+    this.app.use("/evento/", interceptUserCookie, eventoRoutes);
+    this.app.use("/horario/", interceptUserCookie, horarioRoutes);
+    this.app.use("/laboratorio/", interceptUserCookie, laboratorioRoutes);
+    this.app.use("/orientacao/", interceptUserCookie, orientacaoRoutes);
+    this.app.use("/permissao/", interceptUserCookie, permissaoUsuarioRoutes);
+    this.app.use("/professor/", interceptUserCookie, professorRoutes);
+    this.app.use("/recado/", interceptUserCookie, recadoRoutes);
+    this.app.use("/registro/", interceptUserCookie, registroRoutes);
     this.app.use("/usuario/", usuarioRoutes);
     this.app.use("/email/", emailRoutes);
     this.app.use("/relatorio/", relatorioRoutes);

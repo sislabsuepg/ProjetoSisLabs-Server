@@ -3,6 +3,7 @@ import PermissaoUsuario from "../models/PermissaoUsuario.js";
 import config from "../config/config.js";
 import jwt from "jsonwebtoken";
 import { getPaginationParams } from "../types/pagination.js";
+import { Op } from "sequelize";
 export default class UsuarioService {
   static verificaLogin(login: string): string[] {
     const erros: string[] = [];
@@ -28,6 +29,10 @@ export default class UsuarioService {
 
   static verificaNome(nome: string): string[] {
     const erros: string[] = [];
+    if (!nome) {
+      erros.push("Nome é obrigatório");
+      return erros;
+    }
     if (nome.length < 3 || nome.length > 40) {
       erros.push("Nome deve ter entre 3 e 40 caracteres");
     }
@@ -37,14 +42,29 @@ export default class UsuarioService {
     return erros;
   }
 
-  static async getAllUsuarios(offset?: number, limit?: number) {
+  static async getAllUsuarios(
+    offset?: number,
+    limit?: number,
+    ativo?: boolean,
+    nome?: string
+  ) {
     try {
-      const usuarios = await Usuario.findAll({
+      const { rows: usuarios, count: total } = await Usuario.findAndCountAll({
         ...getPaginationParams(offset, limit),
         attributes: ["id", "nome", "login", "ativo", "idPermissao"],
         include: {
           model: PermissaoUsuario,
         },
+        where: {
+          ...(nome && {
+            [Op.or]: {
+              nome: { [Op.iLike]: `%${nome}%` },
+              login: { [Op.iLike]: `%${nome}%` },
+            },
+          }),
+          ...(ativo !== undefined && { ativo }),
+        },
+        order: [["nome", "ASC"]],
       });
       if (!usuarios || usuarios.length === 0) {
         return {
@@ -52,10 +72,17 @@ export default class UsuarioService {
           data: null,
         };
       }
-      return {
-        erros: [],
-        data: usuarios,
-      };
+      if (!nome) {
+        return {
+          erros: [],
+          data: usuarios,
+        };
+      } else {
+        return {
+          erros: [],
+          data: { usuarios, total },
+        };
+      }
     } catch (e) {
       console.log(e);
       return {
@@ -98,6 +125,13 @@ export default class UsuarioService {
     nome: string,
     idPermissao: number
   ) {
+    if (!idPermissao || !senha || !login || !nome) {
+      return {
+        erros: ["Todos os campos são obrigatórios"],
+        data: null,
+      };
+    }
+
     const erros: string[] = [
       ...this.verificaLogin(login),
       ...this.verificaSenha(senha),
@@ -119,7 +153,7 @@ export default class UsuarioService {
         };
       }
       const permissao = await PermissaoUsuario.findByPk(idPermissao);
-      if (!permissao) {
+      if (!permissao || (permissao && !permissao.ativo)) {
         return {
           erros: ["Permissão não encontrada"],
           data: null,
@@ -191,6 +225,7 @@ export default class UsuarioService {
             data: null,
           };
         }
+        usuario.idPermissao = idPermissao;
         usuario.permissaoUsuario = permissao;
       }
       await usuario.save();
@@ -213,12 +248,13 @@ export default class UsuarioService {
           data: null,
         };
       }
-      await usuario.destroy();
+      usuario.ativo = false;
+      await usuario.save();
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao deletar usuário"],
+        erros: ["Erro ao desativar usuário"],
         data: null,
       };
     }
@@ -252,7 +288,7 @@ export default class UsuarioService {
       }
       usuario.senha = "";
 
-      let expires: number = parseInt(config.expires as string) || 1800;
+      let expires = parseInt(config.expires as string) || 3600;
 
       const token: string = jwt.sign({ usuario }, config.secret as string, {
         expiresIn: expires,
@@ -264,6 +300,25 @@ export default class UsuarioService {
         erros: ["Erro ao realizar login"],
         data: null,
       };
+    }
+  }
+
+  static async verificaAtivo(id: number, nome: string, login: string) {
+    try {
+      const usuario: Usuario | null = await Usuario.findOne({
+        where: {
+          [Op.and]: [
+            { id: id },
+            { nome: nome },
+            { login: login },
+            { ativo: true },
+          ],
+        },
+      });
+      return usuario !== null;
+    } catch (error) {
+      console.log(error);
+      return false;
     }
   }
 

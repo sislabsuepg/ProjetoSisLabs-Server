@@ -35,11 +35,14 @@ export default class AlunoService {
 
   static verificaTelefone(telefone: string): string[] {
     const erros: string[] = [];
-    if (!telefone) {
-      erros.push("Telefone do aluno é obrigatório");
+    let telefoneLimpo = telefone.replace(/\D/g, "");
+    if (!telefoneLimpo) {
+      return [];
     }
-    if (!/^\d{10,15}$/.test(telefone)) {
-      erros.push("Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)");
+    if (!/^\d{10,15}$/.test(telefoneLimpo)) {
+      erros.push(
+        "Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)"
+      );
     }
     return erros;
   }
@@ -47,10 +50,10 @@ export default class AlunoService {
   static verificaAnoCurso(ano: number): string[] {
     const erros: string[] = [];
     if (ano < 1) {
-  erros.push("Ano do curso não pode ser inferior a 1");
+      erros.push("Ano do curso não pode ser inferior a 1");
     }
     if (ano > 8) {
-  erros.push("Ano do curso não pode ser superior a 8");
+      erros.push("Ano do curso não pode ser superior a 8");
     }
     return erros;
   }
@@ -118,6 +121,7 @@ export default class AlunoService {
         include: {
           model: Curso,
         },
+        order: [["nome", "ASC"]],
         where: {
           ativo: {
             [Op.or]: ativo === undefined ? [true, false] : [ativo],
@@ -146,6 +150,7 @@ export default class AlunoService {
   static async searchAlunos(
     nome?: string,
     ra?: string,
+    ativo?: boolean,
     offset?: number,
     limit?: number
   ) {
@@ -156,24 +161,18 @@ export default class AlunoService {
           data: [],
         };
       }
-      const erros: string[] = [
-        ...(nome ? this.verificaNome(nome) : []),
-        ...(ra ? this.verificaRa(ra) : []),
-      ];
 
-      if (erros.length > 0) {
-        return {
-          erros: erros,
-          data: [],
-        };
-      }
-      const alunos: Aluno[] = await Aluno.findAll({
+      const { rows: alunos, count: total } = await Aluno.findAndCountAll({
         where: {
           [Op.or]: [
-            { nome: { [Op.iLike]: `%${nome || ""}%` } },
-            { ra: { [Op.like]: `${ra || ""}` } },
+            ...(nome ? [{ nome: { [Op.iLike]: `%${nome}%` } }] : []),
+            ...(ra ? [{ ra: { [Op.like]: `%${ra || ""}%` } }] : []),
+          ],
+          [Op.and]: [
+            { ativo: { [Op.eq]: ativo === undefined ? true : ativo } },
           ],
         },
+        order: [["nome", "ASC"]],
         attributes: [
           "id",
           "ra",
@@ -200,7 +199,7 @@ export default class AlunoService {
 
       return {
         erros: [],
-        data: alunos,
+        data: { alunos, total },
       };
     } catch (e) {
       console.log(e);
@@ -211,9 +210,12 @@ export default class AlunoService {
     }
   }
 
-  static async getAlunoById(id: number) {
+  static async getAlunoByRa(ra: string) {
     try {
-      const aluno: Aluno | null = await Aluno.findByPk(id, {
+      const aluno: Aluno | null = await Aluno.findOne({
+        where: {
+          ra: ra,
+        },
         attributes: [
           "id",
           "ra",
@@ -285,9 +287,9 @@ export default class AlunoService {
       }
 
       const curso = await Curso.findByPk(idCurso);
-      if (!curso) {
+      if (!curso || (curso && !curso.ativo)) {
         return {
-          erros: ["ID do curso inválido"],
+          erros: ["ID do curso inválido ou inativo"],
           data: [],
         };
       }
@@ -307,10 +309,12 @@ export default class AlunoService {
 
       const novoAluno: any = {};
 
+      const telefoneLimpo = telefone ? telefone.replace(/\D/g, "") : null;
+
       for (const [key, value] of Object.entries({
         ra,
         nome,
-        telefone,
+        telefone: telefoneLimpo,
         anoCurso,
         email,
         senha,
@@ -388,8 +392,9 @@ export default class AlunoService {
         ...(nome ? this.verificaNome(nome) : []),
         ...(telefone ? this.verificaTelefone(telefone) : []),
         ...(email ? this.verificaEmail(email) : []),
-        ...(anoCurso || (anoCurso && anoCurso > aluno.curso.anosMaximo)
-          ? this.verificaAnoCurso(anoCurso)
+        ...(anoCurso ? this.verificaAnoCurso(anoCurso) : []),
+        ...(anoCurso && anoCurso > aluno.curso.anosMaximo
+          ? ["Ano do curso inválido"]
           : []),
       ];
 
@@ -400,10 +405,10 @@ export default class AlunoService {
         };
       }
 
-      aluno.nome = nome || aluno.nome;
-      aluno.telefone = telefone || aluno.telefone;
-      aluno.anoCurso = anoCurso || aluno.anoCurso;
-      aluno.email = email || aluno.email;
+      aluno.nome = nome == undefined ? aluno.nome : nome;
+      aluno.telefone = telefone == undefined ? "" : telefone.replace(/\D/g, "");
+      aluno.anoCurso = anoCurso == undefined ? aluno.anoCurso : anoCurso;
+      aluno.email = email == undefined ? aluno.email : email;
       aluno.ativo = ativo === undefined ? aluno.ativo : ativo;
 
       const alunoAtualizado = await aluno.save();
@@ -464,16 +469,17 @@ export default class AlunoService {
         };
       }
 
-      await aluno.destroy();
+      aluno.ativo = false;
+      await aluno.save();
 
       return {
         erros: [],
-        data: ["Aluno excluído com sucesso"],
+        data: null,
       };
     } catch (e) {
       console.log(e);
       return {
-        erros: ["Erro ao excluir aluno"],
+        erros: ["Erro ao desativar aluno"],
         data: [],
       };
     }

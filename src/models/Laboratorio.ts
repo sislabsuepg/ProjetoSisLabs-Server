@@ -21,10 +21,11 @@ interface LaboratorioAtributos {
   nome: string;
   numero: string;
   restrito: boolean;
+  ativo: boolean;
 }
 
 interface LaboratorioCreationAtributos
-  extends Optional<LaboratorioAtributos, "id"> {}
+  extends Optional<LaboratorioAtributos, "id" | "ativo"> {}
 
 @Table({
   tableName: "laboratorio",
@@ -63,6 +64,13 @@ export default class Laboratorio extends Model<
     defaultValue: false,
   })
   declare restrito: boolean;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: true,
+  })
+  declare ativo: boolean;
 
   @HasMany(() => Evento, {
     foreignKey: "idLaboratorio",

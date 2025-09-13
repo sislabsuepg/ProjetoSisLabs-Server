@@ -75,6 +75,12 @@ export default class Usuario extends Model<
   })
   declare ativo: boolean;
 
+  @AllowNull(false)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare idPermissao: number;
+
   @BelongsTo(() => PermissaoUsuario, {
     foreignKey: "idPermissao",
     targetKey: "id",

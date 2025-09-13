@@ -4,11 +4,12 @@ import codes from "../types/responseCodes.js";
 
 class CursoController {
   async index(req: Request, res: Response) {
-    const { page, items } = req.query;
+    const { page, items, ativo } = req.query;
     if (!req.query.nome) {
       const { erros, data } = await CursoService.getAllCursos(
         Number.parseInt(page as string),
-        Number.parseInt(items as string)
+        Number.parseInt(items as string),
+        ativo === undefined ? undefined : ativo === "true"
       );
       if (erros.length > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -19,7 +20,8 @@ class CursoController {
       const { erros, data } = await CursoService.getCursosByNome(
         req.query.nome as string,
         Number.parseInt(page as string),
-        Number.parseInt(items as string)
+        Number.parseInt(items as string),
+        ativo === undefined ? undefined : ativo === "true"
       );
       if (erros.length > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -51,11 +53,12 @@ class CursoController {
 
   async update(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const { nome, anosMaximo } = req.body;
+    const { nome, anosMaximo, ativo } = req.body;
     const { erros, data } = await CursoService.updateCurso(
       id,
       nome,
-      anosMaximo
+      anosMaximo,
+      ativo
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -75,7 +78,9 @@ class CursoController {
   }
 
   async count(req: Request, res: Response) {
-    const count = await CursoService.getCount();
+    const { ativo } = req.query;
+    const ativado = ativo === undefined ? undefined : ativo === "true";
+    const count = await CursoService.getCount(ativado);
     res.status(codes.OK).json({ count });
   }
 }

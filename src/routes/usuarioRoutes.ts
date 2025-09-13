@@ -1,20 +1,37 @@
 import UsuarioController from "../controllers/UsuarioController.js";
 
 import { Router } from "express";
+import { interceptUserCookie } from "../middlewares/interceptUserCookie.js";
+import lockPath from "../middlewares/lockPath.js";
 
 const router: Router = Router();
 
-router.get("/", UsuarioController.index);
+router.get("/", interceptUserCookie, UsuarioController.index);
 
-router.get("/count", UsuarioController.count);
+router.get("/count", interceptUserCookie, UsuarioController.count);
 
-router.get("/:id", UsuarioController.show);
+router.get("/:id", interceptUserCookie, UsuarioController.show);
 
-router.post("/", UsuarioController.store);
+router.post(
+  "/",
+  interceptUserCookie,
+  lockPath("cadastro"),
+  UsuarioController.store
+);
 
-router.put("/:id", UsuarioController.update);
+router.put(
+  "/:id",
+  interceptUserCookie,
+  lockPath("alteracao"),
+  UsuarioController.update
+);
 
-router.delete("/:id", UsuarioController.destroy);
+router.delete(
+  "/:id",
+  interceptUserCookie,
+  lockPath("alteracao"),
+  UsuarioController.destroy
+);
 
 router.post("/login", UsuarioController.login);
 

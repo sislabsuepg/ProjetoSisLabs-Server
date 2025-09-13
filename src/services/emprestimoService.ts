@@ -129,11 +129,14 @@ export default class EmprestimoService {
       }
       if (laboratorio.restrito) {
         const orientacao = await Orientacao.findOne({
-          where: { idLaboratorio: idLaboratorio, idAluno: idAluno },
+          where: {
+            [Op.and]: [{ idLaboratorio: idLaboratorio }, { idAluno: idAluno }],
+            dataFim: { [Op.gt]: new Date() },
+          },
         });
         if (!orientacao) {
           return {
-            erros: ["Aluno não possui orientação no laboratório"],
+            erros: ["Aluno não possui orientação ativa no laboratório"],
             data: null,
           };
         }

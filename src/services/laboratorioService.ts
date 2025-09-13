@@ -1,4 +1,5 @@
 import Laboratorio from "../models/Laboratorio.js";
+import horarioCreatorHelper from "../utils/horarioCreatorHelper.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
 
@@ -34,21 +35,34 @@ export default class laboratorioService {
   static async getAllLaboratorios(
     restrito?: boolean,
     offset?: number,
-    limit?: number
+    limit?: number,
+    nome?: string,
+    ativo?: boolean
   ) {
     try {
-      const laboratorios = await Laboratorio.findAll({
-        ...getPaginationParams(offset, limit),
-        where: {
-          ...(restrito !== undefined && { restrito }),
-        },
-      });
+      const { rows: laboratorios, count: total } =
+        await Laboratorio.findAndCountAll({
+          ...getPaginationParams(offset, limit),
+          where: {
+            ...(restrito !== undefined && { restrito }),
+            ...(nome && { nome: { [Op.iLike]: `%${nome}%` } }),
+            ...(ativo !== undefined && { ativo }),
+          },
+          order: [["numero", "ASC"]],
+        });
       if (!laboratorios || laboratorios.length === 0) {
         return {
           erros: ["Nenhum laboratório encontrado"],
           data: null,
         };
       } else {
+        if (nome) {
+          return {
+            erros: [],
+            data: { laboratorios, total },
+          };
+        } else {
+        }
         return {
           erros: [],
           data: laboratorios,
@@ -87,7 +101,8 @@ export default class laboratorioService {
   static async createLaboratorio(
     numero: string,
     nome: string,
-    restrito?: boolean
+    restrito?: boolean,
+    gerarHorarios?: boolean
   ) {
     try {
       const erros = [
@@ -114,11 +129,19 @@ export default class laboratorioService {
       const laboratorio = await Laboratorio.create({
         numero,
         nome,
-        restrito: restrito || false,
+        restrito: restrito === true,
       });
+      let horarios: any[] = [];
+      if (gerarHorarios) {
+        try {
+          horarios = await horarioCreatorHelper(laboratorio.id);
+        } catch (e) {
+          console.error("Falha ao gerar horários automaticamente", e);
+        }
+      }
       return {
         erros: [],
-        data: laboratorio,
+        data: { laboratorio, horarios },
       };
     } catch (error) {
       return {
@@ -132,7 +155,8 @@ export default class laboratorioService {
     id: number,
     numero?: string,
     nome?: string,
-    restrito?: boolean
+    restrito?: boolean,
+    ativo?: boolean
   ) {
     try {
       const laboratorio = await Laboratorio.findByPk(id);
@@ -142,7 +166,7 @@ export default class laboratorioService {
           data: null,
         };
       }
-      if (!numero && !nome && restrito === undefined) {
+      if (!numero && !nome && restrito === undefined && ativo === undefined) {
         return {
           erros: ["Nenhum dado para atualizar"],
           data: null,
@@ -158,10 +182,11 @@ export default class laboratorioService {
           data: null,
         };
       }
-      laboratorio.numero = numero ? numero : laboratorio.numero;
-      laboratorio.nome = nome ? nome : laboratorio.nome;
+      laboratorio.numero = numero == undefined ? laboratorio.numero : numero;
+      laboratorio.nome = nome == undefined ? laboratorio.nome : nome;
       laboratorio.restrito =
         restrito == undefined ? laboratorio.restrito : restrito;
+      laboratorio.ativo = ativo === undefined ? laboratorio.ativo : ativo;
       await laboratorio.save();
       return {
         erros: [],
@@ -184,14 +209,15 @@ export default class laboratorioService {
           data: null,
         };
       }
-      await laboratorio.destroy();
+      laboratorio.ativo = false;
+      await laboratorio.save();
       return {
         erros: [],
         data: null,
       };
     } catch (error) {
       return {
-        erros: ["Erro ao deletar laboratório"],
+        erros: ["Erro ao desativar laboratório"],
         data: null,
       };
     }
