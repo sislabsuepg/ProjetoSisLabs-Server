@@ -29,6 +29,7 @@ class UsuarioController {
 
   public async store(req: Request, res: Response) {
     const { login, senha, nome, idPermissao } = req.body;
+    console.log(req.body);
     const { erros, data } = await UsuarioService.createUsuario(
       login,
       senha,

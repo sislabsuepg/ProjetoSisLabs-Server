@@ -41,6 +41,6 @@ export async function seedUsuarios() {
     idPermissao: mapPerm.get(u.perfil) as number,
   }));
 
-  await Usuario.bulkCreate(usuarios);
+  await Usuario.bulkCreate(usuarios, { individualHooks: true });
   console.log("[seed] Usuarios inseridos");
 }

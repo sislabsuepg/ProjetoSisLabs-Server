@@ -29,6 +29,10 @@ export default class UsuarioService {
 
   static verificaNome(nome: string): string[] {
     const erros: string[] = [];
+    if (!nome) {
+      erros.push("Nome é obrigatório");
+      return erros;
+    }
     if (nome.length < 3 || nome.length > 40) {
       erros.push("Nome deve ter entre 3 e 40 caracteres");
     }
@@ -121,6 +125,13 @@ export default class UsuarioService {
     nome: string,
     idPermissao: number
   ) {
+    if (!idPermissao || !senha || !login || !nome) {
+      return {
+        erros: ["Todos os campos são obrigatórios"],
+        data: null,
+      };
+    }
+
     const erros: string[] = [
       ...this.verificaLogin(login),
       ...this.verificaSenha(senha),
@@ -277,7 +288,7 @@ export default class UsuarioService {
       }
       usuario.senha = "";
 
-      let expires: number = parseInt(config.expires as string) || 1800;
+      let expires = parseInt(config.expires as string) || 3600;
 
       const token: string = jwt.sign({ usuario }, config.secret as string, {
         expiresIn: expires,

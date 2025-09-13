@@ -12,35 +12,57 @@ export async function interceptUserCookie(
   next: NextFunction
 ) {
   const token = req.cookies["authToken"];
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, config.secret as string) as IUsuario;
-      console.log(decoded);
-      (req as UsuarioRequest).usuario = {
-        id: decoded.id,
-        nome: decoded.nome,
-        login: decoded.login,
-        ativo: decoded.ativo,
-        idPermissao: decoded.idPermissao,
-        permissaoUsuario: {
-          id: decoded.idPermissao,
-          nomePermissao: decoded.permissaoUsuario.nomePermissao,
-          geral: decoded.permissaoUsuario.geral,
-          cadastro: decoded.permissaoUsuario.cadastro,
-          alteracao: decoded.permissaoUsuario.alteracao,
-          relatorio: decoded.permissaoUsuario.relatorio,
-          advertencia: decoded.permissaoUsuario.advertencia
+
+  if (!token) {
+    res
+      .status(codes.UNAUTHORIZED)
+      .json({ erros: ["Token não fornecido"], data: null });
+  } else {
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, config.secret as string) as {
+          usuario: IUsuario;
+        };
+        const estaAtivo = await UsuarioService.verificaAtivo(
+          decoded.usuario.id,
+          decoded.usuario.nome,
+          decoded.usuario.login
+        );
+        if (!estaAtivo) {
+          res
+            .status(codes.UNAUTHORIZED)
+            .json({ erros: ["Usuário inativo"], data: null });
+          return;
         }
-      };
-      const estaAtivo = await UsuarioService.verificaAtivo(decoded.id, decoded.nome, decoded.login);
-      if (!estaAtivo) {
-        res.status(codes.UNAUTHORIZED).json({ erros: ["Usuário inativo"], data: null });
-        return;
+        const usuario = decoded.usuario;
+
+        if (req.body == null || req.body == undefined) {
+          req.body = {};
+        }
+
+        req.body.usuario = {
+          id: usuario.id,
+          nome: usuario.nome,
+          login: usuario.login,
+          ativo: usuario.ativo,
+          idPermissao: usuario.idPermissao,
+          permissaoUsuario: {
+            id: usuario.idPermissao,
+            nomePermissao: usuario.permissaoUsuario.nomePermissao,
+            geral: usuario.permissaoUsuario.geral,
+            cadastro: usuario.permissaoUsuario.cadastro,
+            alteracao: usuario.permissaoUsuario.alteracao,
+            relatorio: usuario.permissaoUsuario.relatorio,
+            advertencia: usuario.permissaoUsuario.advertencia,
+          },
+        };
+
+        next();
+      } catch (error) {
+        res
+          .status(codes.UNAUTHORIZED)
+          .json({ erros: ["Token inválido"], data: null });
       }
-    } catch (error) {
-      res.status(codes.UNAUTHORIZED).json({ erros: ["Token inválido"], data: null });
     }
   }
-  next();
 }
-

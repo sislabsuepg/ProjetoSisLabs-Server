@@ -100,8 +100,8 @@ class AlunoController {
   }
 
   async login(req: Request, res: Response) {
-    const { ra, senha } = req.body;
-    const { erros, data } = await AlunoService.loginAluno(ra, senha);
+    const { login, senha } = req.body;
+    const { erros, data } = await AlunoService.loginAluno(login, senha);
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
     } else {
