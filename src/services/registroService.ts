@@ -1,11 +1,27 @@
+import { Op, where } from "sequelize";
 import Registro from "../models/Registro.js";
 import Usuario from "../models/Usuario.js";
 import { getPaginationParams } from "../types/pagination.js";
 export default class RegistroService {
-  static async getAllRegistros(offset?: number, limit?: number) {
+  static async getAllRegistros(
+    data1?: Date | undefined,
+    data2?: Date | undefined,
+    page?: number,
+    itens?: number
+  ) {
     try {
-      const registros = await Registro.findAll({
-        ...getPaginationParams(offset, limit),
+      let where = {};
+      if (data1 !== undefined && data2 !== undefined) {
+        where = {
+          dataHora: {
+            [Op.between]: [data1, data2],
+          },
+        };
+      }
+
+      const { rows: registros, count: total } = await Registro.findAndCountAll({
+        where,
+        ...getPaginationParams(page, itens),
         include: [
           {
             model: Usuario,
@@ -20,7 +36,7 @@ export default class RegistroService {
           data: null,
         };
       }
-      return { erros: [], data: registros };
+      return { erros: [], data: { registros, total } };
     } catch (e) {
       console.log(e);
       return {
@@ -57,10 +73,28 @@ export default class RegistroService {
     }
   }
 
-  static async getRegistroByUserId(userId: number) {
+  static async getRegistroByUserId(
+    userId: number,
+    data1?: Date | undefined,
+    data2?: Date | undefined,
+    itens?: number,
+    page?: number
+  ) {
     try {
-      const registros = await Registro.findAll({
-        where: { idUsuario: userId },
+      let where: any = { idUsuario: userId };
+      if (data1 !== undefined && data2 !== undefined) {
+        where.dataHora = {
+          [Op.between]: [data1, data2],
+        };
+      }
+      if (itens && page) {
+        where = {
+          ...where,
+        };
+      }
+      const { rows: registros, count: total } = await Registro.findAndCountAll({
+        where,
+        ...getPaginationParams(page, itens),
         include: [
           {
             model: Usuario,
@@ -75,7 +109,7 @@ export default class RegistroService {
           data: null,
         };
       }
-      return { erros: [], data: registros };
+      return { erros: [], data: { registros, total } };
     } catch (e) {
       console.log(e);
       return {

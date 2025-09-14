@@ -8,10 +8,4 @@ router.get("/", lockPath("geral"), RegistroController.index);
 
 router.get("/count", lockPath("geral"), RegistroController.count);
 
-router.get("/:id", lockPath("geral"), RegistroController.show);
-
-router.get("/user/:userId", lockPath("geral"), RegistroController.showByUserId);
-
-router.post("/", lockPath("geral"), RegistroController.create);
-
 export default router;
