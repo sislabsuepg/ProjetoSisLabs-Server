@@ -34,9 +34,13 @@ export default class HorarioService {
         };
       }
 
+      const labsFiltrados = labsComHorarios.filter(
+        (lab) => lab.horarios && lab.horarios.length > 0
+      );
+
       return {
         erros: [],
-        data: labsComHorarios,
+        data: labsFiltrados,
       };
     } catch (e) {
       console.log(e);
@@ -195,8 +199,8 @@ export default class HorarioService {
 
   static async updateHorario(
     id: number,
-    idProfessor: number,
-    semestral: boolean
+    idProfessor?: number,
+    semestral?: boolean
   ) {
     try {
       const horarioExistente = await Horario.findByPk(id);
@@ -207,28 +211,22 @@ export default class HorarioService {
         };
       }
 
-      if (!idProfessor && !semestral) {
-        return {
-          erros: ["ID do professor ou semestral são obrigatórios"],
-          data: null,
-        };
-      }
+      let professor: Professor | null = null;
 
       if (idProfessor) {
-        const professor = await Professor.findByPk(idProfessor);
+        professor = await Professor.findByPk(idProfessor);
         if (!professor) {
           return {
             erros: ["Professor não encontrado"],
             data: null,
           };
         }
-        horarioExistente.professor = professor;
       }
 
-      horarioExistente.semestral =
-        semestral == undefined ? horarioExistente.semestral : semestral;
-
-      await horarioExistente.save();
+      await horarioExistente.update({
+        idProfessor,
+        semestral: semestral || false,
+      });
 
       return {
         erros: [],

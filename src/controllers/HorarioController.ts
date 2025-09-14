@@ -24,10 +24,19 @@ class HorarioController {
 
   async showDiaSemana(req: Request, res: Response) {
     const { diaSemana } = req.params;
-    if (isNaN(Number(diaSemana)) || Number(diaSemana) < 1 || Number(diaSemana) > 6) {
-      res.status(codes.BAD_REQUEST).json({ erros: ["diaSemana deve ser um número entre 1 e 6"], data: null });
-    }else{
-      const { erros, data } = await HorarioService.getHorariosByDiaSemana(Number(diaSemana));
+    if (
+      isNaN(Number(diaSemana)) ||
+      Number(diaSemana) < 1 ||
+      Number(diaSemana) > 6
+    ) {
+      res.status(codes.BAD_REQUEST).json({
+        erros: ["diaSemana deve ser um número entre 1 e 6"],
+        data: null,
+      });
+    } else {
+      const { erros, data } = await HorarioService.getHorariosByDiaSemana(
+        Number(diaSemana)
+      );
       if (erros.length > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
       } else {

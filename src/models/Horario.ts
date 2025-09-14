@@ -19,10 +19,11 @@ interface HorarioAtributos {
   horario: string;
   semestral: boolean;
   idLaboratorio: number;
+  idProfessor: number;
 }
 
 interface HorarioCreationAtributos
-  extends Optional<HorarioAtributos, "id" | "semestral"> {}
+  extends Optional<HorarioAtributos, "id" | "semestral" | "idProfessor"> {}
 
 @Table({
   tableName: "horario",
@@ -62,7 +63,7 @@ export default class Horario extends Model<
     foreignKey: "idProfessor",
     targetKey: "id",
   })
-  declare professor: Professor;
+  declare professor: Professor | null;
 
   @BelongsTo(() => Laboratorio, {
     foreignKey: "idLaboratorio",
