@@ -43,7 +43,7 @@ class CursoController {
 
   async store(req: Request, res: Response) {
     const { nome, anosMaximo } = req.body;
-    const { erros, data } = await CursoService.createCurso(nome, anosMaximo);
+  const { erros, data } = await CursoService.createCurso(nome, anosMaximo, req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {
@@ -58,7 +58,8 @@ class CursoController {
       id,
       nome,
       anosMaximo,
-      ativo
+      ativo,
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -69,7 +70,7 @@ class CursoController {
 
   async destroy(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const { erros, data } = await CursoService.deleteCurso(id);
+  const { erros, data } = await CursoService.deleteCurso(id, req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {

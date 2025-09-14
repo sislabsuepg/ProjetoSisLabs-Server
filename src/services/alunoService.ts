@@ -4,6 +4,7 @@ import config from "../config/config.js";
 import jwt from "jsonwebtoken";
 import Curso from "../models/Curso.js";
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
     const erros: string[] = [];
@@ -259,7 +260,8 @@ export default class AlunoService {
     anoCurso: number,
     email: string,
     senha: string,
-    idCurso: number
+    idCurso: number,
+    idUsuario?: number
   ) {
     try {
       if (!nome || !ra || !anoCurso || !senha || !idCurso) {
@@ -336,10 +338,9 @@ export default class AlunoService {
       aluno.senha = ""; // Não retornar a senha no response
       aluno.curso = curso; // Incluir o curso no response
 
-      return {
-        erros: [],
-        data: aluno,
-      };
+      // registrar ação
+      criarRegistro(idUsuario, `Aluno criado: ra=${ra}`);
+      return { erros: [], data: aluno };
     } catch (e) {
       console.log(e);
       return {
@@ -355,7 +356,8 @@ export default class AlunoService {
     telefone?: string,
     anoCurso?: number,
     email?: string,
-    ativo?: boolean
+    ativo?: boolean,
+    idUsuario?: number
   ) {
     try {
       const aluno = await Aluno.findByPk(id, {
@@ -413,10 +415,8 @@ export default class AlunoService {
 
       const alunoAtualizado = await aluno.save();
 
-      return {
-        erros: [],
-        data: alunoAtualizado,
-      };
+      criarRegistro(idUsuario, `Aluno atualizado: id=${id}`);
+      return { erros: [], data: alunoAtualizado };
     } catch (e) {
       console.log(e);
       return {
@@ -426,7 +426,7 @@ export default class AlunoService {
     }
   }
 
-  static async updateSenhaAluno(ra: string, novaSenha: string) {
+  static async updateSenhaAluno(ra: string, novaSenha: string, idUsuario?: number) {
     try {
       const aluno = await Aluno.findByPk(ra);
       if (!aluno) {
@@ -446,10 +446,8 @@ export default class AlunoService {
       aluno.atualizaSenha(novaSenha);
       await aluno.save();
 
-      return {
-        erros: [],
-        data: ["Senha atualizada com sucesso"],
-      };
+      criarRegistro(idUsuario, `Aluno senha atualizada: ra=${ra}`);
+      return { erros: [], data: ["Senha atualizada com sucesso"] };
     } catch (e) {
       console.log(e);
       return {
@@ -459,7 +457,7 @@ export default class AlunoService {
     }
   }
 
-  static async deleteAluno(ra: string) {
+  static async deleteAluno(ra: string, idUsuario?: number) {
     try {
       const aluno = await Aluno.findByPk(ra);
       if (!aluno) {
@@ -472,10 +470,8 @@ export default class AlunoService {
       aluno.ativo = false;
       await aluno.save();
 
-      return {
-        erros: [],
-        data: null,
-      };
+      criarRegistro(idUsuario, `Aluno desativado: ra=${ra}`);
+      return { erros: [], data: null };
     } catch (e) {
       console.log(e);
       return {
@@ -485,7 +481,7 @@ export default class AlunoService {
     }
   }
 
-  static async loginAluno(ra: string, senha: string) {
+  static async loginAluno(ra: string, senha: string, idUsuario?: number) {
     try {
       const aluno: Aluno | null = await Aluno.findOne({
         where: {
@@ -519,10 +515,8 @@ export default class AlunoService {
         expiresIn: expires,
       });
 
-      return {
-        erros: [],
-        data: { aluno, token },
-      };
+      criarRegistro(idUsuario, `Aluno login: ra=${ra}`);
+      return { erros: [], data: { aluno, token } };
     } catch (e) {
       console.log(e);
       return {

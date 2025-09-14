@@ -52,7 +52,8 @@ class AlunoController {
       anoCurso,
       email,
       senha,
-      idCurso
+      idCurso,
+      req.body.idUsuario
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -70,7 +71,8 @@ class AlunoController {
       telefone,
       anoCurso,
       email,
-      ativo
+      ativo,
+      req.body.idUsuario
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
@@ -91,7 +93,7 @@ class AlunoController {
 
   async destroy(req: Request, res: Response) {
     const { id } = req.params;
-    const { erros, data } = await AlunoService.deleteAluno(id);
+  const { erros, data } = await AlunoService.deleteAluno(id, req.body.idUsuario);
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
     } else {
@@ -101,7 +103,7 @@ class AlunoController {
 
   async login(req: Request, res: Response) {
     const { login, senha } = req.body;
-    const { erros, data } = await AlunoService.loginAluno(login, senha);
+  const { erros, data } = await AlunoService.loginAluno(login, senha, req.body.idUsuario);
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
     } else {

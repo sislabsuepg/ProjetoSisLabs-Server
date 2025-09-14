@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import Evento from "../models/Evento.js";
 import Laboratorio from "../models/Laboratorio.js";
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 export default class EventoService {
   static verificaData(data: Date): string[] {
     const erros: string[] = [];
@@ -112,7 +113,8 @@ export default class EventoService {
     data: Date,
     duracao: number,
     responsavel: string,
-    idLaboratorio: number
+    idLaboratorio: number,
+    idUsuario?: number
   ) {
     try {
       if (!data || !nome || !duracao || !responsavel || !idLaboratorio) {
@@ -142,10 +144,8 @@ export default class EventoService {
         responsavel,
         idLaboratorio,
       });
-      return {
-        erros: [],
-        data: evento,
-      };
+      await criarRegistro(idUsuario, `Evento criado: nome=${nome}`);
+      return { erros: [], data: evento };
     } catch (e) {
       console.log(e);
       return {
@@ -161,7 +161,8 @@ export default class EventoService {
     data?: Date,
     duracao?: number,
     responsavel?: string,
-    idLaboratorio?: number
+    idLaboratorio?: number,
+    idUsuario?: number
   ) {
     try {
       const evento = await Evento.findByPk(id);
@@ -208,10 +209,8 @@ export default class EventoService {
       evento.nome = nome || evento.nome;
 
       await evento.save();
-      return {
-        erros: [],
-        data: evento,
-      };
+      await criarRegistro(idUsuario, `Evento atualizado: id=${id}`);
+      return { erros: [], data: evento };
     } catch (e) {
       console.log(e);
       return {
@@ -221,7 +220,7 @@ export default class EventoService {
     }
   }
 
-  static async deleteEvento(id: number) {
+  static async deleteEvento(id: number, idUsuario?: number) {
     try {
       const evento = await Evento.findByPk(id);
       if (!evento) {
@@ -231,10 +230,8 @@ export default class EventoService {
         };
       }
       await evento.destroy();
-      return {
-        erros: [],
-        data: null,
-      };
+      await criarRegistro(idUsuario, `Evento removido: id=${id}`);
+      return { erros: [], data: null };
     } catch (e) {
       console.log(e);
       return {

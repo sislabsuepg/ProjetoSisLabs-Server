@@ -1,8 +1,7 @@
 import PermissaoUsuario from "../models/PermissaoUsuario.js";
-
 import { Op } from "sequelize";
-
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 export default class PermissaoUsuarioService {
   static verificaNomePermissao(nomePermissao: string): string[] {
     const erros: string[] = [];
@@ -114,7 +113,8 @@ export default class PermissaoUsuarioService {
     cadastro?: boolean,
     alteracao?: boolean,
     relatorio?: boolean,
-    excluir?: boolean
+    excluir?: boolean,
+    idUsuario?: number
   ) {
     try {
       const permissaoUsuarioExistente = await PermissaoUsuario.findOne({
@@ -142,14 +142,9 @@ export default class PermissaoUsuarioService {
         advertencia: excluir || false,
       };
 
-      const permissaoUsuario = await PermissaoUsuario.create(
-        novaPermissaoUsuario
-      );
-
-      return {
-        erros: [],
-        data: permissaoUsuario,
-      };
+      const permissaoUsuario = await PermissaoUsuario.create(novaPermissaoUsuario);
+      await criarRegistro(idUsuario, `Permissao criada: nome=${nomePermissao}`);
+      return { erros: [], data: permissaoUsuario };
     } catch (e) {
       console.log(e);
       return {
@@ -167,7 +162,8 @@ export default class PermissaoUsuarioService {
     alteracao?: boolean,
     relatorio?: boolean,
     advertencia?: boolean,
-    ativo?: boolean
+    ativo?: boolean,
+    idUsuario?: number
   ) {
     try {
       const permissaoUsuario = await PermissaoUsuario.findByPk(id);
@@ -221,11 +217,8 @@ export default class PermissaoUsuarioService {
         ativo == undefined ? permissaoUsuario.ativo : ativo;
 
       await permissaoUsuario.save();
-
-      return {
-        erros: [],
-        data: permissaoUsuario,
-      };
+      await criarRegistro(idUsuario, `Permissao atualizada: id=${id}`);
+      return { erros: [], data: permissaoUsuario };
     } catch (e) {
       console.log(e);
       return {
@@ -235,7 +228,7 @@ export default class PermissaoUsuarioService {
     }
   }
 
-  static async deletePermissaoUsuario(id: number) {
+  static async deletePermissaoUsuario(id: number, idUsuario?: number) {
     try {
       const permissaoUsuario = await PermissaoUsuario.findByPk(id);
       if (!permissaoUsuario) {
@@ -247,11 +240,8 @@ export default class PermissaoUsuarioService {
 
       permissaoUsuario.ativo = false;
       await permissaoUsuario.save();
-
-      return {
-        erros: [],
-        data: ["Permissão de usuario desativada com sucesso"],
-      };
+      await criarRegistro(idUsuario, `Permissao removida: id=${id}`);
+      return { erros: [], data: ["Permissão de usuario desativada com sucesso"] };
     } catch (e) {
       console.log(e);
       return {

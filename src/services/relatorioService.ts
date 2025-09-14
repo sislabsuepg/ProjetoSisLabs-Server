@@ -1,15 +1,15 @@
 import PDFDocument from 'pdfkit';
 import { Response } from 'express';
 import { addTabela, addCabecalho, CORES } from '../utils/pdfGenerator';
-
 import Emprestimo from '../models/Emprestimo';
 import Aluno from '../models/Aluno';
 import Laboratorio from '../models/Laboratorio';
 import Curso from '../models/Curso';
 import { Op } from 'sequelize';
+import { criarRegistro } from '../utils/registroLogger.js';
 
 export default class RelatorioService {
-    async gerarRelatorioAcademicoPorCurso(cursoId: number, res: Response) {
+    async gerarRelatorioAcademicoPorCurso(cursoId: number, res: Response, idUsuario?: number) {
         const doc = new PDFDocument({ margin: 50, size: 'A4' });
         doc.pipe(res);
 
@@ -50,6 +50,7 @@ export default class RelatorioService {
         addRodape(pageNumber);
 
         try {
+            await criarRegistro(idUsuario, `Relatorio academico por curso: cursoId=${cursoId}`);
             const curso = await Curso.findByPk(cursoId);
             const nomeCurso = curso ? curso.nome : `Curso ID ${cursoId}`;
             const tituloCabacalho = `Acadêmicos de ${nomeCurso}`
@@ -120,7 +121,7 @@ export default class RelatorioService {
         }
     }
 
-    async gerarRelatorioAcademico(alunoId: number, res: Response) {
+    async gerarRelatorioAcademico(alunoId: number, res: Response, idUsuario?: number) {
         const doc = new PDFDocument({ margin: 50, size: 'A4' });
         doc.pipe(res);
 
@@ -157,6 +158,7 @@ export default class RelatorioService {
         addRodape(pageNumber);
 
         try {
+            await criarRegistro(idUsuario, `Relatorio academico: alunoId=${alunoId}`);
             const aluno = await Aluno.findByPk(alunoId);
             const nomeAluno = aluno ? aluno.nome : `Aluno ID ${alunoId}`;
             
@@ -226,7 +228,7 @@ export default class RelatorioService {
     }
 
     //Se não fornecer os dados retorna tudo
-    async gerarRelatorioEmprestimo(laboratorioId: number | null, dataInicio: Date | null, dataFim: Date | null, res: Response) {
+    async gerarRelatorioEmprestimo(laboratorioId: number | null, dataInicio: Date | null, dataFim: Date | null, res: Response, idUsuario?: number) {
         const doc = new PDFDocument({ margin: 50, size: 'A4' });
         doc.pipe(res);
 
@@ -263,6 +265,7 @@ export default class RelatorioService {
         addRodape(pageNumber);
 
         try {
+            await criarRegistro(idUsuario, `Relatorio emprestimo: lab=${laboratorioId || 'todos'}`);
             const whereClause: any = {};
             if (laboratorioId) {
                 whereClause['$laboratorio.id$'] = laboratorioId;

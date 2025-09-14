@@ -31,7 +31,7 @@ class ProfessorController {
 
   async create(req: Request, res: Response) {
     const { nome, email } = req.body;
-    const { erros, data } = await professorService.createProfessor(nome, email);
+  const { erros, data } = await professorService.createProfessor(nome, email, req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {
@@ -46,7 +46,8 @@ class ProfessorController {
       Number(id),
       nome,
       email,
-      ativo
+      ativo,
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -57,7 +58,7 @@ class ProfessorController {
 
   async destroy(req: Request, res: Response) {
     const { id } = req.params;
-    const { erros, data } = await professorService.deleteProfessor(Number(id));
+  const { erros, data } = await professorService.deleteProfessor(Number(id), req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {

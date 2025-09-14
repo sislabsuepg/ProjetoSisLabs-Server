@@ -59,7 +59,8 @@ class LaboratorioController {
       numero,
       nome,
       restrito,
-      gerarFlag
+      gerarFlag,
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -76,7 +77,8 @@ class LaboratorioController {
       numero,
       nome,
       restrito,
-      ativo
+      ativo,
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -88,7 +90,8 @@ class LaboratorioController {
   async destroy(req: Request, res: Response) {
     const { id } = req.params;
     const { erros, data } = await laboratorioService.deleteLaboratorio(
-      Number(id)
+      Number(id),
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });

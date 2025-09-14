@@ -2,6 +2,7 @@ import Laboratorio from "../models/Laboratorio.js";
 import horarioCreatorHelper from "../utils/horarioCreatorHelper.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 
 export default class laboratorioService {
   static verificaNumero(numero: string): string[] {
@@ -102,7 +103,8 @@ export default class laboratorioService {
     numero: string,
     nome: string,
     restrito?: boolean,
-    gerarHorarios?: boolean
+    gerarHorarios?: boolean,
+    idUsuario?: number
   ) {
     try {
       const erros = [
@@ -139,10 +141,11 @@ export default class laboratorioService {
           console.error("Falha ao gerar horários automaticamente", e);
         }
       }
-      return {
-        erros: [],
-        data: { laboratorio, horarios },
-      };
+      await criarRegistro(
+        idUsuario,
+        `Laboratorio criado: nome=${nome} numero=${numero}`
+      );
+      return { erros: [], data: { laboratorio, horarios } };
     } catch (error) {
       return {
         erros: ["Erro ao criar laboratório"],
@@ -156,7 +159,8 @@ export default class laboratorioService {
     numero?: string,
     nome?: string,
     restrito?: boolean,
-    ativo?: boolean
+    ativo?: boolean,
+    idUsuario?: number
   ) {
     try {
       const laboratorio = await Laboratorio.findByPk(id);
@@ -188,10 +192,8 @@ export default class laboratorioService {
         restrito == undefined ? laboratorio.restrito : restrito;
       laboratorio.ativo = ativo === undefined ? laboratorio.ativo : ativo;
       await laboratorio.save();
-      return {
-        erros: [],
-        data: laboratorio,
-      };
+      await criarRegistro(idUsuario, `Laboratorio atualizado: id=${id}`);
+      return { erros: [], data: laboratorio };
     } catch (error) {
       return {
         erros: ["Erro ao atualizar laboratório"],
@@ -200,7 +202,7 @@ export default class laboratorioService {
     }
   }
 
-  static async deleteLaboratorio(id: number) {
+  static async deleteLaboratorio(id: number, idUsuario?: number) {
     try {
       const laboratorio = await Laboratorio.findByPk(id);
       if (!laboratorio) {
@@ -211,10 +213,8 @@ export default class laboratorioService {
       }
       laboratorio.ativo = false;
       await laboratorio.save();
-      return {
-        erros: [],
-        data: null,
-      };
+      await criarRegistro(idUsuario, `Laboratorio desativado: id=${id}`);
+      return { erros: [], data: null };
     } catch (error) {
       return {
         erros: ["Erro ao desativar laboratório"],

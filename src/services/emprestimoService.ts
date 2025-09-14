@@ -5,6 +5,7 @@ import Emprestimo from "../models/Emprestimo.js";
 import Orientacao from "../models/Orientacao.js";
 import { getPaginationParams } from "../types/pagination.js";
 import { Op } from "sequelize";
+import { criarRegistro } from "../utils/registroLogger.js";
 export default class EmprestimoService {
   static async getAllEmprestimos(offset?: number, limit?: number) {
     try {
@@ -102,7 +103,8 @@ export default class EmprestimoService {
   static async createEmprestimo(
     idLaboratorio: number,
     idAluno: number,
-    idUsuario: number
+    idUsuario: number,
+    idUsuarioExecutor?: number
   ) {
     try {
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
@@ -149,21 +151,25 @@ export default class EmprestimoService {
         idAluno: idAluno,
         idUsuarioEntrada: idUsuario,
       });
-
-      return {
-  erros: [],
-  data: emprestimo,
-      };
+      await criarRegistro(
+        idUsuarioExecutor,
+        `Emprestimo criado: idLaboratorio=${idLaboratorio} idAluno=${idAluno}`
+      );
+      return { erros: [], data: emprestimo };
     } catch (e) {
       console.log(e);
       return {
-  erros: ["Erro ao criar empréstimo"],
-  data: null,
+        erros: ["Erro ao criar empréstimo"],
+        data: null,
       };
     }
   }
 
-  static async closeEmprestimo(id: number, idUsuarioSaida: number) {
+  static async closeEmprestimo(
+    id: number,
+    idUsuarioSaida: number,
+    idUsuarioExecutor?: number
+  ) {
     try {
       const emprestimo = await Emprestimo.findByPk(id, {
         include: [
@@ -207,21 +213,25 @@ export default class EmprestimoService {
         dataHoraSaida: new Date(),
         idUsuarioSaida: idUsuarioSaida,
       });
-
-      return {
-  erros: [],
-  data: emprestimoAtualizado,
-      };
+      await criarRegistro(
+        idUsuarioExecutor,
+        `Emprestimo fechado: id=${id}`
+      );
+      return { erros: [], data: emprestimoAtualizado };
     } catch (e) {
       console.log(e);
       return {
-  erros: ["Erro ao fechar empréstimo"],
-  data: null,
+        erros: ["Erro ao fechar empréstimo"],
+        data: null,
       };
     }
   }
 
-  static async updateAdvertencia(id: number, advertencia: string) {
+  static async updateAdvertencia(
+    id: number,
+    advertencia: string,
+    idUsuarioExecutor?: number
+  ) {
     try {
       const emprestimo = await Emprestimo.findByPk(id);
       if (!emprestimo) {
@@ -233,16 +243,16 @@ export default class EmprestimoService {
 
       emprestimo.advertencia = advertencia;
       await emprestimo.save();
-
-      return {
-  erros: [],
-  data: emprestimo,
-      };
+      await criarRegistro(
+        idUsuarioExecutor,
+        `Emprestimo advertencia atualizada: id=${id}`
+      );
+      return { erros: [], data: emprestimo };
     } catch (e) {
       console.log(e);
       return {
-  erros: ["Erro ao atualizar advertência"],
-  data: null,
+        erros: ["Erro ao atualizar advertência"],
+        data: null,
       };
     }
   }

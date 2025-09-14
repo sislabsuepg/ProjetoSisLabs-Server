@@ -1,6 +1,7 @@
 import Professor from "../models/Professor.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 
 export default class professorService {
   static verificaNome(nome: string): string[] {
@@ -107,7 +108,7 @@ export default class professorService {
     }
   }
 
-  static async createProfessor(nome: string, email: string) {
+  static async createProfessor(nome: string, email: string, idUsuario?: number) {
     try {
       const erros = [...this.verificaNome(nome), ...this.verificaEmail(email)];
       if (erros.length > 0) {
@@ -129,10 +130,8 @@ export default class professorService {
         };
       }
       const professor = await Professor.create({ nome, email, ativo: true });
-      return {
-        erros: [],
-        data: professor,
-      };
+      await criarRegistro(idUsuario, `Professor criado: nome=${nome}`);
+      return { erros: [], data: professor };
     } catch (e) {
       console.log(e);
       return {
@@ -146,7 +145,8 @@ export default class professorService {
     id: number,
     nome?: string,
     email?: string,
-    ativo?: boolean
+    ativo?: boolean,
+    idUsuario?: number
   ) {
     try {
       if (!nome && !email && ativo === undefined) {
@@ -177,10 +177,8 @@ export default class professorService {
       professor.ativo = ativo == undefined ? professor.ativo : ativo;
 
       await professor.save();
-      return {
-        erros: [],
-        data: professor,
-      };
+      await criarRegistro(idUsuario, `Professor atualizado: id=${id}`);
+      return { erros: [], data: professor };
     } catch (e) {
       console.log(e);
       return {
@@ -190,7 +188,7 @@ export default class professorService {
     }
   }
 
-  static async deleteProfessor(id: number) {
+  static async deleteProfessor(id: number, idUsuario?: number) {
     try {
       const professor = await Professor.findByPk(id);
       if (!professor) {
@@ -201,10 +199,8 @@ export default class professorService {
       }
       professor.ativo = false;
       await professor.save();
-      return {
-        erros: [],
-        data: null,
-      };
+      await criarRegistro(idUsuario, `Professor removido: id=${id}`);
+      return { erros: [], data: null };
     } catch (e) {
       console.log(e);
       return {

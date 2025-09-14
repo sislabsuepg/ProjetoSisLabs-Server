@@ -20,7 +20,7 @@ class RelatorioController {
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename=relatorio_academicos_curso_${cursoId}.pdf`);
             
-            await relatorioService.gerarRelatorioAcademicoPorCurso(Number(cursoId), res);
+            await relatorioService.gerarRelatorioAcademicoPorCurso(Number(cursoId), res, (req.body as any)?.idUsuario);
 
         } catch (error) {
             if (!res.headersSent) {
@@ -42,7 +42,7 @@ class RelatorioController {
         try {
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename=relatorio_academico_RA_${alunoId}.pdf`);
-            await relatorioService.gerarRelatorioAcademico(Number(alunoId), res);
+            await relatorioService.gerarRelatorioAcademico(Number(alunoId), res, (req.body as any)?.idUsuario);
 
         } catch (error) {
             if (!res.headersSent) {
@@ -62,7 +62,8 @@ class RelatorioController {
                 laboratorioId ? Number(laboratorioId) : null,
                 dataInicio ? new Date(dataInicio as string) : null,
                 dataFim ? new Date(dataFim as string) : null,
-                res
+                res,
+                (req.body as any)?.idUsuario
             );
 
         } catch (error) {

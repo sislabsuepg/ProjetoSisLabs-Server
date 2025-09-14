@@ -1,0 +1,10 @@
+GET http://localhost:3400/relatorio/AcademicoPorCurso?cursoId=1
+
+###
+
+GET http://localhost:3400/relatorio/Academico?alunoId=1
+
+
+###
+
+GET http://localhost:3400/relatorio/emprestimo?laboratorioId=1&dataInicio=2025-09-12T00:00:00.000Z&dataFim=2025-09-13T00:00:00.000Z

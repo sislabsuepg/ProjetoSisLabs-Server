@@ -1,5 +1,6 @@
 import Recado from "../models/Recado.js";
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 export default class RecadoService {
   static verificaTexto(texto: string) {
     const erros: string[] = [];
@@ -60,7 +61,7 @@ export default class RecadoService {
     }
   }
 
-  static async createRecado(texto: string) {
+  static async createRecado(texto: string, idUsuario?: number) {
     try {
       const erros: string[] = this.verificaTexto(texto);
       if (erros.length > 0) {
@@ -71,10 +72,8 @@ export default class RecadoService {
       }
 
       const recado = await Recado.create({ texto });
-      return {
-        erros: [],
-        data: recado,
-      };
+      await criarRegistro(idUsuario, `Recado criado`);
+      return { erros: [], data: recado };
     } catch (e) {
       console.log(e);
       return {
@@ -84,7 +83,7 @@ export default class RecadoService {
     }
   }
 
-  static async updateRecado(id: number, texto: string) {
+  static async updateRecado(id: number, texto: string, idUsuario?: number) {
     try {
       const recado = await Recado.findByPk(id);
       if (!recado) {
@@ -103,10 +102,8 @@ export default class RecadoService {
 
       recado.texto = texto;
       await recado.save();
-      return {
-        erros: [],
-        data: recado,
-      };
+      await criarRegistro(idUsuario, `Recado atualizado: id=${id}`);
+      return { erros: [], data: recado };
     } catch (e) {
       console.log(e);
       return {
@@ -116,7 +113,7 @@ export default class RecadoService {
     }
   }
 
-  static async deleteRecado(id: number) {
+  static async deleteRecado(id: number, idUsuario?: number) {
     try {
       const recado = await Recado.findByPk(id);
       if (!recado) {
@@ -126,10 +123,8 @@ export default class RecadoService {
         };
       }
       await recado.destroy();
-      return {
-        erros: [],
-        data: recado,
-      };
+      await criarRegistro(idUsuario, `Recado removido: id=${id}`);
+      return { erros: [], data: recado };
     } catch (e) {
       console.log(e);
       return {

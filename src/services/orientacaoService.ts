@@ -4,6 +4,7 @@ import Laboratorio from "../models/Laboratorio.js";
 import Orientacao from "../models/Orientacao.js";
 import Professor from "../models/Professor.js";
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 
 function getAtivo(ativo: boolean | undefined): {} {
   if (ativo === true) {
@@ -162,7 +163,8 @@ export default class OrientacaoService {
     dataFim: Date,
     idAluno: number,
     idProfessor: number,
-    idLaboratorio: number
+    idLaboratorio: number,
+    idUsuario?: number
   ) {
     try {
       if (!dataFim || !idAluno || !idProfessor || !idLaboratorio) {
@@ -207,11 +209,11 @@ export default class OrientacaoService {
         idProfessor,
         idLaboratorio,
       });
-
-      return {
-        erros: [],
-        data: novaOrientacao,
-      };
+      await criarRegistro(
+        idUsuario,
+        `Orientacao criada: aluno=${idAluno} lab=${idLaboratorio}`
+      );
+      return { erros: [], data: novaOrientacao };
     } catch (error) {
       console.log(error);
       return {
@@ -221,7 +223,12 @@ export default class OrientacaoService {
     }
   }
 
-  static async updateOrientacao(id: number, dataInicio?: Date, dataFim?: Date) {
+  static async updateOrientacao(
+    id: number,
+    dataInicio?: Date,
+    dataFim?: Date,
+    idUsuario?: number
+  ) {
     try {
       if (!dataInicio && !dataFim) {
         return {
@@ -270,11 +277,8 @@ export default class OrientacaoService {
       orientacao.dataFim = dataFim || orientacao.dataFim;
 
       await orientacao.save();
-
-      return {
-        erros: [],
-        data: orientacao,
-      };
+      await criarRegistro(idUsuario, `Orientacao atualizada: id=${id}`);
+      return { erros: [], data: orientacao };
     } catch (error) {
       console.log(error);
       return {
@@ -284,7 +288,7 @@ export default class OrientacaoService {
     }
   }
 
-  static async deleteOrientacao(id: number) {
+  static async deleteOrientacao(id: number, idUsuario?: number) {
     try {
       const orientacao = await Orientacao.findByPk(id);
       if (!orientacao) {
@@ -306,11 +310,8 @@ export default class OrientacaoService {
       }
       orientacao.dataFim = new Date();
       await orientacao.save();
-
-      return {
-        erros: [],
-        data: ["Orientação desativada com sucesso"],
-      };
+      await criarRegistro(idUsuario, `Orientacao removida: id=${id}`);
+      return { erros: [], data: ["Orientação desativada com sucesso"] };
     } catch (error) {
       console.log(error);
       return {

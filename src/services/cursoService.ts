@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import Curso from "../models/Curso.js";
 import { getPaginationParams } from "../types/pagination.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 export default class CursoService {
   static verificaNome(nome: string): string[] {
     const erros: string[] = [];
@@ -112,7 +113,7 @@ export default class CursoService {
     }
   }
 
-  static async createCurso(nome: string, anosMaximo: number) {
+  static async createCurso(nome: string, anosMaximo: number, idUsuario?: number) {
     try {
       const erros: string[] = [
         ...CursoService.verificaNome(nome),
@@ -134,6 +135,7 @@ export default class CursoService {
       }
 
       const curso = await Curso.create({ nome: nome, anosMaximo: anosMaximo });
+      await criarRegistro(idUsuario, `Curso criado: nome=${nome}`);
       return {
         erros: [],
         data: curso,
@@ -151,7 +153,8 @@ export default class CursoService {
     id: number,
     nome?: string,
     anosMaximo?: number,
-    ativo?: boolean
+    ativo?: boolean,
+    idUsuario?: number
   ) {
     try {
       if (!nome && !anosMaximo && ativo === undefined) {
@@ -183,6 +186,7 @@ export default class CursoService {
         anosMaximo == undefined ? curso.anosMaximo : anosMaximo;
       curso.ativo = ativo === undefined ? curso.ativo : ativo;
       await curso.save();
+      await criarRegistro(idUsuario, `Curso atualizado: id=${id}`);
       return {
         erros: [],
         data: curso,
@@ -196,7 +200,7 @@ export default class CursoService {
     }
   }
 
-  static async deleteCurso(id: number) {
+  static async deleteCurso(id: number, idUsuario?: number) {
     try {
       const curso = await Curso.findByPk(id);
       if (!curso) {
@@ -207,6 +211,7 @@ export default class CursoService {
       }
       curso.ativo = false;
       await curso.save();
+      await criarRegistro(idUsuario, `Curso desativado: id=${id}`);
       return {
         erros: [],
         data: null,

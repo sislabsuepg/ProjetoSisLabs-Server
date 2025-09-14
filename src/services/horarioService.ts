@@ -1,6 +1,7 @@
 import Horario from "../models/Horario.js";
 import Professor from "../models/Professor.js";
 import Laboratorio from "../models/Laboratorio.js";
+import { criarRegistro } from "../utils/registroLogger.js";
 
 export default class HorarioService {
   static verificaDiaSemana(diaSemana: number): string[] {
@@ -140,7 +141,8 @@ export default class HorarioService {
   static async createHorario(
     diaSemana: number,
     horario: string,
-    idLaboratorio: number
+    idLaboratorio: number,
+    idUsuario?: number
   ) {
     try {
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
@@ -183,11 +185,11 @@ export default class HorarioService {
         horario,
         idLaboratorio,
       });
-
-      return {
-        erros: [],
-        data: novoHorario,
-      };
+      await criarRegistro(
+        idUsuario,
+        `Horario criado: dia=${diaSemana} lab=${idLaboratorio}`
+      );
+      return { erros: [], data: novoHorario };
     } catch (e) {
       console.log(e);
       return {
@@ -200,7 +202,8 @@ export default class HorarioService {
   static async updateHorario(
     id: number,
     idProfessor?: number,
-    semestral?: boolean
+    semestral?: boolean,
+    idUsuario?: number
   ) {
     try {
       const horarioExistente = await Horario.findByPk(id);
@@ -227,11 +230,8 @@ export default class HorarioService {
         idProfessor,
         semestral: semestral || false,
       });
-
-      return {
-        erros: [],
-        data: horarioExistente,
-      };
+      await criarRegistro(idUsuario, `Horario atualizado: id=${id}`);
+      return { erros: [], data: horarioExistente };
     } catch (e) {
       console.log(e);
       return {
@@ -241,7 +241,7 @@ export default class HorarioService {
     }
   }
 
-  static async deleteHorario(id: number) {
+  static async deleteHorario(id: number, idUsuario?: number) {
     try {
       const horario = await Horario.findByPk(id);
       if (!horario) {
@@ -252,11 +252,8 @@ export default class HorarioService {
       }
 
       await horario.destroy();
-
-      return {
-        erros: [],
-        data: null,
-      };
+      await criarRegistro(idUsuario, `Horario removido: id=${id}`);
+      return { erros: [], data: null };
     } catch (e) {
       console.log(e);
       return {

@@ -62,7 +62,8 @@ class HorarioController {
     const { erros, data } = await HorarioService.createHorario(
       diaSemana,
       horario,
-      idLaboratorio
+      idLaboratorio,
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -77,7 +78,8 @@ class HorarioController {
     const { erros, data } = await HorarioService.updateHorario(
       Number(id),
       idProfessor,
-      semestral
+      semestral,
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -88,7 +90,7 @@ class HorarioController {
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const { erros, data } = await HorarioService.deleteHorario(Number(id));
+  const { erros, data } = await HorarioService.deleteHorario(Number(id), req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {

@@ -28,7 +28,7 @@ class RecadoController {
 
   async store(req: Request, res: Response) {
     const { texto } = req.body;
-    const { erros, data } = await RecadoService.createRecado(texto);
+  const { erros, data } = await RecadoService.createRecado(texto, req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {
@@ -39,7 +39,7 @@ class RecadoController {
   async update(req: Request, res: Response) {
     const id = req.params.id;
     const { texto } = req.body;
-    const { erros, data } = await RecadoService.updateRecado(Number(id), texto);
+  const { erros, data } = await RecadoService.updateRecado(Number(id), texto, req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {
@@ -49,7 +49,7 @@ class RecadoController {
 
   async destroy(req: Request, res: Response) {
     const id = req.params.id;
-    const { erros, data } = await RecadoService.deleteRecado(Number(id));
+  const { erros, data } = await RecadoService.deleteRecado(Number(id), req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {

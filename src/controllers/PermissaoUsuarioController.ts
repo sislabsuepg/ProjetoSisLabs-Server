@@ -52,15 +52,15 @@ class PermissaoUsuarioController {
       relatorio,
       advertencia,
     } = req.body;
-    const { erros, data } =
-      await permissaoUsuarioService.createPermissaoUsuario(
-        nomePermissao,
-        geral,
-        cadastro,
-        alteracao,
-        relatorio,
-        advertencia
-      );
+    const { erros, data } = await permissaoUsuarioService.createPermissaoUsuario(
+      nomePermissao,
+      geral,
+      cadastro,
+      alteracao,
+      relatorio,
+      advertencia,
+      req.body.idUsuario
+    );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {
@@ -79,17 +79,17 @@ class PermissaoUsuarioController {
       advertencia,
       ativo,
     } = req.body;
-    const { erros, data } =
-      await permissaoUsuarioService.updatePermissaoUsuario(
-        id,
-        nomePermissao,
-        geral,
-        cadastro,
-        alteracao,
-        relatorio,
-        advertencia,
-        ativo
-      );
+    const { erros, data } = await permissaoUsuarioService.updatePermissaoUsuario(
+      id,
+      nomePermissao,
+      geral,
+      cadastro,
+      alteracao,
+      relatorio,
+      advertencia,
+      ativo,
+      req.body.idUsuario
+    );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {
@@ -99,8 +99,7 @@ class PermissaoUsuarioController {
 
   async destroy(req: Request, res: Response) {
     const id = parseInt(req.params.id);
-    const { erros, data } =
-      await permissaoUsuarioService.deletePermissaoUsuario(id);
+    const { erros, data } = await permissaoUsuarioService.deletePermissaoUsuario(id, req.body.idUsuario);
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {

@@ -4,6 +4,7 @@ import config from "../config/config.js";
 import jwt from "jsonwebtoken";
 import { getPaginationParams } from "../types/pagination.js";
 import { Op } from "sequelize";
+import { criarRegistro } from "../utils/registroLogger.js";
 export default class UsuarioService {
   static verificaLogin(login: string): string[] {
     const erros: string[] = [];
@@ -123,7 +124,8 @@ export default class UsuarioService {
     login: string,
     senha: string,
     nome: string,
-    idPermissao: number
+    idPermissao: number,
+    idUsuario?: number
   ) {
     if (!idPermissao || !senha || !login || !nome) {
       return {
@@ -166,6 +168,8 @@ export default class UsuarioService {
         idPermissao,
         ativo: true,
       });
+      // auditoria
+      await criarRegistro(idUsuario, `Usuario criado: login=${login}`);
       return {
         erros: [],
         data: {
@@ -189,7 +193,8 @@ export default class UsuarioService {
     id: number,
     nome?: string,
     ativo?: boolean,
-    idPermissao?: number
+    idPermissao?: number,
+    idUsuario?: number
   ) {
     try {
       const usuario = await Usuario.findByPk(id, {
@@ -229,6 +234,7 @@ export default class UsuarioService {
         usuario.permissaoUsuario = permissao;
       }
       await usuario.save();
+      await criarRegistro(idUsuario, `Usuario atualizado: id=${id}`);
       return { erros: [], data: usuario };
     } catch (e) {
       console.log(e);
@@ -239,7 +245,7 @@ export default class UsuarioService {
     }
   }
 
-  static async deleteUsuario(id: number) {
+  static async deleteUsuario(id: number, idUsuario?: number) {
     try {
       const usuario = await Usuario.findByPk(id);
       if (!usuario) {
@@ -250,6 +256,7 @@ export default class UsuarioService {
       }
       usuario.ativo = false;
       await usuario.save();
+      await criarRegistro(idUsuario, `Usuario desativado: id=${id}`);
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);
@@ -260,7 +267,7 @@ export default class UsuarioService {
     }
   }
 
-  static async loginUsuario(login: string, senha: string) {
+  static async loginUsuario(login: string, senha: string, idUsuario?: number) {
     try {
       const usuario: Usuario | null = await Usuario.findOne({
         where: { login },
@@ -293,6 +300,7 @@ export default class UsuarioService {
       const token: string = jwt.sign({ usuario }, config.secret as string, {
         expiresIn: expires,
       });
+      await criarRegistro(idUsuario, `Usuario login: login=${login}`);
       return { erros: [], data: { usuario, token } };
     } catch (e) {
       console.log(e);

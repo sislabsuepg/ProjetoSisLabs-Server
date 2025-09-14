@@ -69,7 +69,8 @@ class OrientacaoController {
       dataFim,
       idAluno,
       idProfessor,
-      idLaboratorio
+      idLaboratorio,
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -95,7 +96,8 @@ class OrientacaoController {
     const { erros, data } = await OrientacaoService.updateOrientacao(
       Number(id),
       dataInicio,
-      dataFim
+      dataFim,
+      req.body.idUsuario
     );
 
     if (erros.length > 0) {
@@ -108,7 +110,8 @@ class OrientacaoController {
   async destroy(req: Request, res: Response) {
     const { id } = req.params;
     const { erros, data } = await OrientacaoService.deleteOrientacao(
-      Number(id)
+      Number(id),
+      req.body.idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
