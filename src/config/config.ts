@@ -23,7 +23,7 @@ const config: Config = {
   database: process.env.DB || "sislabs",
   db_port: Number(process.env.DB_PORT) || 5432,
   secret: process.env.SECRET || "Default",
-  expires: process.env.EXPIRES_IN || "4h",
+  expires: process.env.EXPIRES_IN || "28800",
 };
 
 export default config;
