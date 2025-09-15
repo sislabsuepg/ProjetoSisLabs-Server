@@ -74,7 +74,7 @@ function desenharCabecalhoTabela(doc: PDFKit.PDFDocument, y: number) {
 export function addTabela(doc: PDFKit.PDFDocument, data: dadosRelatorio[], titulo: string) {
     const tableTop = 170;
     const itemHeight = 25;
-    const colWidths = [170, 70, 60, 100, 100]; 
+    const colWidths = [160, 80, 60, 100, 100]; 
     const pageBottom = doc.page.height - doc.page.margins.bottom;
 
     let y = tableTop;
@@ -94,7 +94,7 @@ export function addTabela(doc: PDFKit.PDFDocument, data: dadosRelatorio[], titul
             y += itemHeight;
         }
 
-        //Colorir alternadamente as linhas parar legibilidade
+        //Colorir alternadamente as linhas para mais legibilidade
         const isEvenRow = data.indexOf(row) % 2 !== 0;
         if (isEvenRow) {
             doc.rect(50, y, colWidths.reduce((a, b) => a + b), itemHeight).fill(CORES.cinzaClaro);
