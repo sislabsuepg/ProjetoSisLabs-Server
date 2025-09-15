@@ -16,6 +16,7 @@ import registroRoutes from "./routes/registroRoutes.js";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import emailRoutes from "./routes/emailRoutes.js";
 import relatorioRoutes from "./routes/relatorioRoutes.js";
+import soliciacoesRoutes from "./routes/solicitacoesRoutes.js";
 import { interceptUserCookie } from "./middlewares/interceptUserCookie.js";
 
 class App {
@@ -57,6 +58,7 @@ class App {
     this.app.use("/usuario/", usuarioRoutes);
     this.app.use("/email/", emailRoutes);
     this.app.use("/relatorio/", relatorioRoutes);
+    this.app.use("/solicitacoes/", soliciacoesRoutes);
   }
 }
 

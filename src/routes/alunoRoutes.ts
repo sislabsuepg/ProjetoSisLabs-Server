@@ -41,8 +41,6 @@ router.post(
 
 router.post("/login", AlunoController.login);
 
-/* router.put("/senha/:id", AlunoController.updateSenha); */
-
 router.put(
   "/:id",
   interceptUserCookie,

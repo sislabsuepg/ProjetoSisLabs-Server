@@ -1,7 +1,4 @@
-import Laboratorio from "../models/Laboratorio";
-import Orientacao from "../models/Orientacao";
 import Aluno from "../models/Aluno";
-import { Op } from "sequelize";
 import md5 from "md5";
 
 export default class AtualizacoesService {

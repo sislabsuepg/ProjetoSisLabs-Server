@@ -81,16 +81,6 @@ class AlunoController {
     }
   }
 
-  /* async updateSenha(req: Request, res: Response) {
-    const { id } = req.params;
-    const { novaSenha } = req.body;
-    const { status, erros, data } = await AlunoService.updateSenhaAluno(
-      id,
-      novaSenha
-    );
-    res.status(status).json({ erros, data });
-  } */
-
   async destroy(req: Request, res: Response) {
     const { id } = req.params;
     const { erros, data } = await AlunoService.deleteAluno(
@@ -161,10 +151,10 @@ class AlunoController {
   }
 
   async updateProfile(req: Request, res: Response) {
-    const { id } = req.params;
+    const { idAluno } = req.params;
     const { telefone, email } = req.body;
     const { erros, data } = await AlunoService.updateProfile(
-      Number(id),
+      Number(idAluno),
       telefone,
       email
     );
@@ -177,10 +167,10 @@ class AlunoController {
   }
 
   async updatePassword(req: Request, res: Response) {
-    const { id } = req.params;
+    const { idAluno } = req.params;
     const { novaSenha } = req.body;
     const { erros, data } = await AlunoService.updateSenhaAluno(
-      Number(id),
+      Number(idAluno),
       novaSenha
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {

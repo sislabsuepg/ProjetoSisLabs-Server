@@ -522,7 +522,7 @@ export default class AlunoService {
       }
       const erros: string[] = [
         ...(telefone ? this.verificaTelefone(telefone) : []),
-        ...(email ? this.verificaEmail(email) : []),
+        ...this.verificaEmail(email),
       ];
       if (erros.length > 0) {
         return {
