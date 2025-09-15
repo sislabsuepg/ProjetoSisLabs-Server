@@ -1,12 +1,16 @@
-import { faker } from "@faker-js/faker";
 import Horario from "../models/Horario.js";
 import Professor from "../models/Professor.js";
 import Laboratorio from "../models/Laboratorio.js";
 
-// Slots informados:
-// Segunda a sexta: 08:15, 09:10, 10:05, 11:00, 13:30, 14:20, 15:10, 16:00, 17:05, 17:55, 18:45, 19:40, 20:35, 21:30
-// Sábado: 08:15, 09:10, 10:05, 11:00
-// Sábado: 08:00,08:55,09:40,10:35,11:30
+// Nova regra: GERAR TODOS os horários possíveis (todos os slots semanais) para cada laboratório ativo.
+// Apenas ~18% dos registros terão um professor associado; os demais ficam com idProfessor = null (vago).
+// Dias considerados: 1 (segunda) a 6 (sábado). Domingo (0) ignorado.
+// Slots:
+//   Seg-Sex: 14 slots
+//   Sáb: 4 slots
+// Total por laboratório: 74 registros garantidos.
+
+const PROFESSOR_RATE = 0.18; // probabilidade de atribuir professor
 const weekdaySlots = [
   "08:15",
   "09:10",
@@ -23,70 +27,64 @@ const weekdaySlots = [
   "20:35",
   "21:30",
 ];
-const saturdaySlots = [
-  "08:15",
-  "09:10",
-  "10:05",
-  "11:00",
-];
+const saturdaySlots = ["08:15", "09:10", "10:05", "11:00"];
+const TOTAL_SLOTS_POR_LAB = weekdaySlots.length * 5 + saturdaySlots.length; // 74
 
 export async function seedHorarios() {
-  const existing = await Horario.count();
-  const TARGET = 80;
-  if (existing >= TARGET) {
-    console.log("[seed] Horarios suficientes já existem, pulando");
-    return;
-  }
   const professores = await Professor.findAll({ attributes: ["id"] });
-  const labsAll = await Laboratorio.findAll({ attributes: ["id"] });
-  if (!professores.length || !labsAll.length) {
-    console.warn("[seed] Faltam professores ou laboratórios para horários");
+  const laboratorios = await Laboratorio.findAll({ attributes: ["id", "ativo"] });
+  if (!professores.length || !laboratorios.length) {
+    console.warn("[seed] Faltam professores ou laboratórios para gerar horários");
     return;
   }
-  const labs = labsAll.slice(0, Math.min(4, labsAll.length));
 
-  const combos: {
-    diaSemana: number;
-    horario: string;
-    idLaboratorio: number;
-    idProfessor: number;
-    semestral: boolean;
-  }[] = [];
-  const used = new Set<string>();
+  const labsAtivos = laboratorios.filter((l: any) => l.ativo !== false);
+  if (!labsAtivos.length) {
+    console.warn("[seed] Nenhum laboratório ativo para gerar horários");
+    return;
+  }
 
-  const dias = [1, 2, 3, 4, 5, 6];
-  for (const dia of dias) {
-    const slots = dia === 6 ? saturdaySlots : weekdaySlots;
-    for (const lab of labs) {
-      const desiredCount =
-        dia === 6
-          ? faker.number.int({ min: 2, max: 5 })
-          : faker.number.int({ min: 5, max: 8 });
-      const shuffled = faker.helpers.shuffle(slots.slice());
-      const pick = shuffled.slice(0, desiredCount);
-      for (const hora of pick) {
-        if (combos.length + existing >= TARGET) break;
-        const prof = faker.helpers.arrayElement(professores);
-        const key = `${dia}-${hora}-${lab.id}`;
-        if (used.has(key)) continue;
-        used.add(key);
-        combos.push({
+  // Busca existentes para não duplicar
+  const existentes = await Horario.findAll({ attributes: ["diaSemana", "horario", "idLaboratorio"] });
+  const cacheExistentes = new Set(
+    existentes.map((h: any) => `${h.diaSemana}|${h.horario}|${h.idLaboratorio}`)
+  );
+
+  const inserts: any[] = [];
+
+  for (const lab of labsAtivos) {
+    for (let dia = 1; dia <= 6; dia++) {
+      const slots = dia === 6 ? saturdaySlots : weekdaySlots;
+      for (const hora of slots) {
+        const key = `${dia}|${hora}|${lab.id}`;
+        if (cacheExistentes.has(key)) continue; // já existe
+
+        // Decide se este slot terá professor
+        let idProfessor: number | null = null;
+        if (professores.length && Math.random() < PROFESSOR_RATE) {
+          const prof = professores[Math.floor(Math.random() * professores.length)];
+          idProfessor = prof?.id ?? null;
+        }
+
+        inserts.push({
           diaSemana: dia,
           horario: hora,
-          semestral: Math.random() < 0.3,
-          idProfessor: prof.id,
+          semestral: false,
+          idProfessor,
           idLaboratorio: lab.id,
         });
       }
-      if (combos.length + existing >= TARGET) break;
     }
-    if (combos.length + existing >= TARGET) break;
   }
 
-  if (!combos.length) {
-    console.log("[seed] Nenhum novo horário gerado");
+  if (!inserts.length) {
+    console.log("[seed] Todos os slots já existiam");
     return;
   }
-  await Horario.bulkCreate(combos as any[]);
-  console.log(`[seed] Horarios inseridos: ${combos.length}`);
+
+  await Horario.bulkCreate(inserts as any[]);
+  // Estatística simples da ocupação criada nesta rodada
+  const ocupadosNovos = inserts.filter(i => i.idProfessor !== null).length;
+  const taxa = ((ocupadosNovos / inserts.length) * 100).toFixed(2);
+  console.log(`[seed] Horários gerados: ${inserts.length} (com professor: ${ocupadosNovos} = ${taxa}% desta inserção)`);
 }
