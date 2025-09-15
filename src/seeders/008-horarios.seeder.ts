@@ -32,9 +32,13 @@ const TOTAL_SLOTS_POR_LAB = weekdaySlots.length * 5 + saturdaySlots.length; // 7
 
 export async function seedHorarios() {
   const professores = await Professor.findAll({ attributes: ["id"] });
-  const laboratorios = await Laboratorio.findAll({ attributes: ["id", "ativo"] });
+  const laboratorios = await Laboratorio.findAll({
+    attributes: ["id", "ativo"],
+  });
   if (!professores.length || !laboratorios.length) {
-    console.warn("[seed] Faltam professores ou laboratórios para gerar horários");
+    console.warn(
+      "[seed] Faltam professores ou laboratórios para gerar horários"
+    );
     return;
   }
 
@@ -45,7 +49,9 @@ export async function seedHorarios() {
   }
 
   // Busca existentes para não duplicar
-  const existentes = await Horario.findAll({ attributes: ["diaSemana", "horario", "idLaboratorio"] });
+  const existentes = await Horario.findAll({
+    attributes: ["diaSemana", "horario", "idLaboratorio"],
+  });
   const cacheExistentes = new Set(
     existentes.map((h: any) => `${h.diaSemana}|${h.horario}|${h.idLaboratorio}`)
   );
@@ -62,7 +68,8 @@ export async function seedHorarios() {
         // Decide se este slot terá professor
         let idProfessor: number | null = null;
         if (professores.length && Math.random() < PROFESSOR_RATE) {
-          const prof = professores[Math.floor(Math.random() * professores.length)];
+          const prof =
+            professores[Math.floor(Math.random() * professores.length)];
           idProfessor = prof?.id ?? null;
         }
 
@@ -84,7 +91,9 @@ export async function seedHorarios() {
 
   await Horario.bulkCreate(inserts as any[]);
   // Estatística simples da ocupação criada nesta rodada
-  const ocupadosNovos = inserts.filter(i => i.idProfessor !== null).length;
+  const ocupadosNovos = inserts.filter((i) => i.idProfessor !== null).length;
   const taxa = ((ocupadosNovos / inserts.length) * 100).toFixed(2);
-  console.log(`[seed] Horários gerados: ${inserts.length} (com professor: ${ocupadosNovos} = ${taxa}% desta inserção)`);
+  console.log(
+    `[seed] Horários gerados: ${inserts.length} (com professor: ${ocupadosNovos} = ${taxa}% desta inserção)`
+  );
 }
