@@ -12,6 +12,8 @@ router.get("/count", interceptUserCookie, AlunoController.count);
 
 router.get("/:ra", interceptUserCookie, AlunoController.show);
 
+router.post("/verificasenha", AlunoController.verifyPassword);
+
 router.post(
   "/",
   interceptUserCookie,
