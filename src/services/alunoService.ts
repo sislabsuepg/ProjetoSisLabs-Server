@@ -426,7 +426,11 @@ export default class AlunoService {
     }
   }
 
-  static async updateSenhaAluno(ra: string, novaSenha: string, idUsuario?: number) {
+  static async updateSenhaAluno(
+    ra: string,
+    novaSenha: string,
+    idUsuario?: number
+  ) {
     try {
       const aluno = await Aluno.findByPk(ra);
       if (!aluno) {
@@ -486,6 +490,9 @@ export default class AlunoService {
       const aluno: Aluno | null = await Aluno.findOne({
         where: {
           ra,
+        },
+        include: {
+          model: Curso,
         },
       });
       if (!aluno) {
