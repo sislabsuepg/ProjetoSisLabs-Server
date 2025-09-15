@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import AlunoController from "../controllers/AlunoController.js";
 import { interceptUserCookie } from "../middlewares/interceptUserCookie.js";
+import { interceptAlunoCookie } from "../middlewares/interceptAlunoCookie.js";
 import lockPath from "../middlewares/lockPath.js";
 
 const router: Router = Router();
@@ -15,6 +16,18 @@ router.get("/:ra", interceptUserCookie, AlunoController.show);
 router.get(
   "/laboratorios/:idAluno",
   AlunoController.buscaLaboratoriosDisponiveis
+);
+
+router.put(
+  "/perfil/:idAluno",
+  interceptAlunoCookie,
+  AlunoController.updateProfile
+);
+
+router.put(
+  "/senha/:idAluno",
+  interceptAlunoCookie,
+  AlunoController.updatePassword
 );
 
 router.post("/verificasenha", AlunoController.verifyPassword);

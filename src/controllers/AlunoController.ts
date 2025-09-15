@@ -160,6 +160,36 @@ class AlunoController {
     }
   }
 
+  async updateProfile(req: Request, res: Response) {
+    const { id } = req.params;
+    const { telefone, email } = req.body;
+    const { erros, data } = await AlunoService.updateProfile(
+      Number(id),
+      telefone,
+      email
+    );
+
+    if ((Array.isArray(erros) ? erros.length : 0) > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data: null });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
+  async updatePassword(req: Request, res: Response) {
+    const { id } = req.params;
+    const { novaSenha } = req.body;
+    const { erros, data } = await AlunoService.updateSenhaAluno(
+      Number(id),
+      novaSenha
+    );
+    if ((Array.isArray(erros) ? erros.length : 0) > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data: null });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
   async count(req: Request, res: Response) {
     const { ativo } = req.query;
     let ativado = undefined;

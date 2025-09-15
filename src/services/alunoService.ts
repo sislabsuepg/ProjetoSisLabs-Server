@@ -482,13 +482,9 @@ export default class AlunoService {
     }
   }
 
-  static async updateSenhaAluno(
-    ra: string,
-    novaSenha: string,
-    idUsuario?: number
-  ) {
+  static async updateSenhaAluno(id: number, novaSenha: string) {
     try {
-      const aluno = await Aluno.findByPk(ra);
+      const aluno = await Aluno.findByPk(id);
       if (!aluno) {
         return {
           erros: ["Aluno não encontrado"],
@@ -505,8 +501,6 @@ export default class AlunoService {
 
       aluno.atualizaSenha(novaSenha);
       await aluno.save();
-
-      criarRegistro(idUsuario, `Aluno senha atualizada: ra=${ra}`);
       return { erros: [], data: ["Senha atualizada com sucesso"] };
     } catch (e) {
       console.log(e);
@@ -514,6 +508,56 @@ export default class AlunoService {
         erros: ["Erro ao atualizar senha"],
         data: [],
       };
+    }
+  }
+
+  static async updateProfile(id: number, telefone: string, email: string) {
+    try {
+      const aluno = await Aluno.findByPk(id);
+      if (!aluno) {
+        return {
+          erros: ["Aluno não encontrado"],
+          data: [],
+        };
+      }
+      const erros: string[] = [
+        ...(telefone ? this.verificaTelefone(telefone) : []),
+        ...(email ? this.verificaEmail(email) : []),
+      ];
+      if (erros.length > 0) {
+        return {
+          erros: erros,
+          data: [],
+        };
+      }
+      aluno.telefone = telefone == undefined ? "" : telefone.replace(/\D/g, "");
+      aluno.email = email == undefined ? aluno.email : email;
+      const alunoAtualizado = await aluno.save();
+      return { erros: [], data: alunoAtualizado };
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      return {
+        erros: ["Erro ao atualizar perfil"],
+        data: [],
+      };
+    }
+  }
+
+  static async verificaAtivo(id: number, nome: string, ra: string) {
+    try {
+      const aluno = await Aluno.findByPk(id);
+      if (!aluno) {
+        console.log(`Aluno não encontrado: id=${id}, ra=${ra}, nome=${nome}`);
+        return false;
+      }
+      if (!aluno.ativo) {
+        console.log(`Aluno inativo: id=${id}, ra=${ra}, nome=${nome}`);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Erro ao verificar aluno:", error);
+      return false;
     }
   }
 
