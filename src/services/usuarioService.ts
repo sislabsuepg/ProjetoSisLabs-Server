@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { getPaginationParams } from "../types/pagination.js";
 import { Op } from "sequelize";
 import { criarRegistro } from "../utils/registroLogger.js";
+import md5 from "md5";
 export default class UsuarioService {
   static verificaLogin(login: string): string[] {
     const erros: string[] = [];
@@ -262,6 +263,32 @@ export default class UsuarioService {
       console.log(e);
       return {
         erros: ["Erro ao desativar usuário"],
+        data: null,
+      };
+    }
+  }
+
+  static async updateSenhaUsuario(
+    id: number,
+    novaSenha: string,
+    idUsuario?: number
+  ) {
+    try {
+      const usuario = await Usuario.findByPk(id);
+      if (!usuario) {
+        return {
+          erros: ["Usuário não encontrado"],
+          data: null,
+        };
+      }
+      usuario.senha = md5(novaSenha);
+      await usuario.save();
+      await criarRegistro(idUsuario, `Usuario atualizado senha: id=${id}`);
+      return { erros: [], data: usuario };
+    } catch (e) {
+      console.log(e);
+      return {
+        erros: ["Erro ao atualizar senha"],
         data: null,
       };
     }

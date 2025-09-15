@@ -12,6 +12,11 @@ router.get("/count", interceptUserCookie, AlunoController.count);
 
 router.get("/:ra", interceptUserCookie, AlunoController.show);
 
+router.get(
+  "/laboratorios/:idAluno",
+  AlunoController.buscaLaboratoriosDisponiveis
+);
+
 router.post("/verificasenha", AlunoController.verifyPassword);
 
 router.post(

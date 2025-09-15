@@ -148,6 +148,18 @@ class AlunoController {
     }
   }
 
+  async buscaLaboratoriosDisponiveis(req: Request, res: Response) {
+    const { idAluno } = req.params;
+    const { erros, data } = await AlunoService.buscaLaboratoriosDisponiveis(
+      Number(idAluno)
+    );
+    if ((Array.isArray(erros) ? erros.length : 0) > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data: null });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
   async count(req: Request, res: Response) {
     const { ativo } = req.query;
     let ativado = undefined;

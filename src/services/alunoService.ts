@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 import Curso from "../models/Curso.js";
 import { getPaginationParams } from "../types/pagination.js";
 import { criarRegistro } from "../utils/registroLogger.js";
+import Laboratorio from "../models/Laboratorio.js";
+import Orientacao from "../models/Orientacao.js";
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
     const erros: string[] = [];
@@ -421,6 +423,60 @@ export default class AlunoService {
       console.log(e);
       return {
         erros: ["Erro ao atualizar aluno"],
+        data: [],
+      };
+    }
+  }
+
+  static async buscaLaboratoriosDisponiveis(idAluno: number) {
+    try {
+      const aluno = await Aluno.findByPk(idAluno);
+
+      if (!aluno || (aluno && aluno.ativo === false)) {
+        console.log("Aluno não encontrado ou inativo");
+        return {
+          erros: ["Aluno não encontrado ou inativo"],
+          data: [],
+        };
+      }
+
+      const laboratorios = await Laboratorio.findAll({
+        where: {
+          [Op.and]: [{ ativo: true }, { restrito: false }],
+        },
+      });
+
+      const orientacoes = await Orientacao.findAll({
+        where: {
+          [Op.and]: [{ idAluno }, { dataFim: { [Op.gt]: new Date() } }],
+        },
+        include: {
+          model: Laboratorio,
+        },
+      });
+
+      if (orientacoes && orientacoes.length > 0) {
+        console.log(orientacoes[0]);
+        const labRestrito = await Laboratorio.findByPk(
+          orientacoes[0].laboratorio.id
+        );
+        if (
+          labRestrito &&
+          labRestrito.restrito === true &&
+          labRestrito.ativo === true
+        ) {
+          laboratorios.push(labRestrito);
+        }
+      }
+
+      return {
+        erros: [],
+        data: laboratorios,
+      };
+    } catch (error) {
+      console.error("Erro ao buscar laboratórios disponíveis:", error);
+      return {
+        erros: ["Erro ao buscar laboratórios disponíveis"],
         data: [],
       };
     }

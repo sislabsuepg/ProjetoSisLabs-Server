@@ -12,6 +12,8 @@ router.get("/count", interceptUserCookie, UsuarioController.count);
 
 router.get("/:id", interceptUserCookie, UsuarioController.show);
 
+router.put("/senha/:id", interceptUserCookie, UsuarioController.updateSenha);
+
 router.post(
   "/",
   interceptUserCookie,

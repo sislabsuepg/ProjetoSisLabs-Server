@@ -63,7 +63,10 @@ class UsuarioController {
 
   public async destroy(req: Request, res: Response) {
     const { id } = req.params;
-  const { erros, data } = await UsuarioService.deleteUsuario(Number(id), req.body.idUsuario);
+    const { erros, data } = await UsuarioService.deleteUsuario(
+      Number(id),
+      req.body.idUsuario
+    );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
     } else {
@@ -73,7 +76,11 @@ class UsuarioController {
 
   public async login(req: Request, res: Response) {
     const { login, senha } = req.body;
-  const { erros, data } = await UsuarioService.loginUsuario(login, senha, req.body.idUsuario);
+    const { erros, data } = await UsuarioService.loginUsuario(
+      login,
+      senha,
+      req.body.idUsuario
+    );
     if (!data?.token) {
       res.status(codes.UNAUTHORIZED).json({ erros, data });
     } else {
@@ -89,6 +96,20 @@ class UsuarioController {
     }
   }
 
+  public async updateSenha(req: Request, res: Response) {
+    const { id } = req.params;
+    const { novaSenha } = req.body;
+    const { erros, data } = await UsuarioService.updateSenhaUsuario(
+      Number(id),
+      novaSenha,
+      req.body.idUsuario
+    );
+    if (erros.length > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data: null });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
   public async count(req: Request, res: Response) {
     const { ativo } = req.query;
     let ativado = undefined;
