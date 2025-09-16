@@ -121,7 +121,11 @@ export default class OrientacaoService {
     try {
       const orientacoes = await Orientacao.findAll({
         where: {
-          [Op.and]: [{ idAluno }, { dataFim: { [Op.gt]: new Date() } }],
+          [Op.and]: [
+            { idAluno },
+            { dataFim: { [Op.gt]: new Date() } },
+            { dataInicio: { [Op.lte]: new Date() } },
+          ],
         },
         include: [
           {
