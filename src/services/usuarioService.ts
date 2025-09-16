@@ -231,6 +231,14 @@ export default class UsuarioService {
             data: null,
           };
         }
+
+        if (permissao.ativo === false) {
+          return {
+            erros: ["Permissão inativa"],
+            data: null,
+          };
+        }
+
         usuario.idPermissao = idPermissao;
         usuario.permissaoUsuario = permissao;
       }
@@ -354,6 +362,28 @@ export default class UsuarioService {
     } catch (error) {
       console.log(error);
       return false;
+    }
+  }
+
+  static async resetSenhaUsuario(id: number, idUsuario?: number) {
+    try {
+      const usuario = await Usuario.findByPk(id);
+      if (!usuario) {
+        return {
+          erros: ["Usuário não encontrado"],
+          data: null,
+        };
+      }
+      usuario.senha = md5("123456");
+      await usuario.save();
+      await criarRegistro(idUsuario, `Usuario resetar senha: id=${id}`);
+      return { erros: [], data: usuario };
+    } catch (error) {
+      console.log(error);
+      return {
+        erros: ["Erro ao resetar senha"],
+        data: null,
+      };
     }
   }
 

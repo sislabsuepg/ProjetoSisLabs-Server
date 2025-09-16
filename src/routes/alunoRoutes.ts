@@ -30,6 +30,12 @@ router.put(
   AlunoController.updatePassword
 );
 
+router.post(
+  "/resetarsenha/:id",
+  interceptUserCookie,
+  AlunoController.resetPassword
+);
+
 router.post("/verificasenha", AlunoController.verifyPassword);
 
 router.post(

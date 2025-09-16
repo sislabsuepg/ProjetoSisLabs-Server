@@ -15,6 +15,12 @@ router.get("/:id", interceptUserCookie, UsuarioController.show);
 router.put("/senha/:id", interceptUserCookie, UsuarioController.updateSenha);
 
 router.post(
+  "/resetarsenha/:id",
+  interceptUserCookie,
+  UsuarioController.resetSenha
+);
+
+router.post(
   "/",
   interceptUserCookie,
   lockPath("cadastro"),

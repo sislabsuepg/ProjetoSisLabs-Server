@@ -585,6 +585,30 @@ export default class AlunoService {
     }
   }
 
+  static async resetSenhaAluno(id: number, idUsuario?: number) {
+    try {
+      const aluno = await Aluno.findByPk(id);
+      if (!aluno) {
+        return {
+          erros: ["Aluno não encontrado"],
+          data: [],
+        };
+      }
+
+      await aluno.atualizaSenha("1234");
+      await aluno.save();
+
+      criarRegistro(idUsuario, `Senha resetada: id=${id}`);
+      return { erros: [], data: ["Senha resetada com sucesso"] };
+    } catch (e) {
+      console.log(e);
+      return {
+        erros: ["Erro ao resetar senha"],
+        data: [],
+      };
+    }
+  }
+
   static async loginAluno(ra: string, senha: string, idUsuario?: number) {
     try {
       const aluno: Aluno | null = await Aluno.findOne({
