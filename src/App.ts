@@ -56,8 +56,8 @@ class App {
     this.app.use("/recado/", interceptUserCookie, recadoRoutes);
     this.app.use("/registro/", interceptUserCookie, registroRoutes);
     this.app.use("/usuario/", usuarioRoutes);
-    this.app.use("/email/", emailRoutes);
-    this.app.use("/relatorio/", relatorioRoutes);
+    this.app.use("/email/", interceptUserCookie, emailRoutes);
+    this.app.use("/relatorio/", interceptUserCookie, relatorioRoutes);
     this.app.use("/solicitacoes/", soliciacoesRoutes);
   }
 }

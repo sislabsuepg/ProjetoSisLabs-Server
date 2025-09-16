@@ -18,6 +18,12 @@ router.get(
   AlunoController.buscaLaboratoriosDisponiveis
 );
 
+router.get(
+  "/advertencias/:idAluno",
+  interceptUserCookie,
+  AlunoController.buscaAdvertencias
+);
+
 router.put(
   "/perfil/:idAluno",
   interceptAlunoCookie,

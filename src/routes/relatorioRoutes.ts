@@ -1,19 +1,19 @@
 import express from "express";
 import RelatorioController from "../controllers/RelatorioController.js";
+import lockPath from "../middlewares/lockPath.js";
 
 const router = express.Router();
-const relatorioController = new RelatorioController();
 
-router.get("/academicoPorCurso", (req, res) => {
-  relatorioController.gerarRelatorioAcademicoPorCurso(req, res);
+router.get("/academicoPorCurso", lockPath("relatorio"), (req, res) => {
+  RelatorioController.gerarRelatorioAcademicoPorCurso(req, res);
 });
 
-router.get("/academico", (req, res) => {
-  relatorioController.gerarRelatorioAcademico(req, res);
+router.get("/academico", lockPath("relatorio"), (req, res) => {
+  RelatorioController.gerarRelatorioAcademico(req, res);
 });
 
-router.get("/emprestimo", (req, res) => {
-  relatorioController.gerarRelatorioEmprestimo(req, res);
+router.get("/emprestimo", lockPath("relatorio"), (req, res) => {
+  RelatorioController.gerarRelatorioEmprestimo(req, res);
 });
 
 export default router;

@@ -7,6 +7,7 @@ import { getPaginationParams } from "../types/pagination.js";
 import { criarRegistro } from "../utils/registroLogger.js";
 import Laboratorio from "../models/Laboratorio.js";
 import Orientacao from "../models/Orientacao.js";
+import Emprestimo from "../models/Emprestimo.js";
 export default class AlunoService {
   static verificaRa(ra: string): string[] {
     const erros: string[] = [];
@@ -652,6 +653,39 @@ export default class AlunoService {
       console.log(e);
       return {
         erros: ["Erro ao fazer login"],
+        data: null,
+      };
+    }
+  }
+
+  static async buscaAdvertencias(idAluno: string) {
+    try {
+      const mesAnterior = new Date();
+      mesAnterior.setMonth(mesAnterior.getMonth() - 1);
+
+      const aluno = await Aluno.findByPk(idAluno);
+      if (!aluno) {
+        return {
+          erros: ["Aluno não encontrado"],
+          data: null,
+        };
+      }
+      const emprestimos = await Emprestimo.findAll({
+        where: {
+          idAluno: idAluno,
+          advertencia: { [Op.ne]: null },
+          dataHoraEntrada: { [Op.gte]: mesAnterior },
+        },
+        attributes: ["id", "advertencia"],
+      });
+      return {
+        erros: [],
+        data: emprestimos.length > 0 ? true : false,
+      };
+    } catch (error) {
+      console.error("Erro ao buscar advertências:", error);
+      return {
+        erros: ["Erro ao buscar advertências"],
         data: null,
       };
     }

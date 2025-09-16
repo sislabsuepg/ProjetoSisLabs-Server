@@ -94,6 +94,16 @@ class AlunoController {
     }
   }
 
+  async buscaAdvertencias(req: Request, res: Response) {
+    const { idAluno } = req.params;
+    const { erros, data } = await AlunoService.buscaAdvertencias(idAluno);
+    if ((Array.isArray(erros) ? erros.length : 0) > 0) {
+      res.status(codes.BAD_REQUEST).json({ erros, data: null });
+    } else {
+      res.status(codes.OK).json({ erros, data });
+    }
+  }
+
   async login(req: Request, res: Response) {
     const { login, senha } = req.body;
     const { erros, data } = await AlunoService.loginAluno(

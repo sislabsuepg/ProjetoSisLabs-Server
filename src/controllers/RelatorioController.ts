@@ -94,4 +94,4 @@ class RelatorioController {
   }
 }
 
-export default RelatorioController;
+export default new RelatorioController();
