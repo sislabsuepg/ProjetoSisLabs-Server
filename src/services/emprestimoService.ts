@@ -103,8 +103,7 @@ export default class EmprestimoService {
   static async createEmprestimo(
     idLaboratorio: number,
     idAluno: number,
-    idUsuario: number,
-    idUsuarioExecutor?: number
+    idUsuario: number
   ) {
     try {
       const laboratorio = await Laboratorio.findByPk(idLaboratorio);
@@ -129,6 +128,21 @@ export default class EmprestimoService {
           data: null,
         };
       }
+
+      const emprestimoAtivo = await Emprestimo.findOne({
+        where: {
+          idAluno: idAluno,
+          dataHoraSaida: null,
+        },
+      });
+
+      if (emprestimoAtivo) {
+        return {
+          erros: ["Aluno já possui um empréstimo ativo"],
+          data: null,
+        };
+      }
+
       if (laboratorio.restrito) {
         const orientacao = await Orientacao.findOne({
           where: {
@@ -152,7 +166,7 @@ export default class EmprestimoService {
         idUsuarioEntrada: idUsuario,
       });
       await criarRegistro(
-        idUsuarioExecutor,
+        idUsuario,
         `Emprestimo criado: idLaboratorio=${idLaboratorio} idAluno=${idAluno}`
       );
       return { erros: [], data: emprestimo };
@@ -165,11 +179,7 @@ export default class EmprestimoService {
     }
   }
 
-  static async closeEmprestimo(
-    id: number,
-    idUsuarioSaida: number,
-    idUsuarioExecutor?: number
-  ) {
+  static async closeEmprestimo(id: number, idUsuarioSaida: number) {
     try {
       const emprestimo = await Emprestimo.findByPk(id, {
         include: [
@@ -213,10 +223,7 @@ export default class EmprestimoService {
         dataHoraSaida: new Date(),
         idUsuarioSaida: idUsuarioSaida,
       });
-      await criarRegistro(
-        idUsuarioExecutor,
-        `Emprestimo fechado: id=${id}`
-      );
+      await criarRegistro(idUsuarioSaida, `Emprestimo fechado: id=${id}`);
       return { erros: [], data: emprestimoAtualizado };
     } catch (e) {
       console.log(e);
@@ -261,7 +268,7 @@ export default class EmprestimoService {
     try {
       const where: any = {};
       if (ativo !== undefined) {
-  where.dataHoraSaida = { [Op.is]: null };
+        where.dataHoraSaida = { [Op.is]: null };
       }
 
       const count: number = await Emprestimo.count({

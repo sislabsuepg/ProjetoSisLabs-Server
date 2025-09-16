@@ -31,8 +31,7 @@ class EmprestimoController {
     const { data, erros } = await EmprestimoService.createEmprestimo(
       idLaboratorio,
       idAluno,
-      idUsuario,
-      req.body.idUsuario
+      idUsuario
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ data, erros });
@@ -46,8 +45,7 @@ class EmprestimoController {
     const { idUsuario } = req.body;
     const { data, erros } = await EmprestimoService.closeEmprestimo(
       id,
-      parseInt(idUsuario),
-      req.body.idUsuario
+      parseInt(idUsuario)
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ data, erros });

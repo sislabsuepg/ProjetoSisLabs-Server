@@ -35,7 +35,7 @@ class App {
     this.app.use(cookieParser());
     this.app.use(
       cors({
-        origin: "http://localhost:3000", // Permite requisições de qualquer origem
+        origin: "http://localhost:3000", // permite apenas requisições do localhost
         methods: "GET,PUT,POST,DELETE", // Métodos permitidos
         allowedHeaders: "Content-Type, Authorization, Cookie", // Cabeçalhos permitidos
         credentials: true,

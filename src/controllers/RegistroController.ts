@@ -29,7 +29,7 @@ class RegistroController {
       data2 = undefined;
     } else {
       data1 = new Date(dataInicio as string);
-      data2 = new Date((dataFim + "T23:59:59") as string);
+      data2 = new Date(dataFim as string);
     }
     if (data1 && data2 && data1 > data2) {
       res
