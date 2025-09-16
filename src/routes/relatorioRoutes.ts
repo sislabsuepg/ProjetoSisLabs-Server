@@ -1,5 +1,5 @@
 import express from "express";
-import RelatorioController from "../controllers/RelatorioController";
+import RelatorioController from "../controllers/RelatorioController.js";
 
 const router = express.Router();
 const relatorioController = new RelatorioController();
@@ -14,8 +14,6 @@ router.get("/academico", (req, res) => {
 
 router.get("/emprestimo", (req, res) => {
   relatorioController.gerarRelatorioEmprestimo(req, res);
-})
-
-
+});
 
 export default router;

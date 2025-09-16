@@ -1,5 +1,5 @@
-import Laboratorio from "../models/Laboratorio";
-import Aluno from "../models/Aluno";
+import Laboratorio from "../models/Laboratorio.js";
+import Aluno from "../models/Aluno.js";
 
 interface Solicitacao {
   id: string;

@@ -1,4 +1,4 @@
-import SolicitacoesService from "../services/solicitacesService";
+import SolicitacoesService from "../services/solicitacesService.js";
 import { Request, Response } from "express";
 import codes from "../types/responseCodes.js";
 
