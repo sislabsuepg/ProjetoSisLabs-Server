@@ -46,6 +46,8 @@ export default class EventoService {
 
   static async getAllEventos(offset?: number, limit?: number) {
     try {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0); // Define para o início do dia
       const eventos = await Evento.findAll({
         include: [
           {
@@ -55,7 +57,8 @@ export default class EventoService {
           },
         ],
         ...getPaginationParams(offset, limit),
-        order: [["data", "DESC"]],
+        order: [["data", "ASC"]],
+        where: { data: { [Op.gte]: hoje } },
       });
       // Lista vazia deve retornar erro específico conforme padrão adotado
       if (!eventos || eventos.length === 0) {
@@ -137,6 +140,13 @@ export default class EventoService {
         };
       }
 
+      if (new Date(data) < new Date()) {
+        return {
+          erros: ["Data do evento não pode ser no passado"],
+          data: null,
+        };
+      }
+
       const evento = await Evento.create({
         nome,
         data,
@@ -149,8 +159,8 @@ export default class EventoService {
     } catch (e) {
       console.log(e);
       return {
-  erros: ["Erro ao criar evento"],
-  data: null,
+        erros: ["Erro ao criar evento"],
+        data: null,
       };
     }
   }
@@ -214,8 +224,8 @@ export default class EventoService {
     } catch (e) {
       console.log(e);
       return {
-  erros: ["Erro ao atualizar evento"],
-  data: null,
+        erros: ["Erro ao atualizar evento"],
+        data: null,
       };
     }
   }
