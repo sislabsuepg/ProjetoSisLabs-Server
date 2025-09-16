@@ -72,7 +72,12 @@ export default class RecadoService {
       }
 
       const recado = await Recado.create({ texto });
-      await criarRegistro(idUsuario, `Recado criado`);
+      await criarRegistro(
+        idUsuario,
+        `Recado criado: preview: ${texto.substring(0, 30)}${
+          texto.length > 30 ? "..." : ""
+        }`
+      );
       return { erros: [], data: recado };
     } catch (e) {
       console.log(e);
@@ -102,7 +107,12 @@ export default class RecadoService {
 
       recado.texto = texto;
       await recado.save();
-      await criarRegistro(idUsuario, `Recado atualizado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Recado atualizado: preview: ${texto.substring(0, 30)}${
+          texto.length > 30 ? "..." : ""
+        }`
+      );
       return { erros: [], data: recado };
     } catch (e) {
       console.log(e);
@@ -123,7 +133,7 @@ export default class RecadoService {
         };
       }
       await recado.destroy();
-      await criarRegistro(idUsuario, `Recado removido: id=${id}`);
+      await criarRegistro(idUsuario, `Recado removido`);
       return { erros: [], data: recado };
     } catch (e) {
       console.log(e);

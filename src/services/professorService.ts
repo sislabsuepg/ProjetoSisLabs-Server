@@ -130,7 +130,10 @@ export default class professorService {
         };
       }
       const professor = await Professor.create({ nome, email, ativo: true });
-      await criarRegistro(idUsuario, `Professor criado: nome=${nome}`);
+      await criarRegistro(
+        idUsuario,
+        `Professor criado: nome: ${nome} email: ${email}`
+      );
       return { erros: [], data: professor };
     } catch (e) {
       console.log(e);
@@ -177,7 +180,10 @@ export default class professorService {
       professor.ativo = ativo == undefined ? professor.ativo : ativo;
 
       await professor.save();
-      await criarRegistro(idUsuario, `Professor atualizado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Professor atualizado: nome: ${professor.nome} ativo: ${professor.ativo}`
+      );
       return { erros: [], data: professor };
     } catch (e) {
       console.log(e);
@@ -199,7 +205,10 @@ export default class professorService {
       }
       professor.ativo = false;
       await professor.save();
-      await criarRegistro(idUsuario, `Professor removido: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Professor removido: nome: ${professor.nome}`
+      );
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);

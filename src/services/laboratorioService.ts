@@ -143,7 +143,7 @@ export default class laboratorioService {
       }
       await criarRegistro(
         idUsuario,
-        `Laboratorio criado: nome=${nome} numero=${numero}`
+        `Laboratorio criado: numero: ${numero} nome: ${nome} restrito: ${laboratorio.restrito}`
       );
       return { erros: [], data: { laboratorio, horarios } };
     } catch (error) {
@@ -192,7 +192,10 @@ export default class laboratorioService {
         restrito == undefined ? laboratorio.restrito : restrito;
       laboratorio.ativo = ativo === undefined ? laboratorio.ativo : ativo;
       await laboratorio.save();
-      await criarRegistro(idUsuario, `Laboratorio atualizado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Laboratorio atualizado: numero: ${laboratorio.numero} nome: ${laboratorio.nome} ativo: ${laboratorio.ativo}`
+      );
       return { erros: [], data: laboratorio };
     } catch (error) {
       return {
@@ -213,7 +216,10 @@ export default class laboratorioService {
       }
       laboratorio.ativo = false;
       await laboratorio.save();
-      await criarRegistro(idUsuario, `Laboratorio desativado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Laboratorio desativado: numero: ${laboratorio.numero} nome: ${laboratorio.nome}`
+      );
       return { erros: [], data: null };
     } catch (error) {
       return {

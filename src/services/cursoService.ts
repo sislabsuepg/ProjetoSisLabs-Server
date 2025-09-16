@@ -135,7 +135,10 @@ export default class CursoService {
       }
 
       const curso = await Curso.create({ nome: nome, anosMaximo: anosMaximo });
-      await criarRegistro(idUsuario, `Curso criado: nome=${nome}`);
+      await criarRegistro(
+        idUsuario,
+        `Curso criado: nome: ${nome} anosMax: ${anosMaximo}`
+      );
       return {
         erros: [],
         data: curso,
@@ -186,7 +189,10 @@ export default class CursoService {
         anosMaximo == undefined ? curso.anosMaximo : anosMaximo;
       curso.ativo = ativo === undefined ? curso.ativo : ativo;
       await curso.save();
-      await criarRegistro(idUsuario, `Curso atualizado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Curso atualizado: nome: ${curso.nome} anosMax: ${curso.anosMaximo} ativo: ${curso.ativo}`
+      );
       return {
         erros: [],
         data: curso,
@@ -211,7 +217,10 @@ export default class CursoService {
       }
       curso.ativo = false;
       await curso.save();
-      await criarRegistro(idUsuario, `Curso desativado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Curso desativado: nome: ${curso.nome}`
+      );
       return {
         erros: [],
         data: null,

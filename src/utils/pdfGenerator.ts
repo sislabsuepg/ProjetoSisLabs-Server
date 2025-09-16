@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dadosRelatorio } from "../models/Relatorio";
 
@@ -20,8 +21,15 @@ function getDirname() {
 }
 
 export function addCabecalho(doc: PDFKit.PDFDocument, titulo: string) {
-    const assetsPath = path.join(getDirname(), '../utils/assets');
-    const imagePath = path.join(assetsPath, 'logo_uepg.png');
+    // Resolve logo path for both src and dist runtimes
+    const baseDir = getDirname();
+    const primaryPath = path.resolve(baseDir, 'assets', 'logo_uepg.png');
+    const fallbackPath = path.resolve(baseDir, '../../src/utils/assets/logo_uepg.png');
+    const imagePath = fs.existsSync(primaryPath) ? primaryPath : fallbackPath;
+    if (!fs.existsSync(imagePath)) {
+        throw new Error(`Logo não encontrada. Procurei em: ${primaryPath} e ${fallbackPath}`);
+    }
+
     doc.image(imagePath, 50, 50, { width: 100 });
 
     doc

@@ -342,7 +342,10 @@ export default class AlunoService {
       aluno.curso = curso; // Incluir o curso no response
 
       // registrar ação
-      criarRegistro(idUsuario, `Aluno criado: ra=${ra}`);
+      criarRegistro(
+        idUsuario,
+        `Aluno criado: ra: ${ra} nome: ${nome} curso: ${curso.nome}`
+      );
       return { erros: [], data: aluno };
     } catch (e) {
       console.log(e);
@@ -418,7 +421,10 @@ export default class AlunoService {
 
       const alunoAtualizado = await aluno.save();
 
-      criarRegistro(idUsuario, `Aluno atualizado: id=${id}`);
+      criarRegistro(
+        idUsuario,
+        `Aluno atualizado: ra: ${aluno.ra} nome: ${aluno.nome}`
+      );
       return { erros: [], data: alunoAtualizado };
     } catch (e) {
       console.log(e);
@@ -575,7 +581,10 @@ export default class AlunoService {
       aluno.ativo = false;
       await aluno.save();
 
-      criarRegistro(idUsuario, `Aluno desativado: ra=${ra}`);
+      criarRegistro(
+        idUsuario,
+        `Aluno desativado: ra: ${ra} nome: ${aluno.nome}`
+      );
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);
@@ -599,7 +608,10 @@ export default class AlunoService {
       await aluno.atualizaSenha("1234");
       await aluno.save();
 
-      criarRegistro(idUsuario, `Senha resetada: id=${id}`);
+      criarRegistro(
+        idUsuario,
+        `Senha resetada: ra: ${aluno.ra} nome: ${aluno.nome}`
+      );
       return { erros: [], data: ["Senha resetada com sucesso"] };
     } catch (e) {
       console.log(e);
@@ -647,7 +659,7 @@ export default class AlunoService {
         expiresIn: expires,
       });
 
-      criarRegistro(idUsuario, `Aluno login: ra=${ra}`);
+  criarRegistro(idUsuario, `Aluno login: ra: ${ra} nome: ${aluno.nome}`);
       return { erros: [], data: { aluno, token } };
     } catch (e) {
       console.log(e);

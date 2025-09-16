@@ -170,7 +170,10 @@ export default class UsuarioService {
         ativo: true,
       });
       // auditoria
-      await criarRegistro(idUsuario, `Usuario criado: login=${login}`);
+      await criarRegistro(
+        idUsuario,
+        `Usuario criado: login: ${login} nome: ${nome}`
+      );
       return {
         erros: [],
         data: {
@@ -243,7 +246,10 @@ export default class UsuarioService {
         usuario.permissaoUsuario = permissao;
       }
       await usuario.save();
-      await criarRegistro(idUsuario, `Usuario atualizado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Usuario atualizado: login: ${usuario.login} nome: ${usuario.nome} ativo: ${usuario.ativo}`
+      );
       return { erros: [], data: usuario };
     } catch (e) {
       console.log(e);
@@ -265,7 +271,10 @@ export default class UsuarioService {
       }
       usuario.ativo = false;
       await usuario.save();
-      await criarRegistro(idUsuario, `Usuario desativado: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Usuario desativado: login: ${usuario.login} nome: ${usuario.nome}`
+      );
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);
@@ -291,7 +300,10 @@ export default class UsuarioService {
       }
       usuario.senha = md5(novaSenha);
       await usuario.save();
-      await criarRegistro(idUsuario, `Usuario atualizado senha: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Usuario atualizado senha: login: ${usuario.login}`
+      );
       return { erros: [], data: usuario };
     } catch (e) {
       console.log(e);
@@ -335,7 +347,7 @@ export default class UsuarioService {
       const token: string = jwt.sign({ usuario }, config.secret as string, {
         expiresIn: expires,
       });
-      await criarRegistro(idUsuario, `Usuario login: login=${login}`);
+  await criarRegistro(idUsuario, `Usuario login: login: ${login} nome: ${usuario.nome}`);
       return { erros: [], data: { usuario, token } };
     } catch (e) {
       console.log(e);
@@ -376,7 +388,10 @@ export default class UsuarioService {
       }
       usuario.senha = md5("123456");
       await usuario.save();
-      await criarRegistro(idUsuario, `Usuario resetar senha: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Usuario resetar senha: login: ${usuario.login}`
+      );
       return { erros: [], data: usuario };
     } catch (error) {
       console.log(error);

@@ -60,7 +60,7 @@ export default class RelatorioService {
     try {
       await criarRegistro(
         idUsuario,
-        `Relatorio academico por curso: cursoId=${cursoId}`
+        `Relatorio academico por curso: curso: ${cursoId}`
       );
       const curso = await Curso.findByPk(cursoId);
       const nomeCurso = curso ? curso.nome : `Curso ID ${cursoId}`;
@@ -177,7 +177,7 @@ export default class RelatorioService {
     addRodape(pageNumber);
 
     try {
-      await criarRegistro(idUsuario, `Relatorio academico: alunoId=${alunoId}`);
+  await criarRegistro(idUsuario, `Relatorio academico: aluno: ${alunoId}`);
       const aluno = await Aluno.findByPk(alunoId);
       const nomeAluno = aluno ? aluno.nome : `Aluno ID ${alunoId}`;
 
@@ -296,7 +296,7 @@ export default class RelatorioService {
     try {
       await criarRegistro(
         idUsuario,
-        `Relatorio emprestimo: lab=${laboratorioId || "todos"}`
+        `Relatorio emprestimo: lab: ${laboratorioId || "todos"}`
       );
       const whereClause: any = {};
       if (laboratorioId) {

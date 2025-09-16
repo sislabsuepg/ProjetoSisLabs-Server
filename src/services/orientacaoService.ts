@@ -215,7 +215,7 @@ export default class OrientacaoService {
       });
       await criarRegistro(
         idUsuario,
-        `Orientacao criada: aluno=${idAluno} lab=${idLaboratorio}`
+        `Orientacao criada: aluno ra: ${aluno!.ra} nome: ${aluno!.nome} lab: ${laboratorio!.nome} prof: ${professor!.nome}`
       );
       return { erros: [], data: novaOrientacao };
     } catch (error) {
@@ -281,7 +281,10 @@ export default class OrientacaoService {
       orientacao.dataFim = dataFim || orientacao.dataFim;
 
       await orientacao.save();
-      await criarRegistro(idUsuario, `Orientacao atualizada: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Orientacao atualizada: inicio: ${orientacao.dataInicio?.toISOString()} fim: ${orientacao.dataFim?.toISOString()}`
+      );
       return { erros: [], data: orientacao };
     } catch (error) {
       console.log(error);
@@ -314,7 +317,10 @@ export default class OrientacaoService {
       }
       orientacao.dataFim = new Date();
       await orientacao.save();
-      await criarRegistro(idUsuario, `Orientacao removida: id=${id}`);
+      await criarRegistro(
+        idUsuario,
+        `Orientacao removida: aluno: ${orientacao.getDataValue("idAluno")} lab: ${orientacao.getDataValue("idLaboratorio")}`
+      );
       return { erros: [], data: ["Orientação desativada com sucesso"] };
     } catch (error) {
       console.log(error);
