@@ -137,6 +137,18 @@ export default class RegistroService {
         descricao,
         idUsuario,
       });
+      const count = await Registro.count();
+      if (count > 400) {
+        for (let i = 0; i < 20; i++) {
+          const oldestRegistro = await Registro.findOne({
+            order: [["dataHora", "ASC"]],
+          });
+          if (oldestRegistro) {
+            await oldestRegistro.destroy();
+          }
+        }
+      }
+
       return { erros: [], data: registro };
     } catch (e) {
       console.log(e);
