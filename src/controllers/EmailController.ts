@@ -21,7 +21,7 @@ class EmailController {
 
       const advertenciaData = await EmprestimoService.updateAdvertencia(
         emprestimoId,
-        subject.splice(0, 100), // Limita a 100 caracteres, trocar depois caso altere a logica
+        subject.slice(0, 100), // Limita a 100 caracteres, trocar depois caso altere a logica
         idUsuario
       );
 
