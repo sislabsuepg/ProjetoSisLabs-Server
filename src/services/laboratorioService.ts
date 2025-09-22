@@ -143,7 +143,7 @@ export default class laboratorioService {
       }
       await criarRegistro(
         idUsuario,
-        `Laboratorio criado: numero: ${numero} nome: ${nome} restrito: ${laboratorio.restrito}`
+        `Criou laboratório: numero=${numero}; nome=${nome}; restrito=${laboratorio.restrito}`
       );
       return { erros: [], data: { laboratorio, horarios } };
     } catch (error) {
@@ -194,7 +194,7 @@ export default class laboratorioService {
       await laboratorio.save();
       await criarRegistro(
         idUsuario,
-        `Laboratorio atualizado: numero: ${laboratorio.numero} nome: ${laboratorio.nome} ativo: ${laboratorio.ativo}`
+        `Atualizou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}; ativo=${laboratorio.ativo}`
       );
       return { erros: [], data: laboratorio };
     } catch (error) {
@@ -218,7 +218,7 @@ export default class laboratorioService {
       await laboratorio.save();
       await criarRegistro(
         idUsuario,
-        `Laboratorio desativado: numero: ${laboratorio.numero} nome: ${laboratorio.nome}`
+        `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`
       );
       return { erros: [], data: null };
     } catch (error) {

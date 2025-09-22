@@ -106,7 +106,7 @@ export default class EmprestimoService {
     idUsuario: number
   ) {
     try {
-  const laboratorio = await Laboratorio.findByPk(idLaboratorio);
+      const laboratorio = await Laboratorio.findByPk(idLaboratorio);
       if (!laboratorio) {
         return {
           erros: ["Laboratório não encontrado"],
@@ -121,7 +121,7 @@ export default class EmprestimoService {
         };
       }
 
-  const aluno = await Aluno.findByPk(idAluno);
+      const aluno = await Aluno.findByPk(idAluno);
       if (!aluno || (aluno && aluno.ativo === false)) {
         return {
           erros: ["Aluno não encontrado ou inativo"],
@@ -167,7 +167,7 @@ export default class EmprestimoService {
       });
       await criarRegistro(
         idUsuario,
-        `Emprestimo criado: lab: ${laboratorio.numero} aluno ra: ${aluno.ra} nome: ${aluno.nome}`
+        `Criou empréstimo: lab=${laboratorio.numero}; ra=${aluno.ra}; nome=${aluno.nome}`
       );
       return { erros: [], data: emprestimo };
     } catch (e) {
@@ -225,7 +225,7 @@ export default class EmprestimoService {
       });
       await criarRegistro(
         idUsuarioSaida,
-        `Emprestimo fechado: lab: ${emprestimo.laboratorio?.numero} aluno ra: ${emprestimo.aluno?.ra} nome: ${emprestimo.aluno?.nome}`
+        `Fechou empréstimo: lab=${emprestimo.laboratorio?.numero}; ra=${emprestimo.aluno?.ra}; nome=${emprestimo.aluno?.nome}`
       );
       return { erros: [], data: emprestimoAtualizado };
     } catch (e) {
@@ -239,15 +239,12 @@ export default class EmprestimoService {
 
   static async updateAdvertencia(
     id: number,
-    advertencia: string,
+    advertencia: boolean,
     idUsuarioExecutor?: number
   ) {
     try {
       const emprestimo = await Emprestimo.findByPk(id, {
-        include: [
-          { model: Aluno },
-          { model: Laboratorio },
-        ],
+        include: [{ model: Aluno }, { model: Laboratorio }],
       });
       if (!emprestimo) {
         return {
@@ -260,7 +257,7 @@ export default class EmprestimoService {
       await emprestimo.save();
       await criarRegistro(
         idUsuarioExecutor,
-        `Emprestimo advertencia atualizada: lab: ${emprestimo.laboratorio?.numero} aluno ra: ${emprestimo.aluno?.ra} nome: ${emprestimo.aluno?.nome}`
+        `Atualizou advertência: lab=${emprestimo.laboratorio?.numero}; ra=${emprestimo.aluno?.ra}; nome=${emprestimo.aluno?.nome}`
       );
       return { erros: [], data: emprestimo };
     } catch (e) {

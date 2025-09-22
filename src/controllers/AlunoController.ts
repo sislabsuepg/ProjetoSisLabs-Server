@@ -195,7 +195,7 @@ class AlunoController {
     const { idUsuario } = req.body;
     const { erros, data } = await AlunoService.resetSenhaAluno(
       Number(id),
-      idUsuario
+      Number(idUsuario),
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });

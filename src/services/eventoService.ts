@@ -154,10 +154,10 @@ export default class EventoService {
         responsavel,
         idLaboratorio,
       });
-       await criarRegistro(
-         idUsuario,
-         `Evento criado: nome: ${nome} laboratorio: ${idLaboratorio}`
-       );
+      await criarRegistro(
+        idUsuario,
+        `Criou evento: nome=${nome}; lab=${idLaboratorio}`
+      );
       return { erros: [], data: evento };
     } catch (e) {
       console.log(e);
@@ -222,10 +222,7 @@ export default class EventoService {
       evento.nome = nome || evento.nome;
 
       await evento.save();
-       await criarRegistro(
-         idUsuario,
-         `Evento atualizado: nome: ${evento.nome}`
-       );
+      await criarRegistro(idUsuario, `Atualizou evento: nome=${evento.nome}`);
       return { erros: [], data: evento };
     } catch (e) {
       console.log(e);
@@ -245,8 +242,8 @@ export default class EventoService {
           data: null,
         };
       }
-  await evento.destroy();
-       await criarRegistro(idUsuario, `Evento removido: nome: ${evento.nome}`);
+      await evento.destroy();
+      await criarRegistro(idUsuario, `Removeu evento: nome=${evento.nome}`);
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);

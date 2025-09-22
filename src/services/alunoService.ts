@@ -344,7 +344,7 @@ export default class AlunoService {
       // registrar ação
       criarRegistro(
         idUsuario,
-        `Aluno criado: ra: ${ra} nome: ${nome} curso: ${curso.nome}`
+        `Criou aluno: ra=${ra}; nome=${nome}; curso=${curso.nome}`
       );
       return { erros: [], data: aluno };
     } catch (e) {
@@ -423,7 +423,7 @@ export default class AlunoService {
 
       criarRegistro(
         idUsuario,
-        `Aluno atualizado: ra: ${aluno.ra} nome: ${aluno.nome}`
+        `Atualizou aluno: ra=${aluno.ra}; nome=${aluno.nome}`
       );
       return { erros: [], data: alunoAtualizado };
     } catch (e) {
@@ -583,7 +583,7 @@ export default class AlunoService {
 
       criarRegistro(
         idUsuario,
-        `Aluno desativado: ra: ${ra} nome: ${aluno.nome}`
+        `Desativou aluno: ra=${ra}; nome=${aluno.nome}`
       );
       return { erros: [], data: null };
     } catch (e) {
@@ -610,8 +610,9 @@ export default class AlunoService {
 
       criarRegistro(
         idUsuario,
-        `Senha resetada: ra: ${aluno.ra} nome: ${aluno.nome}`
+        `Resetou senha de aluno: ra=${aluno.ra}; nome=${aluno.nome}`
       );
+      console.log("ID DE USUARIO:", idUsuario)
       return { erros: [], data: ["Senha resetada com sucesso"] };
     } catch (e) {
       console.log(e);
@@ -659,7 +660,7 @@ export default class AlunoService {
         expiresIn: expires,
       });
 
-  criarRegistro(idUsuario, `Aluno login: ra: ${ra} nome: ${aluno.nome}`);
+  criarRegistro(idUsuario, `Login de aluno: ra=${ra}; nome=${aluno.nome}`);
       return { erros: [], data: { aluno, token } };
     } catch (e) {
       console.log(e);

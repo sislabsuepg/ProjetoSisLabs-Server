@@ -70,10 +70,11 @@ export default class Emprestimo extends Model<
   declare posseChave: boolean;
 
   @AllowNull(true)
+  @Default(false)
   @Column({
-    type: DataType.STRING(255),
+    type: DataType.BOOLEAN,
   })
-  declare advertencia: string;
+  declare advertencia: boolean;
 
   @BelongsTo(() => Laboratorio, {
     foreignKey: "idLaboratorio",

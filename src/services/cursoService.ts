@@ -137,7 +137,7 @@ export default class CursoService {
       const curso = await Curso.create({ nome: nome, anosMaximo: anosMaximo });
       await criarRegistro(
         idUsuario,
-        `Curso criado: nome: ${nome} anosMax: ${anosMaximo}`
+        `Criou curso: nome=${nome}; anosMax=${anosMaximo}`
       );
       return {
         erros: [],
@@ -191,7 +191,7 @@ export default class CursoService {
       await curso.save();
       await criarRegistro(
         idUsuario,
-        `Curso atualizado: nome: ${curso.nome} anosMax: ${curso.anosMaximo} ativo: ${curso.ativo}`
+        `Atualizou curso: nome=${curso.nome}; anosMax=${curso.anosMaximo}; ativo=${curso.ativo}`
       );
       return {
         erros: [],
@@ -219,7 +219,7 @@ export default class CursoService {
       await curso.save();
       await criarRegistro(
         idUsuario,
-        `Curso desativado: nome: ${curso.nome}`
+        `Desativou curso: nome=${curso.nome}`
       );
       return {
         erros: [],

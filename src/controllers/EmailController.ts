@@ -19,11 +19,7 @@ class EmailController {
         return;
       }
 
-      const advertenciaData = await EmprestimoService.updateAdvertencia(
-        emprestimoId,
-        subject.slice(0, 100), // Limita a 100 caracteres, trocar depois caso altere a logica
-        idUsuario
-      );
+      await EmprestimoService.updateAdvertencia(emprestimoId, true, idUsuario);
 
       const result = await this.emailService.sendMail({
         to,

@@ -40,9 +40,6 @@ export async function seedEmprestimos() {
 
   const emprestimos: any[] = [];
 
-  // Helper para advertência (raramente não nula)
-  const advertencias = [null, null, null, "Chave atrasada", "Porta aberta"];
-
   // Criar ativos (sem dataHoraSaida). Mantemos a mesma semântica original:
   // closed = false => dataHoraSaida = null
   for (let i = 0; i < ativosParaCriar; i++) {
@@ -55,7 +52,7 @@ export async function seedEmprestimos() {
       dataHoraEntrada: entrada,
       dataHoraSaida: null,
       posseChave: closed, // preservando a lógica pré-existente
-      advertencia: faker.helpers.arrayElement(advertencias),
+      advertencia: false,
       idLaboratorio: lab.id,
       idAluno: aluno.id,
       idUsuarioEntrada: userEntrada.id,
@@ -76,7 +73,7 @@ export async function seedEmprestimos() {
       dataHoraEntrada: entrada,
       dataHoraSaida: saida,
       posseChave: closed, // preservando a lógica pré-existente
-      advertencia: faker.helpers.arrayElement(advertencias),
+      advertencia: false,
       idLaboratorio: lab.id,
       idAluno: aluno.id,
       idUsuarioEntrada: userEntrada.id,
@@ -86,6 +83,6 @@ export async function seedEmprestimos() {
 
   await Emprestimo.bulkCreate(emprestimos);
   console.log(
-    `[#seed] Empréstimos inseridos: ${emprestimos.length} (ativos novos: ${ativosParaCriar}, fechados novos: ${fechadosParaCriar})`
+    `[seed] Empréstimos inseridos: ${emprestimos.length} (ativos novos: ${ativosParaCriar}, fechados novos: ${fechadosParaCriar})`
   );
 }

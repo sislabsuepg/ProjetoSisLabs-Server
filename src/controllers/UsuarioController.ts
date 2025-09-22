@@ -116,7 +116,7 @@ class UsuarioController {
     const { idUsuario } = req.body;
     const { erros, data } = await UsuarioService.resetSenhaUsuario(
       Number(id),
-      idUsuario
+      Number(idUsuario)
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });

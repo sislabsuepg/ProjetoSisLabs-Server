@@ -187,7 +187,7 @@ export default class HorarioService {
       });
       await criarRegistro(
         idUsuario,
-        `Horario criado: dia: ${diaSemana} hora: ${horario} lab: ${idLaboratorio}`
+        `Criou horário: dia=${diaSemana}; hora=${horario}; lab=${idLaboratorio}`
       );
       return { erros: [], data: novoHorario };
     } catch (e) {
@@ -232,7 +232,7 @@ export default class HorarioService {
       });
       await criarRegistro(
         idUsuario,
-        `Horario atualizado: prof: ${idProfessor ?? "none"} semestral: ${
+        `Atualizou horário: prof=${idProfessor ?? "none"}; semestral=${
           semestral ?? false
         }`
       );
@@ -257,7 +257,7 @@ export default class HorarioService {
       }
 
       await horario.destroy();
-  await criarRegistro(idUsuario, `Horario removido: id=${id}`);
+      await criarRegistro(idUsuario, `Removeu horário: id=${id}`);
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);

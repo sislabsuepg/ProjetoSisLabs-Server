@@ -108,7 +108,11 @@ export default class professorService {
     }
   }
 
-  static async createProfessor(nome: string, email: string, idUsuario?: number) {
+  static async createProfessor(
+    nome: string,
+    email: string,
+    idUsuario?: number
+  ) {
     try {
       const erros = [...this.verificaNome(nome), ...this.verificaEmail(email)];
       if (erros.length > 0) {
@@ -132,7 +136,7 @@ export default class professorService {
       const professor = await Professor.create({ nome, email, ativo: true });
       await criarRegistro(
         idUsuario,
-        `Professor criado: nome: ${nome} email: ${email}`
+        `Criou professor: nome=${nome}; email=${email}`
       );
       return { erros: [], data: professor };
     } catch (e) {
@@ -182,7 +186,7 @@ export default class professorService {
       await professor.save();
       await criarRegistro(
         idUsuario,
-        `Professor atualizado: nome: ${professor.nome} ativo: ${professor.ativo}`
+        `Atualizou professor: nome=${professor.nome}; ativo=${professor.ativo}`
       );
       return { erros: [], data: professor };
     } catch (e) {
@@ -207,7 +211,7 @@ export default class professorService {
       await professor.save();
       await criarRegistro(
         idUsuario,
-        `Professor removido: nome: ${professor.nome}`
+        `Desativou professor: nome=${professor.nome}`
       );
       return { erros: [], data: null };
     } catch (e) {

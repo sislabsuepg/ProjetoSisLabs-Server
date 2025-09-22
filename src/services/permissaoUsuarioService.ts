@@ -142,11 +142,10 @@ export default class PermissaoUsuarioService {
         advertencia: excluir || false,
       };
 
-      const permissaoUsuario = await PermissaoUsuario.create(novaPermissaoUsuario);
-      await criarRegistro(
-        idUsuario,
-        `Permissao criada: nome: ${nomePermissao}`
+      const permissaoUsuario = await PermissaoUsuario.create(
+        novaPermissaoUsuario
       );
+      await criarRegistro(idUsuario, `Criou permissão: nome=${nomePermissao}`);
       return { erros: [], data: permissaoUsuario };
     } catch (e) {
       console.log(e);
@@ -222,7 +221,7 @@ export default class PermissaoUsuarioService {
       await permissaoUsuario.save();
       await criarRegistro(
         idUsuario,
-        `Permissao atualizada: nome: ${permissaoUsuario.nomePermissao} ativo: ${permissaoUsuario.ativo}`
+        `Atualizou permissão: nome=${permissaoUsuario.nomePermissao}; ativo=${permissaoUsuario.ativo}`
       );
       return { erros: [], data: permissaoUsuario };
     } catch (e) {
@@ -248,9 +247,12 @@ export default class PermissaoUsuarioService {
       await permissaoUsuario.save();
       await criarRegistro(
         idUsuario,
-        `Permissao removida: nome: ${permissaoUsuario.nomePermissao}`
+        `Desativou permissão: nome=${permissaoUsuario.nomePermissao}`
       );
-      return { erros: [], data: ["Permissão de usuario desativada com sucesso"] };
+      return {
+        erros: [],
+        data: ["Permissão de usuario desativada com sucesso"],
+      };
     } catch (e) {
       console.log(e);
       return {

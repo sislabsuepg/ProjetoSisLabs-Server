@@ -39,6 +39,7 @@ router.put(
 router.post(
   "/resetarsenha/:id",
   interceptUserCookie,
+  lockPath("alteracao"),
   AlunoController.resetPassword
 );
 

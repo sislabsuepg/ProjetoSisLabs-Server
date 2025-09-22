@@ -172,7 +172,7 @@ export default class UsuarioService {
       // auditoria
       await criarRegistro(
         idUsuario,
-        `Usuario criado: login: ${login} nome: ${nome}`
+        `Criou usuário: login=${login}; nome=${nome}`
       );
       return {
         erros: [],
@@ -248,7 +248,7 @@ export default class UsuarioService {
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Usuario atualizado: login: ${usuario.login} nome: ${usuario.nome} ativo: ${usuario.ativo}`
+        `Atualizou usuário: login=${usuario.login}; nome=${usuario.nome}; ativo=${usuario.ativo}`
       );
       return { erros: [], data: usuario };
     } catch (e) {
@@ -273,7 +273,7 @@ export default class UsuarioService {
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Usuario desativado: login: ${usuario.login} nome: ${usuario.nome}`
+        `Desativou usuário: login=${usuario.login}; nome=${usuario.nome}`
       );
       return { erros: [], data: null };
     } catch (e) {
@@ -302,7 +302,7 @@ export default class UsuarioService {
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Usuario atualizado senha: login: ${usuario.login}`
+        `Atualizou senha de usuário: login=${usuario.login}`
       );
       return { erros: [], data: usuario };
     } catch (e) {
@@ -347,7 +347,7 @@ export default class UsuarioService {
       const token: string = jwt.sign({ usuario }, config.secret as string, {
         expiresIn: expires,
       });
-  await criarRegistro(idUsuario, `Usuario login: login: ${login} nome: ${usuario.nome}`);
+  await criarRegistro(idUsuario, `Login de usuário: login=${login}; nome=${usuario.nome}`);
       return { erros: [], data: { usuario, token } };
     } catch (e) {
       console.log(e);
@@ -390,7 +390,7 @@ export default class UsuarioService {
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Usuario resetar senha: login: ${usuario.login}`
+        `Resetou senha de usuário: login=${usuario.login}`
       );
       return { erros: [], data: usuario };
     } catch (error) {
