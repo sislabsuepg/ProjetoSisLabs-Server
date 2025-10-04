@@ -91,7 +91,7 @@ export default class RelatorioService {
         doc
           .fontSize(16)
           .font("Helvetica-Bold")
-          .text("Nenhum Dado Encontrado", { align: "center" });
+          .text("Nenhum Dado Encontrado", 60, 150, { align: "center" });
 
         doc.moveDown(1);
 
@@ -184,7 +184,7 @@ export default class RelatorioService {
       const aluno = await Aluno.findByPk(alunoId);
       const nomeAluno = aluno ? aluno.nome : `Aluno ID ${alunoId}`;
 
-      addCabecalho(doc, `Acadêmico: ${nomeAluno}`);
+      addCabecalho(doc, `Acadêmico(a): ${nomeAluno}`);
 
       const emprestimos = await Emprestimo.findAll({
         include: [
@@ -208,7 +208,7 @@ export default class RelatorioService {
         doc
           .fontSize(16)
           .font("Helvetica-Bold")
-          .text("Nenhum Dado Encontrado", { align: "center" });
+          .text("Nenhum Dado Encontrado", 60, 150, { align: "center" });
 
         doc.moveDown(1);
 
@@ -216,7 +216,7 @@ export default class RelatorioService {
           .fontSize(11)
           .font("Helvetica")
           .text(
-            `A busca por registros de empréstimos para o acadêmico de RA: "${nomeAluno}" não retornou resultados.`,
+            `A busca por registros de empréstimos para o acadêmico(a): "${nomeAluno}" não retornou resultados.`,
             { align: "center" }
           );
       } else {
@@ -340,7 +340,7 @@ export default class RelatorioService {
         doc
           .fontSize(16)
           .font("Helvetica-Bold")
-          .text("Nenhum Dado Encontrado", { align: "center" });
+          .text("Nenhum Dado Encontrado", 60, 150, { align: "center" });
 
         doc.moveDown(1);
 
