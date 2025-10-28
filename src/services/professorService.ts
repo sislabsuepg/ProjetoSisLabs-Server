@@ -2,6 +2,7 @@ import Professor from "../models/Professor.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
 import { criarRegistro } from "../utils/registroLogger.js";
+import Horario from "../models/Horario.js";
 
 export default class professorService {
   static verificaNome(nome: string): string[] {
@@ -209,6 +210,15 @@ export default class professorService {
       }
       professor.ativo = false;
       await professor.save();
+      Horario.update({
+        idProfessor: null as any,
+      }, {
+        where: {
+          idProfessor: id,
+        },
+      });
+
+
       await criarRegistro(
         idUsuario,
         `Desativou professor: nome=${professor.nome}`

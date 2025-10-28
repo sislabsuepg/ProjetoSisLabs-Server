@@ -17,7 +17,6 @@ export class ReseterService {
     await Horario.update(
       {
         idProfessor: null as any,
-        semestral: false,
       },
       { where: {} }
     );

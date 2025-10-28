@@ -25,11 +25,12 @@ class App {
   app: any;
 
   constructor() {
-    connection.sync({ alter: true }); //remover em produção, essa linha força a recriação do banco de dados, apagando os dados existentes
+    connection.sync({ alter: true }).then(() => {
+      ReseterService.scheduledReset();
+    });
     this.app = express();
     this.middlewares();
     this.routes();
-    ReseterService.scheduledReset();
   }
 
   middlewares() {
