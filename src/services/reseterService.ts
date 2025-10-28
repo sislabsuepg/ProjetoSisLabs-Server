@@ -1,5 +1,6 @@
 import Reseter from "../models/Reseter.js";
 import Horario from "../models/Horario.js";
+import cron from "node-cron";
 
 export class ReseterService {
   static async getReseter(): Promise<Reseter | null> {
@@ -25,5 +26,17 @@ export class ReseterService {
       reseter.lastReset = new Date();
       await reseter.save();
     }
+  }
+
+  static async scheduledReset(): Promise<void> {
+    const reseter = await ReseterService.getReseter();
+    if (!reseter) return;
+    if (reseter?.lastReset.getFullYear() < new Date().getFullYear()) {
+      await ReseterService.reset();
+    }
+
+    cron.schedule("0 0 1 1 *", async () => {
+      await ReseterService.reset();
+    });
   }
 }

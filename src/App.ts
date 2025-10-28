@@ -16,6 +16,7 @@ import registroRoutes from "./routes/registroRoutes.js";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import emailRoutes from "./routes/emailRoutes.js";
 import relatorioRoutes from "./routes/relatorioRoutes.js";
+import reseterRoutes from "./routes/reseterRoutes.js";
 import soliciacoesRoutes from "./routes/solicitacoesRoutes.js";
 import { ReseterService } from "./services/reseterService.js";
 import { interceptUserCookie } from "./middlewares/interceptUserCookie.js";
@@ -28,6 +29,7 @@ class App {
     this.app = express();
     this.middlewares();
     this.routes();
+    ReseterService.scheduledReset();
   }
 
   middlewares() {
@@ -60,6 +62,7 @@ class App {
     this.app.use("/email/", interceptUserCookie, emailRoutes);
     this.app.use("/relatorio/", interceptUserCookie, relatorioRoutes);
     this.app.use("/solicitacoes/", soliciacoesRoutes);
+    this.app.use("/reseter/", interceptUserCookie, reseterRoutes);
   }
 }
 
