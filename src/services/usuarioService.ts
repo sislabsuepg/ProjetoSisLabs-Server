@@ -324,13 +324,13 @@ export default class UsuarioService {
       });
       if (!usuario) {
         return {
-          erros: ["Login inválido"],
+          erros: ["Login ou senha inválidos"],
           data: null,
         };
       }
       if (!usuario.verificaSenha(senha)) {
         return {
-          erros: ["Senha inválida"],
+          erros: ["Login ou senha inválidos"],
           data: null,
         };
       }
@@ -347,7 +347,10 @@ export default class UsuarioService {
       const token: string = jwt.sign({ usuario }, config.secret as string, {
         expiresIn: expires,
       });
-  await criarRegistro(idUsuario, `Login de usuário: login=${login}; nome=${usuario.nome}`);
+      await criarRegistro(
+        idUsuario,
+        `Login de usuário: login=${login}; nome=${usuario.nome}`
+      );
       return { erros: [], data: { usuario, token } };
     } catch (e) {
       console.log(e);

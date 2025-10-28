@@ -581,10 +581,7 @@ export default class AlunoService {
       aluno.ativo = false;
       await aluno.save();
 
-      criarRegistro(
-        idUsuario,
-        `Desativou aluno: ra=${ra}; nome=${aluno.nome}`
-      );
+      criarRegistro(idUsuario, `Desativou aluno: ra=${ra}; nome=${aluno.nome}`);
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);
@@ -612,7 +609,7 @@ export default class AlunoService {
         idUsuario,
         `Resetou senha de aluno: ra=${aluno.ra}; nome=${aluno.nome}`
       );
-      console.log("ID DE USUARIO:", idUsuario)
+      console.log("ID DE USUARIO:", idUsuario);
       return { erros: [], data: ["Senha resetada com sucesso"] };
     } catch (e) {
       console.log(e);
@@ -635,18 +632,11 @@ export default class AlunoService {
       });
       if (!aluno) {
         return {
-          erros: ["RA não encontrado"],
+          erros: ["Login ou senha inválidos"],
           data: null,
         };
       }
 
-      if (!aluno.verificaSenha(senha)) {
-        return {
-          erros: ["Senha inválida"],
-          data: null,
-        };
-      }
-      aluno.senha = "";
       if (!aluno.ativo) {
         return {
           erros: ["Aluno não está ativo"],
@@ -654,13 +644,21 @@ export default class AlunoService {
         };
       }
 
+      if (!aluno.verificaSenha(senha)) {
+        return {
+          erros: ["Login ou senha inválidos"],
+          data: null,
+        };
+      }
+      aluno.senha = "";
+
       let expires: number = parseInt(config.expires as string) || 1800;
 
       const token: string = jwt.sign({ aluno }, config.secret as string, {
         expiresIn: expires,
       });
 
-  criarRegistro(idUsuario, `Login de aluno: ra=${ra}; nome=${aluno.nome}`);
+      criarRegistro(idUsuario, `Login de aluno: ra=${ra}; nome=${aluno.nome}`);
       return { erros: [], data: { aluno, token } };
     } catch (e) {
       console.log(e);

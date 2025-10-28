@@ -12,6 +12,7 @@ import Professor from "../models/Professor.js";
 import Registro from "../models/Registro.js";
 import Usuario from "../models/Usuario.js";
 import Recado from "../models/Recado.js";
+import Reseter from "../models/Reseter.js";
 
 const connection: Sequelize = new Sequelize({
   ...databaseConfig,
@@ -30,6 +31,7 @@ const connection: Sequelize = new Sequelize({
     Orientacao,
     Recado,
     Registro,
+    Reseter,
   ],
 });
 

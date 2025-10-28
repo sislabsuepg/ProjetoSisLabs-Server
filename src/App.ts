@@ -17,6 +17,7 @@ import usuarioRoutes from "./routes/usuarioRoutes.js";
 import emailRoutes from "./routes/emailRoutes.js";
 import relatorioRoutes from "./routes/relatorioRoutes.js";
 import soliciacoesRoutes from "./routes/solicitacoesRoutes.js";
+import { ReseterService } from "./services/reseterService.js";
 import { interceptUserCookie } from "./middlewares/interceptUserCookie.js";
 
 class App {
