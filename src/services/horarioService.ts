@@ -228,7 +228,6 @@ export default class HorarioService {
 
       await horarioExistente.update({
         idProfessor,
-        semestral: semestral || false,
       });
       await criarRegistro(
         idUsuario,

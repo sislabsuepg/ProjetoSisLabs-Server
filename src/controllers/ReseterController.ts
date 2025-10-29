@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import { ReseterService } from "../services/reseterService";
+import { ReseterService } from "../services/reseterService.js";
 
 class testController {
   public async reset(req: Request, res: Response) {
