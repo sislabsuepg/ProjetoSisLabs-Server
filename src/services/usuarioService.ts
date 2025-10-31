@@ -44,6 +44,28 @@ export default class UsuarioService {
     return erros;
   }
 
+  static async countAdminsGeraisAtivos(): Promise<number> {
+    try {
+      const count = await Usuario.count({
+        where: {
+          ativo: true,
+        },
+        include: {
+          model: PermissaoUsuario,
+          where: {
+            geral: true,
+            ativo: true,
+          },
+          required: true,
+        },
+      });
+      return count;
+    } catch (error) {
+      console.log(error);
+      return 0;
+    }
+  }
+
   static async getAllUsuarios(
     offset?: number,
     limit?: number,
@@ -223,6 +245,39 @@ export default class UsuarioService {
         };
       }
 
+      // Proteção: Impedir que o sistema fique sem admin geral
+      const isAdminGeral = usuario.permissaoUsuario.geral && usuario.ativo;
+      const totalAdminsGerais = await this.countAdminsGeraisAtivos();
+
+      // Tentando desativar o último admin geral
+      if (isAdminGeral && ativo === false && totalAdminsGerais <= 1) {
+        return {
+          erros: ["Não é possível desativar o último administrador geral ativo do sistema. Crie outro administrador geral antes."],
+          data: null,
+        };
+      }
+
+      // Tentando mudar a permissão do último admin geral para uma não-geral
+      if (isAdminGeral && idPermissao !== undefined && totalAdminsGerais <= 1) {
+        const novaPermissao = await PermissaoUsuario.findByPk(idPermissao);
+        if (novaPermissao && !novaPermissao.geral) {
+          return {
+            erros: ["Não é possível alterar a permissão do último administrador geral ativo. Crie outro administrador geral antes."],
+            data: null,
+          };
+        }
+      }
+
+      // Validação ao reativar: a permissão deve estar ativa
+      if (ativo === true && !usuario.ativo) {
+        if (!usuario.permissaoUsuario.ativo) {
+          return {
+            erros: ["Não é possível reativar o usuário pois a permissão está inativa. Reative a permissão primeiro."],
+            data: null,
+          };
+        }
+      }
+
       usuario.nome = nome || usuario.nome;
       usuario.ativo = ativo === undefined ? usuario.ativo : ativo;
 
@@ -262,13 +317,30 @@ export default class UsuarioService {
 
   static async deleteUsuario(id: number, idUsuario?: number) {
     try {
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Usuario.findByPk(id, {
+        include: {
+          model: PermissaoUsuario,
+        },
+      });
       if (!usuario) {
         return {
           erros: ["Usuário não encontrado"],
           data: null,
         };
       }
+
+      // Proteção: Impedir que o sistema fique sem admin geral
+      const isAdminGeral = usuario.permissaoUsuario.geral && usuario.ativo;
+      if (isAdminGeral) {
+        const totalAdminsGerais = await this.countAdminsGeraisAtivos();
+        if (totalAdminsGerais <= 1) {
+          return {
+            erros: ["Não é possível desativar o último administrador geral ativo do sistema. Crie outro administrador geral antes."],
+            data: null,
+          };
+        }
+      }
+
       usuario.ativo = false;
       await usuario.save();
       await criarRegistro(

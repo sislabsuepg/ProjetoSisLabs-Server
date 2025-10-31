@@ -1,4 +1,5 @@
 import Laboratorio from "../models/Laboratorio.js";
+import Orientacao from "../models/Orientacao.js";
 import horarioCreatorHelper from "../utils/horarioCreatorHelper.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
@@ -207,21 +208,56 @@ export default class laboratorioService {
 
   static async deleteLaboratorio(id: number, idUsuario?: number) {
     try {
-      const laboratorio = await Laboratorio.findByPk(id);
+      const laboratorio = await Laboratorio.findByPk(id, {
+        include: [{ model: Orientacao }],
+      });
       if (!laboratorio) {
         return {
           erros: ["Laboratório não encontrado"],
           data: null,
         };
       }
+      
       laboratorio.ativo = false;
       await laboratorio.save();
-      await criarRegistro(
-        idUsuario,
-        `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`
-      );
+
+      // Desativa todas as orientações ativas do laboratório (dataFim no futuro)
+      if (laboratorio.orientacoes && laboratorio.orientacoes.length > 0) {
+        const hoje = new Date();
+        const orientacoesAbertas = laboratorio.orientacoes.filter(
+          orientacao => orientacao.dataFim > hoje
+        );
+        
+        for (const orientacao of orientacoesAbertas) {
+          // Se a orientação ainda não começou, ajusta a data de início
+          if (orientacao.dataInicio > hoje) {
+            orientacao.dataInicio = hoje;
+          }
+          orientacao.dataFim = hoje;
+          await orientacao.save();
+        }
+        
+        if (orientacoesAbertas.length > 0) {
+          await criarRegistro(
+            idUsuario,
+            `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome} e ${orientacoesAbertas.length} orientação(ões) ativa(s)`
+          );
+        } else {
+          await criarRegistro(
+            idUsuario,
+            `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`
+          );
+        }
+      } else {
+        await criarRegistro(
+          idUsuario,
+          `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`
+        );
+      }
+      
       return { erros: [], data: null };
     } catch (error) {
+      console.log(error);
       return {
         erros: ["Erro ao desativar laboratório"],
         data: null,

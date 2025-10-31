@@ -1,4 +1,5 @@
 import PermissaoUsuario from "../models/PermissaoUsuario.js";
+import Usuario from "../models/Usuario.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
 import { criarRegistro } from "../utils/registroLogger.js";
@@ -201,6 +202,60 @@ export default class PermissaoUsuarioService {
         };
       }
 
+      // Proteção: Impedir remover a flag "geral" da única permissão geral ativa com usuários
+      if (permissaoUsuario.geral && geral === false) {
+        // Conta quantas permissões gerais ativas existem
+        const permissoesGeraisAtivas = await PermissaoUsuario.count({
+          where: {
+            geral: true,
+            ativo: true,
+          },
+        });
+
+        // Se esta for a única permissão geral ativa, verifica se há usuários ativos usando ela
+        if (permissoesGeraisAtivas <= 1) {
+          const usuariosAtivosComEstaPermissao = await Usuario.count({
+            where: {
+              idPermissao: permissaoUsuario.id,
+              ativo: true,
+            },
+          });
+
+          if (usuariosAtivosComEstaPermissao > 0) {
+            return {
+              erros: ["Não é possível remover a flag 'geral' desta permissão pois ela é a única permissão geral ativa e possui usuários ativos associados. Isso deixaria o sistema sem administrador geral."],
+              data: [],
+            };
+          }
+        }
+      }
+
+      // Proteção: Impedir desativar a única permissão geral ativa com usuários
+      if (permissaoUsuario.geral && ativo === false) {
+        const permissoesGeraisAtivas = await PermissaoUsuario.count({
+          where: {
+            geral: true,
+            ativo: true,
+          },
+        });
+
+        if (permissoesGeraisAtivas <= 1) {
+          const usuariosAtivosComEstaPermissao = await Usuario.count({
+            where: {
+              idPermissao: permissaoUsuario.id,
+              ativo: true,
+            },
+          });
+
+          if (usuariosAtivosComEstaPermissao > 0) {
+            return {
+              erros: ["Não é possível desativar esta permissão pois ela é a única permissão geral ativa e possui usuários ativos. Isso deixaria o sistema sem administrador geral."],
+              data: [],
+            };
+          }
+        }
+      }
+
       permissaoUsuario.nomePermissao =
         nomePermissao == undefined
           ? permissaoUsuario.nomePermissao
@@ -235,12 +290,49 @@ export default class PermissaoUsuarioService {
 
   static async deletePermissaoUsuario(id: number, idUsuario?: number) {
     try {
-      const permissaoUsuario = await PermissaoUsuario.findByPk(id);
+      const permissaoUsuario = await PermissaoUsuario.findByPk(id, {
+        include: [{ model: Usuario }],
+      });
       if (!permissaoUsuario) {
         return {
           erros: ["Permissão de usuario não encontrada"],
           data: [],
         };
+      }
+
+      // Verifica se há usuários ativos associados a esta permissão
+      if (permissaoUsuario.usuarios && permissaoUsuario.usuarios.length > 0) {
+        const usuariosAtivos = permissaoUsuario.usuarios.filter(
+          usuario => usuario.ativo
+        );
+        
+        if (usuariosAtivos.length > 0) {
+          // Proteção adicional: Se for permissão geral e única, impedir desativação
+          if (permissaoUsuario.geral) {
+            const permissoesGeraisAtivas = await PermissaoUsuario.count({
+              where: {
+                geral: true,
+                ativo: true,
+              },
+            });
+
+            if (permissoesGeraisAtivas <= 1) {
+              return {
+                erros: [
+                  `Não é possível desativar esta permissão pois ela é a única permissão geral ativa com ${usuariosAtivos.length} usuário(s) ativo(s). Isso deixaria o sistema sem administrador geral.`
+                ],
+                data: [],
+              };
+            }
+          }
+
+          return {
+            erros: [
+              `Não é possível desativar esta permissão pois existem ${usuariosAtivos.length} usuário(s) ativo(s) associado(s). Altere a permissão dos usuários antes de desativá-la.`
+            ],
+            data: [],
+          };
+        }
       }
 
       permissaoUsuario.ativo = false;

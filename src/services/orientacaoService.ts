@@ -243,7 +243,14 @@ export default class OrientacaoService {
         };
       }
 
-      const orientacao = await Orientacao.findByPk(id);
+      const orientacao = await Orientacao.findByPk(id, {
+        include: [
+          { model: Aluno, as: "aluno" },
+          { model: Professor, as: "professor" },
+          { model: Laboratorio, as: "laboratorio" },
+        ],
+      });
+      
       if (!orientacao) {
         return {
           erros: ["Orientação não encontrada"],

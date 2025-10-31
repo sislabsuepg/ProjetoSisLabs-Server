@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import Curso from "../models/Curso.js";
+import Aluno from "../models/Aluno.js";
 import { getPaginationParams } from "../types/pagination.js";
 import { criarRegistro } from "../utils/registroLogger.js";
 export default class CursoService {
@@ -208,19 +209,38 @@ export default class CursoService {
 
   static async deleteCurso(id: number, idUsuario?: number) {
     try {
-      const curso = await Curso.findByPk(id);
+      const curso = await Curso.findByPk(id, {
+        include: [{ model: Aluno }],
+      });
       if (!curso) {
         return {
           erros: ["Curso não encontrado"],
           data: null,
         };
       }
+      
+      // Desativa o curso
       curso.ativo = false;
       await curso.save();
-      await criarRegistro(
-        idUsuario,
-        `Desativou curso: nome=${curso.nome}`
-      );
+      
+      // Desativa todos os alunos do curso recursivamente
+      if (curso.alunos && curso.alunos.length > 0) {
+        const alunosAtivos = curso.alunos.filter(aluno => aluno.ativo);
+        for (const aluno of alunosAtivos) {
+          aluno.ativo = false;
+          await aluno.save();
+        }
+        await criarRegistro(
+          idUsuario,
+          `Desativou curso: nome=${curso.nome} e ${alunosAtivos.length} aluno(s) associado(s)`
+        );
+      } else {
+        await criarRegistro(
+          idUsuario,
+          `Desativou curso: nome=${curso.nome}`
+        );
+      }
+      
       return {
         erros: [],
         data: null,

@@ -26,6 +26,7 @@ export default class HorarioService {
     try {
       const labsComHorarios = await Laboratorio.findAll({
         include: [{ model: Horario, as: "horarios" }],
+        where: { ativo: true },
       });
 
       if (!labsComHorarios || labsComHorarios.length === 0) {
@@ -82,6 +83,22 @@ export default class HorarioService {
 
   static async getHorariosByLaboratorio(idLaboratorio: number) {
     try {
+      // Verifica se o laboratório existe e está ativo
+      const laboratorio = await Laboratorio.findByPk(idLaboratorio);
+      if (!laboratorio) {
+        return {
+          erros: ["Laboratório não encontrado"],
+          data: [],
+        };
+      }
+      
+      if (!laboratorio.ativo) {
+        return {
+          erros: ["Laboratório está inativo"],
+          data: [],
+        };
+      }
+
       const horarios = await Horario.findAll({
         where: { idLaboratorio },
         include: [
@@ -89,6 +106,7 @@ export default class HorarioService {
           { model: Laboratorio, as: "laboratorio" },
         ],
       });
+      
       if (!horarios || horarios.length === 0) {
         return {
           erros: ["Nenhum horario encontrado"],

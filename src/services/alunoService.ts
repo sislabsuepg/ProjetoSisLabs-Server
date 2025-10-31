@@ -413,6 +413,14 @@ export default class AlunoService {
         };
       }
 
+      // Validação ao reativar: o curso deve estar ativo
+      if (ativo === true && !aluno.ativo && !aluno.curso.ativo) {
+        return {
+          erros: ["Não é possível reativar o aluno pois o curso está inativo. Reative o curso primeiro."],
+          data: [],
+        };
+      }
+
       aluno.nome = nome == undefined ? aluno.nome : nome;
       aluno.telefone = telefone == undefined ? "" : telefone.replace(/\D/g, "");
       aluno.anoCurso = anoCurso == undefined ? aluno.anoCurso : anoCurso;
@@ -570,7 +578,9 @@ export default class AlunoService {
 
   static async deleteAluno(ra: string, idUsuario?: number) {
     try {
-      const aluno = await Aluno.findByPk(ra);
+      const aluno = await Aluno.findByPk(ra, {
+        include: [{ model: Orientacao }],
+      });
       if (!aluno) {
         return {
           erros: ["Aluno não encontrado"],
@@ -581,7 +591,34 @@ export default class AlunoService {
       aluno.ativo = false;
       await aluno.save();
 
-      criarRegistro(idUsuario, `Desativou aluno: ra=${ra}; nome=${aluno.nome}`);
+      // Desativa todas as orientações em aberto (dataFim no futuro)
+      if (aluno.orientacoes && aluno.orientacoes.length > 0) {
+        const hoje = new Date();
+        const orientacoesAbertas = aluno.orientacoes.filter(
+          orientacao => orientacao.dataFim > hoje
+        );
+        
+        for (const orientacao of orientacoesAbertas) {
+          // Se a orientação ainda não começou, ajusta a data de início
+          if (orientacao.dataInicio > hoje) {
+            orientacao.dataInicio = hoje;
+          }
+          orientacao.dataFim = hoje;
+          await orientacao.save();
+        }
+        
+        if (orientacoesAbertas.length > 0) {
+          criarRegistro(
+            idUsuario,
+            `Desativou aluno: ra=${ra}; nome=${aluno.nome} e ${orientacoesAbertas.length} orientação(ões) em aberto`
+          );
+        } else {
+          criarRegistro(idUsuario, `Desativou aluno: ra=${ra}; nome=${aluno.nome}`);
+        }
+      } else {
+        criarRegistro(idUsuario, `Desativou aluno: ra=${ra}; nome=${aluno.nome}`);
+      }
+
       return { erros: [], data: null };
     } catch (e) {
       console.log(e);
