@@ -252,7 +252,7 @@ export default class OrientacaoService {
           { model: Laboratorio, as: "laboratorio" },
         ],
       });
-      
+
       if (!orientacao) {
         return {
           erros: ["Orientação não encontrada"],

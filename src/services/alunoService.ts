@@ -416,7 +416,9 @@ export default class AlunoService {
       // Validação ao reativar: o curso deve estar ativo
       if (ativo === true && !aluno.ativo && !aluno.curso.ativo) {
         return {
-          erros: ["Não é possível reativar o aluno pois o curso está inativo. Reative o curso primeiro."],
+          erros: [
+            "Não é possível reativar o aluno pois o curso está inativo. Reative o curso primeiro.",
+          ],
           data: [],
         };
       }
@@ -598,9 +600,9 @@ export default class AlunoService {
       if (aluno.orientacoes && aluno.orientacoes.length > 0) {
         const hoje = new Date();
         const orientacoesAbertas = aluno.orientacoes.filter(
-          orientacao => orientacao.dataFim > hoje
+          (orientacao) => orientacao.dataFim > hoje
         );
-        
+
         for (const orientacao of orientacoesAbertas) {
           // Se a orientação ainda não começou, ajusta a data de início
           if (orientacao.dataInicio > hoje) {
@@ -609,17 +611,23 @@ export default class AlunoService {
           orientacao.dataFim = hoje;
           await orientacao.save();
         }
-        
+
         if (orientacoesAbertas.length > 0) {
           criarRegistro(
             idUsuario,
             `Desativou aluno: ra=${ra}; nome=${aluno.nome} e ${orientacoesAbertas.length} orientação(ões) em aberto`
           );
         } else {
-          criarRegistro(idUsuario, `Desativou aluno: ra=${ra}; nome=${aluno.nome}`);
+          criarRegistro(
+            idUsuario,
+            `Desativou aluno: ra=${ra}; nome=${aluno.nome}`
+          );
         }
       } else {
-        criarRegistro(idUsuario, `Desativou aluno: ra=${ra}; nome=${aluno.nome}`);
+        criarRegistro(
+          idUsuario,
+          `Desativou aluno: ra=${ra}; nome=${aluno.nome}`
+        );
       }
 
       return { erros: [], data: null };

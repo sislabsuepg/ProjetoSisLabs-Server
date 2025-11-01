@@ -116,7 +116,11 @@ export default class CursoService {
     }
   }
 
-  static async createCurso(nome: string, anosMaximo: number, idUsuario?: number) {
+  static async createCurso(
+    nome: string,
+    anosMaximo: number,
+    idUsuario?: number
+  ) {
     try {
       const erros: string[] = [
         ...CursoService.verificaNome(nome),
@@ -220,14 +224,14 @@ export default class CursoService {
           data: null,
         };
       }
-      
+
       // Desativa o curso
       curso.ativo = false;
       await curso.save();
-      
+
       // Desativa todos os alunos do curso recursivamente
       if (curso.alunos && curso.alunos.length > 0) {
-        const alunosAtivos = curso.alunos.filter(aluno => aluno.ativo);
+        const alunosAtivos = curso.alunos.filter((aluno) => aluno.ativo);
         for (const aluno of alunosAtivos) {
           aluno.ativo = false;
           await aluno.save();
@@ -237,12 +241,9 @@ export default class CursoService {
           `Desativou curso: nome=${curso.nome} e ${alunosAtivos.length} aluno(s) associado(s)`
         );
       } else {
-        await criarRegistro(
-          idUsuario,
-          `Desativou curso: nome=${curso.nome}`
-        );
+        await criarRegistro(idUsuario, `Desativou curso: nome=${curso.nome}`);
       }
-      
+
       return {
         erros: [],
         data: null,

@@ -211,14 +211,16 @@ export default class professorService {
       }
       professor.ativo = false;
       await professor.save();
-      Horario.update({
-        idProfessor: null as any,
-      }, {
-        where: {
-          idProfessor: id,
+      Horario.update(
+        {
+          idProfessor: null as any,
         },
-      });
-
+        {
+          where: {
+            idProfessor: id,
+          },
+        }
+      );
 
       await criarRegistro(
         idUsuario,

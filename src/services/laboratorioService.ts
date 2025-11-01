@@ -217,7 +217,7 @@ export default class laboratorioService {
           data: null,
         };
       }
-      
+
       laboratorio.ativo = false;
       await laboratorio.save();
 
@@ -225,9 +225,9 @@ export default class laboratorioService {
       if (laboratorio.orientacoes && laboratorio.orientacoes.length > 0) {
         const hoje = new Date();
         const orientacoesAbertas = laboratorio.orientacoes.filter(
-          orientacao => orientacao.dataFim > hoje
+          (orientacao) => orientacao.dataFim > hoje
         );
-        
+
         for (const orientacao of orientacoesAbertas) {
           // Se a orientação ainda não começou, ajusta a data de início
           if (orientacao.dataInicio > hoje) {
@@ -236,7 +236,7 @@ export default class laboratorioService {
           orientacao.dataFim = hoje;
           await orientacao.save();
         }
-        
+
         if (orientacoesAbertas.length > 0) {
           await criarRegistro(
             idUsuario,
@@ -254,7 +254,7 @@ export default class laboratorioService {
           `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`
         );
       }
-      
+
       return { erros: [], data: null };
     } catch (error) {
       console.log(error);
