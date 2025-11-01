@@ -30,6 +30,7 @@ export default class CursoService {
         where: {
           ...(ativo !== undefined && { ativo }),
         },
+        order: [["nome", "ASC"]],
       });
       if (cursos.length === 0) {
         return {
@@ -93,6 +94,7 @@ export default class CursoService {
             ...(ativo !== undefined && { ativo }),
           },
         },
+        order: [["nome", "ASC"]],
         ...getPaginationParams(offset, limit),
       });
       if (!cursos || cursos.length === 0) {

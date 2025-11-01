@@ -41,6 +41,7 @@ export default class OrientacaoService {
           where: {
             ...getAtivo(ativo),
           },
+          order: [[{ model: Aluno, as: "aluno" }, "nome", "ASC"]],
           ...getPaginationParams(offset, limit),
         });
 
@@ -141,6 +142,7 @@ export default class OrientacaoService {
             as: "laboratorio",
           },
         ],
+        order: [[{ model: Aluno, as: "aluno" }, "nome", "ASC"]],
       });
 
       if (orientacoes.length === 0) {

@@ -60,6 +60,7 @@ export default class professorService {
             ...(nome ? { nome: { [Op.iLike]: `%${nome}%` } } : {}),
             ...(ativo !== undefined ? { ativo: { [Op.eq]: ativo } } : {}),
           },
+          order: [["nome", "ASC"]],
         });
       if (!professores) {
         return {

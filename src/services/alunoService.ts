@@ -459,6 +459,7 @@ export default class AlunoService {
         where: {
           [Op.and]: [{ ativo: true }, { restrito: false }],
         },
+        order: [["nome", "ASC"]],
       });
 
       const orientacoes = await Orientacao.findAll({
@@ -481,6 +482,8 @@ export default class AlunoService {
           labRestrito.ativo === true
         ) {
           laboratorios.push(labRestrito);
+          // Re-ordenar após adicionar o laboratório restrito
+          laboratorios.sort((a, b) => a.nome.localeCompare(b.nome));
         }
       }
 

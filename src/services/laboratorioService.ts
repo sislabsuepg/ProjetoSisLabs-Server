@@ -50,7 +50,7 @@ export default class laboratorioService {
             ...(nome && { nome: { [Op.iLike]: `%${nome}%` } }),
             ...(ativo !== undefined && { ativo }),
           },
-          order: [["numero", "ASC"]],
+          order: [["nome", "ASC"]],
         });
       if (!laboratorios || laboratorios.length === 0) {
         return {
