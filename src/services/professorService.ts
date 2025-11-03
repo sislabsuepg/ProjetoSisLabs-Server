@@ -181,6 +181,10 @@ export default class professorService {
           data: null,
         };
       }
+      // Normaliza nome (primeira letra maiúscula de cada palavra)
+      if (nome !== undefined) {
+        nome = this.preparaNome(nome);
+      }
       professor.nome = nome == undefined ? professor.nome : nome;
       professor.email = email == undefined ? professor.email : email;
       professor.ativo = ativo == undefined ? professor.ativo : ativo;

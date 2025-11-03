@@ -139,7 +139,14 @@ export default class Aluno extends Model<
 
   @BeforeCreate
   static async hashSenha(instance: Aluno) {
-    instance.senha = await md5(instance.senha);
+    // If senha already looks like an MD5 hash (32 hex chars), keep as-is
+    const isMd5 = /^[a-fA-F0-9]{32}$/.test(instance.senha || "");
+    if (!isMd5) {
+      instance.senha = await md5(instance.senha);
+    } else {
+      // Normalize to lowercase for consistency
+      instance.senha = instance.senha.toLowerCase();
+    }
   }
 
   verificaSenha(senhaInserida: string) {

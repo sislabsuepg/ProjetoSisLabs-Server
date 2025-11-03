@@ -6,7 +6,7 @@ class LaboratorioController {
     const { restrito, page, items, ativo, nome } = req.query;
     let restritoTest: boolean | undefined;
     let ativado: boolean | undefined;
-    
+
     if (restrito === undefined) {
       restritoTest = undefined;
     } else {
@@ -101,7 +101,13 @@ class LaboratorioController {
   }
 
   async count(req: Request, res: Response) {
-    const count = await laboratorioService.getCount();
+    const { ativo } = req.query;
+    let ativado = undefined;
+    if (typeof ativo === "undefined") ativado = undefined;
+    else {
+      ativado = ativo === "true";
+    }
+    const count = await laboratorioService.getCount(ativado);
     res.status(codes.OK).json({ count });
   }
 }

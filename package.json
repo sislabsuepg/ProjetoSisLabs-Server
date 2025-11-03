@@ -8,7 +8,9 @@
     "dev": "nodemon --watch 'src' --exec tsx src/server.ts",
     "start": "node dist/server.js",
     "seed": "npm run build && node dist/seeders/000-seedAll.js",
-    "seed:fresh": "npm run build && node dist/seeders/000-seedAll.js --fresh"
+    "seed:fresh": "npm run build && node dist/seeders/000-seedAll.js --fresh",
+    "migrate:legacy": "tsx src/migration/importMigData.ts",
+    "verify:legacy": "tsx src/migration/verifyImport.ts"
   },
   "repository": {
     "type": "git",
@@ -62,6 +64,7 @@
     "@types/nodemailer": "^7.0.1",
     "@types/pdfkit": "^0.17.3",
     "@types/validator": "^13.15.0",
+    "csv-parse": "^5.6.0",
     "nodemon": "^3.1.10",
     "tsx": "^4.19.3",
     "typescript": "^5.9.2"

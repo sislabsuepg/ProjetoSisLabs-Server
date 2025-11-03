@@ -28,8 +28,11 @@ export default class laboratorioService {
     if (nome.length < 3 || nome.length > 60) {
       erros.push("O nome deve ter entre 3 e 60 caracteres.");
     }
-    if (!/^[a-zA-Z\u00C0-\u00FF0-9 ]+$/.test(nome)) {
-      erros.push("O nome deve conter apenas letras e números.");
+    // Permitir letras (com acentos), números, espaços e hífens (inclui -, – e —)
+    if (!/^[a-zA-Z\u00C0-\u00FF0-9 \-\u2013\u2014]+$/.test(nome)) {
+      erros.push(
+        "O nome deve conter apenas letras, números, espaços e hífens."
+      );
     }
     return erros;
   }
@@ -50,7 +53,7 @@ export default class laboratorioService {
             ...(nome && { nome: { [Op.iLike]: `%${nome}%` } }),
             ...(ativo !== undefined && { ativo }),
           },
-          order: [["nome", "ASC"]],
+          order: [["numero", "ASC"]],
         });
       if (!laboratorios || laboratorios.length === 0) {
         return {
@@ -199,6 +202,7 @@ export default class laboratorioService {
       );
       return { erros: [], data: laboratorio };
     } catch (error) {
+      console.log(error);
       return {
         erros: ["Erro ao atualizar laboratório"],
         data: null,
@@ -265,9 +269,15 @@ export default class laboratorioService {
     }
   }
 
-  static async getCount() {
+  static async getCount(ativo?: boolean) {
     try {
-      const count = await Laboratorio.count();
+      const count: number = await Laboratorio.count({
+        where: {
+          ativo: {
+            [Op.or]: ativo === undefined ? [true, false] : [ativo],
+          },
+        },
+      });
       return count;
     } catch (error) {
       console.log(error);
