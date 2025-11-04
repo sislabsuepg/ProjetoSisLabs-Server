@@ -12,6 +12,7 @@ interface Config {
   db_port: number;
   secret: string;
   expires: string;
+  app_url: string;
 }
 
 const config: Config = {
@@ -24,6 +25,7 @@ const config: Config = {
   db_port: Number(process.env.DB_PORT) || 5432,
   secret: process.env.SECRET || "Default",
   expires: process.env.EXPIRES_IN || "28800",
+  app_url: process.env.APP_URL || "http://localhost:3000",
 };
 
 export default config;

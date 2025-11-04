@@ -20,6 +20,7 @@ import reseterRoutes from "./routes/reseterRoutes.js";
 import soliciacoesRoutes from "./routes/solicitacoesRoutes.js";
 import { ReseterService } from "./services/reseterService.js";
 import { interceptUserCookie } from "./middlewares/interceptUserCookie.js";
+import config from "./config/config.js";
 
 class App {
   app: any;
@@ -39,7 +40,7 @@ class App {
     this.app.use(cookieParser());
     this.app.use(
       cors({
-        origin: ["http://localhost:3000"],
+        origin: config.app_url || "http://localhost:3000", // Origem permitida
         methods: "GET,PUT,POST,DELETE", // Métodos permitidos
         allowedHeaders: "Content-Type, Authorization, Cookie", // Cabeçalhos permitidos
         credentials: true,
