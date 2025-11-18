@@ -249,9 +249,7 @@ export default class HorarioService {
       });
       await criarRegistro(
         idUsuario,
-        `Atualizou horário: prof=${idProfessor ?? "none"}; semestral=${
-          semestral ?? false
-        }`
+        `Atualizou horário: prof=${idProfessor ?? "none"};`
       );
       return { erros: [], data: horarioExistente };
     } catch (e) {
