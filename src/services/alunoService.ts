@@ -45,7 +45,7 @@ export default class AlunoService {
     }
     if (!/^\d{10,15}$/.test(telefoneLimpo)) {
       erros.push(
-        "Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)"
+        "Telefone inválido (deve conter entre 10 e 15 dígitos numéricos)",
       );
     }
     return erros;
@@ -69,7 +69,7 @@ export default class AlunoService {
     }
     if (
       !/[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?/.test(
-        email
+        email,
       )
     ) {
       erros.push("Email inválido");
@@ -156,7 +156,7 @@ export default class AlunoService {
     ra?: string,
     ativo?: boolean,
     offset?: number,
-    limit?: number
+    limit?: number,
   ) {
     try {
       if (!nome && !ra) {
@@ -264,7 +264,7 @@ export default class AlunoService {
     email: string,
     senha: string,
     idCurso: number,
-    idUsuario?: number
+    idUsuario?: number,
   ) {
     try {
       if (!nome || !ra || !anoCurso || !senha || !idCurso) {
@@ -344,7 +344,7 @@ export default class AlunoService {
       // registrar ação
       criarRegistro(
         idUsuario,
-        `Criou aluno: ra=${ra}; nome=${nome}; curso=${curso.nome}`
+        `Criou aluno: ra=${ra}; nome=${nome}; curso=${curso.nome}`,
       );
       return { erros: [], data: aluno };
     } catch (e) {
@@ -363,7 +363,7 @@ export default class AlunoService {
     anoCurso?: number,
     email?: string,
     ativo?: boolean,
-    idUsuario?: number
+    idUsuario?: number,
   ) {
     try {
       const aluno = await Aluno.findByPk(id, {
@@ -433,7 +433,7 @@ export default class AlunoService {
 
       criarRegistro(
         idUsuario,
-        `Atualizou aluno: ra=${aluno.ra}; nome=${aluno.nome}`
+        `Atualizou aluno: ra=${aluno.ra}; nome=${aluno.nome}`,
       );
       return { erros: [], data: alunoAtualizado };
     } catch (e) {
@@ -476,7 +476,7 @@ export default class AlunoService {
       if (orientacoes && orientacoes.length > 0) {
         console.log(orientacoes[0]);
         const labRestrito = await Laboratorio.findByPk(
-          orientacoes[0].laboratorio.id
+          orientacoes[0].laboratorio.id,
         );
         if (
           labRestrito &&
@@ -522,8 +522,7 @@ export default class AlunoService {
       aluno.atualizaSenha(novaSenha);
       await aluno.save();
       return { erros: [], data: ["Senha atualizada com sucesso"] };
-    } catch (e) {
-      console.log(e);
+    } catch {
       return {
         erros: ["Erro ao atualizar senha"],
         data: [],
@@ -554,8 +553,7 @@ export default class AlunoService {
       aluno.email = email == undefined ? aluno.email : email;
       const alunoAtualizado = await aluno.save();
       return { erros: [], data: alunoAtualizado };
-    } catch (error) {
-      console.error("Erro ao atualizar perfil:", error);
+    } catch {
       return {
         erros: ["Erro ao atualizar perfil"],
         data: [],
@@ -563,20 +561,42 @@ export default class AlunoService {
     }
   }
 
+  static async getAuthenticatedAlunoById(id: number) {
+    try {
+      const aluno = await Aluno.findByPk(id, {
+        attributes: [
+          "id",
+          "nome",
+          "ra",
+          "telefone",
+          "anoCurso",
+          "email",
+          "ativo",
+          "idCurso",
+        ],
+      });
+
+      if (!aluno || !aluno.ativo) {
+        return null;
+      }
+
+      return aluno;
+    } catch {
+      return null;
+    }
+  }
+
   static async verificaAtivo(id: number, nome: string, ra: string) {
     try {
       const aluno = await Aluno.findByPk(id);
       if (!aluno) {
-        console.log(`Aluno não encontrado: id=${id}, ra=${ra}, nome=${nome}`);
         return false;
       }
       if (!aluno.ativo) {
-        console.log(`Aluno inativo: id=${id}, ra=${ra}, nome=${nome}`);
         return false;
       }
       return true;
-    } catch (error) {
-      console.error("Erro ao verificar aluno:", error);
+    } catch {
       return false;
     }
   }
@@ -600,7 +620,7 @@ export default class AlunoService {
       if (aluno.orientacoes && aluno.orientacoes.length > 0) {
         const hoje = new Date();
         const orientacoesAbertas = aluno.orientacoes.filter(
-          (orientacao) => orientacao.dataFim > hoje
+          (orientacao) => orientacao.dataFim > hoje,
         );
 
         for (const orientacao of orientacoesAbertas) {
@@ -615,18 +635,18 @@ export default class AlunoService {
         if (orientacoesAbertas.length > 0) {
           criarRegistro(
             idUsuario,
-            `Desativou aluno: ra=${ra}; nome=${aluno.nome} e ${orientacoesAbertas.length} orientação(ões) em aberto`
+            `Desativou aluno: ra=${ra}; nome=${aluno.nome} e ${orientacoesAbertas.length} orientação(ões) em aberto`,
           );
         } else {
           criarRegistro(
             idUsuario,
-            `Desativou aluno: ra=${ra}; nome=${aluno.nome}`
+            `Desativou aluno: ra=${ra}; nome=${aluno.nome}`,
           );
         }
       } else {
         criarRegistro(
           idUsuario,
-          `Desativou aluno: ra=${ra}; nome=${aluno.nome}`
+          `Desativou aluno: ra=${ra}; nome=${aluno.nome}`,
         );
       }
 
@@ -655,12 +675,10 @@ export default class AlunoService {
 
       criarRegistro(
         idUsuario,
-        `Resetou senha de aluno: ra=${aluno.ra}; nome=${aluno.nome}`
+        `Resetou senha de aluno: ra=${aluno.ra}; nome=${aluno.nome}`,
       );
-      console.log("ID DE USUARIO:", idUsuario);
       return { erros: [], data: ["Senha resetada com sucesso"] };
-    } catch (e) {
-      console.log(e);
+    } catch {
       return {
         erros: ["Erro ao resetar senha"],
         data: [],
@@ -702,14 +720,20 @@ export default class AlunoService {
 
       let expires: number = parseInt(config.expires as string) || 1800;
 
-      const token: string = jwt.sign({ aluno }, config.secret as string, {
-        expiresIn: expires,
-      });
+      const token: string = jwt.sign(
+        {
+          aluno: { id: aluno.id },
+        },
+        config.secret as string,
+        {
+          expiresIn: expires,
+          subject: String(aluno.id),
+        },
+      );
 
       criarRegistro(idUsuario, `Login de aluno: ra=${ra}; nome=${aluno.nome}`);
       return { erros: [], data: { aluno, token } };
-    } catch (e) {
-      console.log(e);
+    } catch {
       return {
         erros: ["Erro ao fazer login"],
         data: null,

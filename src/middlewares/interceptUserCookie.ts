@@ -1,15 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import UsuarioRequest from "../types/usuarioRequest.js";
 import config from "../config/config.js";
 import codes from "../types/responseCodes.js";
-import IUsuario from "../types/userInterface.js";
 import UsuarioService from "../services/usuarioService.js";
+
+type UserTokenPayload = jwt.JwtPayload & {
+  usuario?: {
+    id?: number;
+  };
+  sub?: string;
+};
 
 export async function interceptUserCookie(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const token = req.cookies["authToken"];
 
@@ -20,21 +25,31 @@ export async function interceptUserCookie(
   } else {
     if (token) {
       try {
-        const decoded = jwt.verify(token, config.secret as string) as {
-          usuario: IUsuario;
-        };
-        const estaAtivo = await UsuarioService.verificaAtivo(
-          decoded.usuario.id,
-          decoded.usuario.nome,
-          decoded.usuario.login
-        );
-        if (!estaAtivo) {
+        const decoded = jwt.verify(
+          token,
+          config.secret as string,
+        ) as UserTokenPayload;
+        const userId = decoded.usuario?.id ?? Number(decoded.sub);
+
+        if (!userId || Number.isNaN(userId)) {
           res
             .status(codes.UNAUTHORIZED)
-            .json({ erros: ["Usuário inativo"], data: null });
+            .json({ erros: ["Token inválido"], data: null });
           return;
         }
-        const usuario = decoded.usuario;
+
+        const usuario =
+          await UsuarioService.getAuthenticatedUsuarioById(userId);
+
+        if (!usuario) {
+          res
+            .status(codes.UNAUTHORIZED)
+            .json({
+              erros: ["Usuário inativo ou sem permissão válida"],
+              data: null,
+            });
+          return;
+        }
 
         if (req.body == null || req.body == undefined) {
           req.body = {};

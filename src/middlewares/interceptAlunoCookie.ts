@@ -2,13 +2,19 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 import codes from "../types/responseCodes.js";
-import IAluno from "../types/alunoInterface.js";
 import AlunoService from "../services/alunoService.js";
+
+type AlunoTokenPayload = jwt.JwtPayload & {
+  aluno?: {
+    id?: number;
+  };
+  sub?: string;
+};
 
 export async function interceptAlunoCookie(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const token = req.cookies["authToken"];
 
@@ -19,22 +25,27 @@ export async function interceptAlunoCookie(
   } else {
     if (token) {
       try {
-        const decoded = jwt.verify(token, config.secret as string) as {
-          aluno: IAluno;
-        };
-        const estaAtivo = await AlunoService.verificaAtivo(
-          decoded.aluno.id,
-          decoded.aluno.nome,
-          decoded.aluno.ra
-        );
-        if (!estaAtivo) {
+        const decoded = jwt.verify(
+          token,
+          config.secret as string,
+        ) as AlunoTokenPayload;
+        const alunoId = decoded.aluno?.id ?? Number(decoded.sub);
+
+        if (!alunoId || Number.isNaN(alunoId)) {
+          res
+            .status(codes.UNAUTHORIZED)
+            .json({ erros: ["Token inválido"], data: null });
+          return;
+        }
+
+        const aluno = await AlunoService.getAuthenticatedAlunoById(alunoId);
+
+        if (!aluno) {
           res
             .status(codes.UNAUTHORIZED)
             .json({ erros: ["Aluno inativo"], data: null });
           return;
         }
-
-        const aluno = decoded.aluno;
 
         if (req.body == null || req.body == undefined) {
           req.body = {};

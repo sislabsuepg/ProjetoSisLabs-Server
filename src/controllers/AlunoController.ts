@@ -1,6 +1,7 @@
 import AlunoService from "../services/alunoService.js";
 import { Request, Response } from "express";
 import codes from "../types/responseCodes.js";
+import config from "../config/config.js";
 
 class AlunoController {
   async index(req: Request, res: Response) {
@@ -10,7 +11,7 @@ class AlunoController {
       const { erros, data } = await AlunoService.getAllAlunos(
         Number.parseInt(page as string),
         Number.parseInt(items as string),
-        ativo === undefined ? undefined : ativado
+        ativo === undefined ? undefined : ativado,
       );
       if ((Array.isArray(erros) ? erros.length : 0) > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -23,7 +24,7 @@ class AlunoController {
         ra === undefined ? undefined : String(ra),
         ativo === undefined ? undefined : ativado,
         Number.parseInt(page as string),
-        Number.parseInt(items as string)
+        Number.parseInt(items as string),
       );
       if ((Array.isArray(erros) ? erros.length : 0) > 0) {
         res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -53,7 +54,7 @@ class AlunoController {
       email,
       senha,
       idCurso,
-      req.body.idUsuario
+      req.body.idUsuario,
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -72,7 +73,7 @@ class AlunoController {
       anoCurso,
       email,
       ativo,
-      req.body.idUsuario
+      req.body.idUsuario,
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
@@ -85,7 +86,7 @@ class AlunoController {
     const { id } = req.params;
     const { erros, data } = await AlunoService.deleteAluno(
       id,
-      req.body.idUsuario
+      req.body.idUsuario,
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
@@ -109,9 +110,8 @@ class AlunoController {
     const { erros, data } = await AlunoService.loginAluno(
       login,
       senha,
-      req.body.idUsuario
+      req.body.idUsuario,
     );
-    console.log(req.body);
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
     } else {
@@ -119,6 +119,7 @@ class AlunoController {
         res.cookie("authToken", data.token, {
           httpOnly: true,
           sameSite: "strict",
+          secure: config.nodeEnv === "production",
           path: "/",
           expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 horas
         });
@@ -135,7 +136,7 @@ class AlunoController {
     const { erros, data } = await AlunoService.loginAluno(
       login,
       senha,
-      req.body.idUsuario
+      req.body.idUsuario,
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
@@ -151,7 +152,7 @@ class AlunoController {
   async buscaLaboratoriosDisponiveis(req: Request, res: Response) {
     const { idAluno } = req.params;
     const { erros, data } = await AlunoService.buscaLaboratoriosDisponiveis(
-      Number(idAluno)
+      Number(idAluno),
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });
@@ -162,11 +163,23 @@ class AlunoController {
 
   async updateProfile(req: Request, res: Response) {
     const { idAluno } = req.params;
+    const alunoAutenticado = req.body?.aluno;
+
+    if (!alunoAutenticado || alunoAutenticado.id !== Number(idAluno)) {
+      res
+        .status(codes.FORBIDDEN)
+        .json({
+          erros: ["Você só pode alterar o seu próprio perfil"],
+          data: null,
+        });
+      return;
+    }
+
     const { telefone, email } = req.body;
     const { erros, data } = await AlunoService.updateProfile(
       Number(idAluno),
       telefone,
-      email
+      email,
     );
 
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
@@ -178,10 +191,22 @@ class AlunoController {
 
   async updatePassword(req: Request, res: Response) {
     const { idAluno } = req.params;
+    const alunoAutenticado = req.body?.aluno;
+
+    if (!alunoAutenticado || alunoAutenticado.id !== Number(idAluno)) {
+      res
+        .status(codes.FORBIDDEN)
+        .json({
+          erros: ["Você só pode alterar a sua própria senha"],
+          data: null,
+        });
+      return;
+    }
+
     const { novaSenha } = req.body;
     const { erros, data } = await AlunoService.updateSenhaAluno(
       Number(idAluno),
-      novaSenha
+      novaSenha,
     );
     if ((Array.isArray(erros) ? erros.length : 0) > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data: null });

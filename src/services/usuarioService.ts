@@ -70,7 +70,7 @@ export default class UsuarioService {
     offset?: number,
     limit?: number,
     ativo?: boolean,
-    nome?: string
+    nome?: string,
   ) {
     try {
       const { rows: usuarios, count: total } = await Usuario.findAndCountAll({
@@ -148,7 +148,7 @@ export default class UsuarioService {
     senha: string,
     nome: string,
     idPermissao: number,
-    idUsuario?: number
+    idUsuario?: number,
   ) {
     if (!idPermissao || !senha || !login || !nome) {
       return {
@@ -194,7 +194,7 @@ export default class UsuarioService {
       // auditoria
       await criarRegistro(
         idUsuario,
-        `Criou usuário: login=${login}; nome=${nome}`
+        `Criou usuário: login=${login}; nome=${nome}`,
       );
       return {
         erros: [],
@@ -220,7 +220,7 @@ export default class UsuarioService {
     nome?: string,
     ativo?: boolean,
     idPermissao?: number,
-    idUsuario?: number
+    idUsuario?: number,
   ) {
     try {
       const usuario = await Usuario.findByPk(id, {
@@ -252,7 +252,9 @@ export default class UsuarioService {
       // Tentando desativar o último admin geral
       if (isAdminGeral && ativo === false && totalAdminsGerais <= 1) {
         return {
-          erros: ["Não é possível desativar o último administrador geral ativo do sistema. Crie outro administrador geral antes."],
+          erros: [
+            "Não é possível desativar o último administrador geral ativo do sistema. Crie outro administrador geral antes.",
+          ],
           data: null,
         };
       }
@@ -262,7 +264,9 @@ export default class UsuarioService {
         const novaPermissao = await PermissaoUsuario.findByPk(idPermissao);
         if (novaPermissao && !novaPermissao.geral) {
           return {
-            erros: ["Não é possível alterar a permissão do último administrador geral ativo. Crie outro administrador geral antes."],
+            erros: [
+              "Não é possível alterar a permissão do último administrador geral ativo. Crie outro administrador geral antes.",
+            ],
             data: null,
           };
         }
@@ -272,7 +276,9 @@ export default class UsuarioService {
       if (ativo === true && !usuario.ativo) {
         if (!usuario.permissaoUsuario.ativo) {
           return {
-            erros: ["Não é possível reativar o usuário pois a permissão está inativa. Reative a permissão primeiro."],
+            erros: [
+              "Não é possível reativar o usuário pois a permissão está inativa. Reative a permissão primeiro.",
+            ],
             data: null,
           };
         }
@@ -303,7 +309,7 @@ export default class UsuarioService {
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Atualizou usuário: login=${usuario.login}; nome=${usuario.nome}; ativo=${usuario.ativo}`
+        `Atualizou usuário: login=${usuario.login}; nome=${usuario.nome}; ativo=${usuario.ativo}`,
       );
       return { erros: [], data: usuario };
     } catch (e) {
@@ -335,7 +341,9 @@ export default class UsuarioService {
         const totalAdminsGerais = await this.countAdminsGeraisAtivos();
         if (totalAdminsGerais <= 1) {
           return {
-            erros: ["Não é possível desativar o último administrador geral ativo do sistema. Crie outro administrador geral antes."],
+            erros: [
+              "Não é possível desativar o último administrador geral ativo do sistema. Crie outro administrador geral antes.",
+            ],
             data: null,
           };
         }
@@ -345,7 +353,7 @@ export default class UsuarioService {
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Desativou usuário: login=${usuario.login}; nome=${usuario.nome}`
+        `Desativou usuário: login=${usuario.login}; nome=${usuario.nome}`,
       );
       return { erros: [], data: null };
     } catch (e) {
@@ -360,7 +368,7 @@ export default class UsuarioService {
   static async updateSenhaUsuario(
     id: number,
     novaSenha: string,
-    idUsuario?: number
+    idUsuario?: number,
   ) {
     try {
       const usuario = await Usuario.findByPk(id);
@@ -374,11 +382,10 @@ export default class UsuarioService {
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Atualizou senha de usuário: login=${usuario.login}`
+        `Atualizou senha de usuário: login=${usuario.login}`,
       );
       return { erros: [], data: usuario };
     } catch (e) {
-      console.log(e);
       return {
         erros: ["Erro ao atualizar senha"],
         data: null,
@@ -416,20 +423,45 @@ export default class UsuarioService {
 
       let expires = parseInt(config.expires as string) || 3600;
 
-      const token: string = jwt.sign({ usuario }, config.secret as string, {
-        expiresIn: expires,
-      });
+      const token: string = jwt.sign(
+        {
+          usuario: { id: usuario.id },
+        },
+        config.secret as string,
+        {
+          expiresIn: expires,
+          subject: String(usuario.id),
+        },
+      );
       await criarRegistro(
         idUsuario,
-        `Login de usuário: login=${login}; nome=${usuario.nome}`
+        `Login de usuário: login=${login}; nome=${usuario.nome}`,
       );
       return { erros: [], data: { usuario, token } };
     } catch (e) {
-      console.log(e);
       return {
         erros: ["Erro ao realizar login"],
         data: null,
       };
+    }
+  }
+
+  static async getAuthenticatedUsuarioById(id: number) {
+    try {
+      const usuario = await Usuario.findByPk(id, {
+        attributes: ["id", "nome", "login", "ativo", "idPermissao"],
+        include: {
+          model: PermissaoUsuario,
+        },
+      });
+
+      if (!usuario || !usuario.ativo || !usuario.permissaoUsuario?.ativo) {
+        return null;
+      }
+
+      return usuario;
+    } catch {
+      return null;
     }
   }
 
@@ -452,24 +484,41 @@ export default class UsuarioService {
     }
   }
 
-  static async resetSenhaUsuario(id: number, idUsuario?: number) {
+  static async resetSenhaUsuario(
+    id: number,
+    idUsuario?: number,
+    solicitanteEhGeral?: boolean,
+  ) {
     try {
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Usuario.findByPk(id, {
+        include: {
+          model: PermissaoUsuario,
+        },
+      });
       if (!usuario) {
         return {
           erros: ["Usuário não encontrado"],
           data: null,
         };
       }
+
+      if (usuario.permissaoUsuario?.geral && !solicitanteEhGeral) {
+        return {
+          erros: [
+            "Apenas um usuário com permissão geral pode resetar a senha de outro usuário com permissão geral",
+          ],
+          data: null,
+        };
+      }
+
       usuario.senha = md5("123456");
       await usuario.save();
       await criarRegistro(
         idUsuario,
-        `Resetou senha de usuário: login=${usuario.login}`
+        `Resetou senha de usuário: login=${usuario.login}`,
       );
       return { erros: [], data: usuario };
-    } catch (error) {
-      console.log(error);
+    } catch {
       return {
         erros: ["Erro ao resetar senha"],
         data: null,
@@ -485,8 +534,7 @@ export default class UsuarioService {
         },
       });
       return count;
-    } catch (error) {
-      console.log(error);
+    } catch {
       return 0;
     }
   }

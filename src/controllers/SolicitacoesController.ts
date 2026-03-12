@@ -4,10 +4,19 @@ import codes from "../types/responseCodes.js";
 
 class SolicitacoesController {
   async criarSolicitacao(req: Request, res: Response) {
-    const { idAluno, idLaboratorio } = req.body;
+    const { idLaboratorio } = req.body;
+    const idAluno = req.body?.aluno?.id;
+
+    if (!idAluno) {
+      res
+        .status(codes.UNAUTHORIZED)
+        .json({ erros: ["Aluno não autenticado"], data: null });
+      return;
+    }
+
     const { erros, data } = await SolicitacoesService.solicitarLaboratorio(
       idAluno,
-      idLaboratorio
+      idLaboratorio,
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -20,7 +29,7 @@ class SolicitacoesController {
     const { id, aceita } = req.body;
     const { erros, data } = await SolicitacoesService.responderSolicitacao(
       id,
-      aceita
+      aceita,
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
