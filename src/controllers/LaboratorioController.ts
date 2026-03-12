@@ -1,6 +1,27 @@
 import laboratorioService from "../services/laboratorioService.js";
 import { Request, Response } from "express";
 import codes from "../types/responseCodes.js";
+
+const parseBooleanFlag = (value: unknown): boolean | undefined => {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+  if (typeof value === "string") {
+    const normalizedValue = value.trim().toLowerCase();
+    if (["true", "1", "yes"].includes(normalizedValue)) {
+      return true;
+    }
+    if (["false", "0", "no"].includes(normalizedValue)) {
+      return false;
+    }
+  }
+
+  return undefined;
+};
+
 class LaboratorioController {
   async index(req: Request, res: Response) {
     const { restrito, page, items, ativo, nome } = req.query;
@@ -45,16 +66,7 @@ class LaboratorioController {
 
   async create(req: Request, res: Response) {
     const { numero, nome, restrito, gerarHorarios } = req.body;
-    // Aceita gerarHorarios como string "true"/"false", boolean, 1/0
-    const gerarFlag = ((): boolean => {
-      if (typeof gerarHorarios === "boolean") return gerarHorarios;
-      if (typeof gerarHorarios === "number") return gerarHorarios === 1;
-      if (typeof gerarHorarios === "string") {
-        const val = gerarHorarios.trim().toLowerCase();
-        return val === "true" || val === "1" || val === "yes";
-      }
-      return false;
-    })();
+    const gerarFlag = parseBooleanFlag(gerarHorarios) ?? false;
     const { erros, data } = await laboratorioService.createLaboratorio(
       numero,
       nome,
@@ -71,13 +83,17 @@ class LaboratorioController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { numero, nome, restrito, ativo } = req.body;
+    const { numero, nome, restrito, ativo, temHorarios, gerarHorarios } =
+      req.body;
+    const temHorariosFlag =
+      parseBooleanFlag(temHorarios) ?? parseBooleanFlag(gerarHorarios);
     const { erros, data } = await laboratorioService.updateLaboratorio(
       Number(id),
       numero,
       nome,
       restrito,
       ativo,
+      temHorariosFlag,
       req.body.idUsuario
     );
     if (erros.length > 0) {

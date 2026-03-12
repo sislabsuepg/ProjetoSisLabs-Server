@@ -1,9 +1,31 @@
 import Laboratorio from "../models/Laboratorio.js";
+import Horario from "../models/Horario.js";
 import Orientacao from "../models/Orientacao.js";
 import horarioCreatorHelper from "../utils/horarioCreatorHelper.js";
 import { Op } from "sequelize";
 import { getPaginationParams } from "../types/pagination.js";
 import { criarRegistro } from "../utils/registroLogger.js";
+
+type LaboratorioComHorariosFlag = Laboratorio & {
+  dataValues: Laboratorio["dataValues"] & {
+    temHorarios: boolean;
+  };
+};
+
+const appendTemHorarios = async (
+  laboratorio: Laboratorio
+): Promise<LaboratorioComHorariosFlag> => {
+  const horariosCount = await Horario.count({
+    where: { idLaboratorio: laboratorio.id },
+  });
+
+  const laboratorioComHorarios = laboratorio as LaboratorioComHorariosFlag;
+  laboratorioComHorarios.dataValues.temHorarios = horariosCount > 0;
+  return laboratorioComHorarios;
+};
+
+const appendTemHorariosList = async (laboratorios: Laboratorio[]) =>
+  Promise.all(laboratorios.map((laboratorio) => appendTemHorarios(laboratorio)));
 
 export default class laboratorioService {
   static verificaNumero(numero: string): string[] {
@@ -61,16 +83,17 @@ export default class laboratorioService {
           data: null,
         };
       } else {
+        const laboratoriosComHorarios = await appendTemHorariosList(laboratorios);
         if (nome) {
           return {
             erros: [],
-            data: { laboratorios, total },
+            data: { laboratorios: laboratoriosComHorarios, total },
           };
         } else {
         }
         return {
           erros: [],
-          data: laboratorios,
+          data: laboratoriosComHorarios,
         };
       }
     } catch (error) {
@@ -90,9 +113,10 @@ export default class laboratorioService {
           data: null,
         };
       }
+      const laboratorioComHorarios = await appendTemHorarios(laboratorio);
       return {
         erros: [],
-        data: laboratorio,
+        data: laboratorioComHorarios,
       };
     } catch (e) {
       console.log(e);
@@ -164,6 +188,7 @@ export default class laboratorioService {
     nome?: string,
     restrito?: boolean,
     ativo?: boolean,
+    temHorarios?: boolean,
     idUsuario?: number
   ) {
     try {
@@ -174,7 +199,13 @@ export default class laboratorioService {
           data: null,
         };
       }
-      if (!numero && !nome && restrito === undefined && ativo === undefined) {
+      if (
+        !numero &&
+        !nome &&
+        restrito === undefined &&
+        ativo === undefined &&
+        temHorarios === undefined
+      ) {
         return {
           erros: ["Nenhum dado para atualizar"],
           data: null,
@@ -196,11 +227,32 @@ export default class laboratorioService {
         restrito == undefined ? laboratorio.restrito : restrito;
       laboratorio.ativo = ativo === undefined ? laboratorio.ativo : ativo;
       await laboratorio.save();
+
+      let horariosCount = await Horario.count({
+        where: { idLaboratorio: laboratorio.id },
+      });
+
+      if (temHorarios === true && horariosCount === 0) {
+        await horarioCreatorHelper(laboratorio.id);
+        horariosCount = await Horario.count({
+          where: { idLaboratorio: laboratorio.id },
+        });
+      }
+
+      if (temHorarios === false && horariosCount > 0) {
+        await Horario.destroy({
+          where: { idLaboratorio: laboratorio.id },
+        });
+        horariosCount = 0;
+      }
+
+      const laboratorioComHorarios = laboratorio as LaboratorioComHorariosFlag;
+      laboratorioComHorarios.dataValues.temHorarios = horariosCount > 0;
       await criarRegistro(
         idUsuario,
-        `Atualizou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}; ativo=${laboratorio.ativo}`
+        `Atualizou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}; ativo=${laboratorio.ativo}; temHorarios=${horariosCount > 0}`
       );
-      return { erros: [], data: laboratorio };
+      return { erros: [], data: laboratorioComHorarios };
     } catch (error) {
       console.log(error);
       return {
