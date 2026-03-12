@@ -6,11 +6,26 @@ import lockPath from "../middlewares/lockPath.js";
 
 const router: Router = Router();
 
-router.get("/", interceptUserCookie, UsuarioController.index);
+router.get(
+  "/",
+  interceptUserCookie,
+  lockPath("geral"),
+  UsuarioController.index,
+);
 
-router.get("/count", interceptUserCookie, UsuarioController.count);
+router.get(
+  "/count",
+  interceptUserCookie,
+  lockPath("geral"),
+  UsuarioController.count,
+);
 
-router.get("/:id", interceptUserCookie, UsuarioController.show);
+router.get(
+  "/:id",
+  interceptUserCookie,
+  lockPath("geral"),
+  UsuarioController.show,
+);
 
 router.put("/senha/:id", interceptUserCookie, UsuarioController.updateSenha);
 
