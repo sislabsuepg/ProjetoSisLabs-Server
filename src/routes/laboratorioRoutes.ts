@@ -9,8 +9,8 @@ router.get("/", LaboratorioController.index);
 router.get("/count", LaboratorioController.count);
 
 router.get("/:id", LaboratorioController.show);
-router.post("/", lockPath("cadastro"), LaboratorioController.create);
-router.put("/:id", lockPath("alteracao"), LaboratorioController.update);
-router.delete("/:id", lockPath("alteracao"), LaboratorioController.destroy);
+router.post("/", lockPath("geral"), LaboratorioController.create);
+router.put("/:id", lockPath("geral"), LaboratorioController.update);
+router.delete("/:id", lockPath("geral"), LaboratorioController.destroy);
 
 export default router;

@@ -18,28 +18,28 @@ router.post(
   "/resetarsenha/:id",
   interceptUserCookie,
   lockPath("geral"),
-  UsuarioController.resetSenha
+  UsuarioController.resetSenha,
 );
 
 router.post(
   "/",
   interceptUserCookie,
-  lockPath("cadastro"),
-  UsuarioController.store
+  lockPath("geral"),
+  UsuarioController.store,
 );
 
 router.put(
   "/:id",
   interceptUserCookie,
-  lockPath("alteracao"),
-  UsuarioController.update
+  lockPath("geral"),
+  UsuarioController.update,
 );
 
 router.delete(
   "/:id",
   interceptUserCookie,
-  lockPath("alteracao"),
-  UsuarioController.destroy
+  lockPath("geral"),
+  UsuarioController.destroy,
 );
 
 router.post("/login", UsuarioController.login);

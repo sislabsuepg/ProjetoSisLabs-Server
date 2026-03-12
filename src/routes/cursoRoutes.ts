@@ -11,10 +11,10 @@ router.get("/count", CursoController.count);
 
 router.get("/:id", CursoController.show);
 
-router.post("/", lockPath("alteracao"), CursoController.store);
+router.post("/", lockPath("geral"), CursoController.store);
 
-router.put("/:id", lockPath("alteracao"), CursoController.update);
+router.put("/:id", lockPath("geral"), CursoController.update);
 
-router.delete("/:id", lockPath("alteracao"), CursoController.destroy);
+router.delete("/:id", lockPath("geral"), CursoController.destroy);
 
 export default router;
