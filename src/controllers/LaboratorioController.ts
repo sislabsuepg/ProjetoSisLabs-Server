@@ -43,7 +43,7 @@ class LaboratorioController {
       Number(page),
       Number(items),
       nome === undefined ? undefined : String(nome),
-      ativo === undefined ? undefined : ativado
+      ativo === undefined ? undefined : ativado,
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -55,7 +55,7 @@ class LaboratorioController {
   async show(req: Request, res: Response) {
     const { id } = req.params;
     const { erros, data } = await laboratorioService.getLaboratorioById(
-      Number(id)
+      Number(id),
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -72,7 +72,7 @@ class LaboratorioController {
       nome,
       restrito,
       gerarFlag,
-      req.body.idUsuario
+      req.body.idUsuario,
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -94,7 +94,7 @@ class LaboratorioController {
       restrito,
       ativo,
       temHorariosFlag,
-      req.body.idUsuario
+      req.body.idUsuario,
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });
@@ -107,7 +107,7 @@ class LaboratorioController {
     const { id } = req.params;
     const { erros, data } = await laboratorioService.deleteLaboratorio(
       Number(id),
-      req.body.idUsuario
+      req.body.idUsuario,
     );
     if (erros.length > 0) {
       res.status(codes.BAD_REQUEST).json({ erros, data });

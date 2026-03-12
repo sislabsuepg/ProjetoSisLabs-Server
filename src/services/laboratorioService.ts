@@ -13,7 +13,7 @@ type LaboratorioComHorariosFlag = Laboratorio & {
 };
 
 const appendTemHorarios = async (
-  laboratorio: Laboratorio
+  laboratorio: Laboratorio,
 ): Promise<LaboratorioComHorariosFlag> => {
   const horariosCount = await Horario.count({
     where: { idLaboratorio: laboratorio.id },
@@ -25,7 +25,9 @@ const appendTemHorarios = async (
 };
 
 const appendTemHorariosList = async (laboratorios: Laboratorio[]) =>
-  Promise.all(laboratorios.map((laboratorio) => appendTemHorarios(laboratorio)));
+  Promise.all(
+    laboratorios.map((laboratorio) => appendTemHorarios(laboratorio)),
+  );
 
 export default class laboratorioService {
   static verificaNumero(numero: string): string[] {
@@ -53,7 +55,7 @@ export default class laboratorioService {
     // Permitir letras (com acentos), números, espaços e hífens (inclui -, – e —)
     if (!/^[a-zA-Z\u00C0-\u00FF0-9 \-\u2013\u2014]+$/.test(nome)) {
       erros.push(
-        "O nome deve conter apenas letras, números, espaços e hífens."
+        "O nome deve conter apenas letras, números, espaços e hífens.",
       );
     }
     return erros;
@@ -64,7 +66,7 @@ export default class laboratorioService {
     offset?: number,
     limit?: number,
     nome?: string,
-    ativo?: boolean
+    ativo?: boolean,
   ) {
     try {
       const { rows: laboratorios, count: total } =
@@ -83,7 +85,8 @@ export default class laboratorioService {
           data: null,
         };
       } else {
-        const laboratoriosComHorarios = await appendTemHorariosList(laboratorios);
+        const laboratoriosComHorarios =
+          await appendTemHorariosList(laboratorios);
         if (nome) {
           return {
             erros: [],
@@ -132,7 +135,7 @@ export default class laboratorioService {
     nome: string,
     restrito?: boolean,
     gerarHorarios?: boolean,
-    idUsuario?: number
+    idUsuario?: number,
   ) {
     try {
       const erros = [
@@ -171,7 +174,7 @@ export default class laboratorioService {
       }
       await criarRegistro(
         idUsuario,
-        `Criou laboratório: numero=${numero}; nome=${nome}; restrito=${laboratorio.restrito}`
+        `Criou laboratório: numero=${numero}; nome=${nome}; restrito=${laboratorio.restrito}`,
       );
       return { erros: [], data: { laboratorio, horarios } };
     } catch (error) {
@@ -189,7 +192,7 @@ export default class laboratorioService {
     restrito?: boolean,
     ativo?: boolean,
     temHorarios?: boolean,
-    idUsuario?: number
+    idUsuario?: number,
   ) {
     try {
       const laboratorio = await Laboratorio.findByPk(id);
@@ -250,7 +253,7 @@ export default class laboratorioService {
       laboratorioComHorarios.dataValues.temHorarios = horariosCount > 0;
       await criarRegistro(
         idUsuario,
-        `Atualizou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}; ativo=${laboratorio.ativo}; temHorarios=${horariosCount > 0}`
+        `Atualizou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}; ativo=${laboratorio.ativo}; temHorarios=${horariosCount > 0}`,
       );
       return { erros: [], data: laboratorioComHorarios };
     } catch (error) {
@@ -281,7 +284,7 @@ export default class laboratorioService {
       if (laboratorio.orientacoes && laboratorio.orientacoes.length > 0) {
         const hoje = new Date();
         const orientacoesAbertas = laboratorio.orientacoes.filter(
-          (orientacao) => orientacao.dataFim > hoje
+          (orientacao) => orientacao.dataFim > hoje,
         );
 
         for (const orientacao of orientacoesAbertas) {
@@ -296,18 +299,18 @@ export default class laboratorioService {
         if (orientacoesAbertas.length > 0) {
           await criarRegistro(
             idUsuario,
-            `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome} e ${orientacoesAbertas.length} orientação(ões) ativa(s)`
+            `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome} e ${orientacoesAbertas.length} orientação(ões) ativa(s)`,
           );
         } else {
           await criarRegistro(
             idUsuario,
-            `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`
+            `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`,
           );
         }
       } else {
         await criarRegistro(
           idUsuario,
-          `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`
+          `Desativou laboratório: numero=${laboratorio.numero}; nome=${laboratorio.nome}`,
         );
       }
 
