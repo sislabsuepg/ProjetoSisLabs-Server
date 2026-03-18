@@ -756,7 +756,7 @@ export default class AlunoService {
       const emprestimos = await Emprestimo.findAll({
         where: {
           idAluno: idAluno,
-          advertencia: { [Op.ne]: null },
+          advertencia: { [Op.ne]: false },
           dataHoraEntrada: { [Op.gte]: mesAnterior },
         },
         attributes: ["id", "advertencia"],
