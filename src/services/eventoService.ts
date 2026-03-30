@@ -11,10 +11,10 @@ export default class EventoService {
     } else if (Number.isNaN(new Date(data).getTime())) {
       erros.push("Data do evento é inválida");
     } else {
-      const inicioHoje = new Date();
-      inicioHoje.setHours(0, 0, 0, 0);
+      const dataUtc = new Date(data).toISOString().slice(0, 10);
+      const hojeUtc = new Date().toISOString().slice(0, 10);
 
-      if (new Date(data) < inicioHoje) {
+      if (dataUtc < hojeUtc) {
         erros.push("Data do evento não pode ser no passado");
       }
     }
@@ -54,7 +54,7 @@ export default class EventoService {
   static async getAllEventos(offset?: number, limit?: number) {
     try {
       const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0); // Define para o início do dia
+      hoje.setUTCHours(0, 0, 0, 0); // Define para o início do dia em UTC
       const eventos = await Evento.findAll({
         include: [
           {
