@@ -8,8 +8,15 @@ export default class EventoService {
     const erros: string[] = [];
     if (!data) {
       erros.push("Data do evento é obrigatória");
-    } else if (data <= new Date()) {
-      erros.push("Data do evento não pode ser no passado");
+    } else if (Number.isNaN(new Date(data).getTime())) {
+      erros.push("Data do evento é inválida");
+    } else {
+      const inicioHoje = new Date();
+      inicioHoje.setHours(0, 0, 0, 0);
+
+      if (new Date(data) < inicioHoje) {
+        erros.push("Data do evento não pode ser no passado");
+      }
     }
     return erros;
   }
@@ -136,13 +143,6 @@ export default class EventoService {
       if (!laboratorio) {
         return {
           erros: ["Laboratório não encontrado"],
-          data: null,
-        };
-      }
-
-      if (new Date(data) < new Date()) {
-        return {
-          erros: ["Data do evento não pode ser no passado"],
           data: null,
         };
       }

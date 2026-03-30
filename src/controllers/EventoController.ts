@@ -1,6 +1,26 @@
 import EventoService from "../services/eventoService.js";
 import { Request, Response } from "express";
 import codes from "../types/responseCodes.js";
+
+function parseDataEvento(dataEvento: unknown): Date | undefined {
+  if (dataEvento === undefined || dataEvento === null || dataEvento === "") {
+    return undefined;
+  }
+
+  if (typeof dataEvento === "string") {
+    const valor = dataEvento.trim();
+    const matchDataSomente = valor.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (matchDataSomente) {
+      const ano = Number(matchDataSomente[1]);
+      const mes = Number(matchDataSomente[2]) - 1;
+      const dia = Number(matchDataSomente[3]);
+      return new Date(ano, mes, dia, 12, 0, 0, 0);
+    }
+  }
+
+  return new Date(dataEvento as string | number | Date);
+}
+
 class EventoController {
   async index(req: Request, res: Response) {
     const { page, items } = req.query;
@@ -29,7 +49,7 @@ class EventoController {
     const { nome, dataEvento, duracao, responsavel, idLaboratorio } = req.body;
     const { erros, data } = await EventoService.createEvento(
       nome,
-      new Date(dataEvento),
+      parseDataEvento(dataEvento) as Date,
       duracao,
       responsavel,
       idLaboratorio,
@@ -48,7 +68,7 @@ class EventoController {
     const { erros, data } = await EventoService.updateEvento(
       Number(id),
       nome,
-      new Date(dataEvento),
+      parseDataEvento(dataEvento),
       duracao,
       responsavel,
       idLaboratorio,
