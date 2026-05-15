@@ -743,8 +743,8 @@ export default class AlunoService {
 
   static async buscaAdvertencias(idAluno: string) {
     try {
-      const mesAnterior = new Date();
-      mesAnterior.setMonth(mesAnterior.getMonth() - 1);
+      const mesesAnteriores = new Date();
+      mesesAnteriores.setMonth(mesesAnteriores.getMonth() - 5);
 
       const aluno = await Aluno.findByPk(idAluno);
       if (!aluno) {
@@ -757,7 +757,7 @@ export default class AlunoService {
         where: {
           idAluno: idAluno,
           advertencia: { [Op.ne]: false },
-          dataHoraEntrada: { [Op.gte]: mesAnterior },
+          dataHoraEntrada: { [Op.gte]: mesesAnteriores },
         },
         attributes: ["id", "advertencia"],
       });
